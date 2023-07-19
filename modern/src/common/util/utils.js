@@ -1,14 +1,14 @@
-const getDevice = (deviceId) => {
-  const request = new XMLHttpRequest();
-  request.open('GET', `/api/devices/${deviceId}`, false);
-  request.send();
+// const getDevice = (deviceId) => {
+//   const request = new XMLHttpRequest();
+//   request.open('GET', `/api/devices/${deviceId}`, false);
+//   request.send();
 
-  if (request.status === 200) {
-    const data = JSON.parse(request.responseText);
-    return data;
-  }
-  return null;
-};
+//   if (request.status === 200) {
+//     const data = JSON.parse(request.responseText);
+//     return data;
+//   }
+//   return null;
+// };
 // const lastIndexOf = (array, key) => {
 //   // eslint-disable-next-line no-plusplus
 //   for (let i = array.length - 1; i >= 0; i--) {
@@ -269,7 +269,7 @@ export const attsGetter = (obj, attribute) => {
       return temperature;
     }
     case 'name':
-      return getDevice(obj.deviceId).name;
+      return window.device.name ?? '';
     case 'ignition': {
       const motion = attsGetter(obj, 'motion');
       const value = (obj.ignition ? obj.ignition : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : (obj.attributes[`attribute.${attribute}`] ? obj.attributes[`attribute.${attribute}`] : null)));

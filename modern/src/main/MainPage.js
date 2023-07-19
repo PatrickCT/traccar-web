@@ -140,6 +140,7 @@ const MainPage = () => {
 
   if (selectedPosition) {
     Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+    window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
     new Popup()
       .setMaxWidth('400px')
       .setHTML(createPopUp(selectedPosition))
@@ -161,6 +162,7 @@ const MainPage = () => {
       delete window.streetView;
       delete window.position;
       delete window.generateRoute;
+      delete window.device;
     };
   }, []);
 
