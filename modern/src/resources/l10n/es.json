@@ -580,5 +580,12 @@
     "sectionDialog": "Tramo",
     "minTime": "Tiempo minimo",
     "maxTime": "Tiempo maximo",
-    "punishment": "Castigo"
+    "punishment": "Castigo",
+    "laps": "Vuelta #",
+    "checker": "Checador",
+    "date": "Fecha",
+    "referencePoint": "Puntos de referencia",
+    "arrives": "Llegadas ",
+    "exits": " Salidas",
+    "changeExitTime": "Cambiar hora de salida"
 }
