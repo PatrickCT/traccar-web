@@ -3,6 +3,7 @@ import { React, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import makeStyles from '@mui/styles/makeStyles';
 import {
+  IconButton,
   ListItemText,
   ListItemButton,
 } from '@mui/material';
@@ -60,7 +61,7 @@ const DeviceRowTransporte = ({ data, index, style }) => {
   const geofences = useSelector((state) => state.geofences.items);
 
   const [isOpened, setIsOpen] = useState(false);
-  const [, setInfo] = useState({});
+  const [info, setInfo] = useState({});
 
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
   const deviceSecondary = useAttributePreference('deviceSecondary', '');
@@ -100,6 +101,7 @@ const DeviceRowTransporte = ({ data, index, style }) => {
   return (
     <div style={style}>
       <ListItemButton
+        style={isOpened ? { backgroundColor: '#cccccc' } : { backgroundColor: '#ffffff' }}
         key={item.id}
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
@@ -113,6 +115,12 @@ const DeviceRowTransporte = ({ data, index, style }) => {
           secondary={secondaryText()}
           secondaryTypographyProps={{ noWrap: true }}
         />
+
+        {Object.keys(info).length > 0 ? (
+          <IconButton size="small">
+            {`${t('laps')}${info.vueltas}`}
+          </IconButton>
+        ) : <div />}
       </ListItemButton>
       <Collapse isOpened={isOpened}>
         <div className="text" style={{ padding: '1rem' }}><TableExist deviceId={item.id} handleLoadInfo={handleLoadInfo} /></div>

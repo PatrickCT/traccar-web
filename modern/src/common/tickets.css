@@ -1,0 +1,66 @@
+.checador {
+    display: grid;
+    grid-gap: 0.35rem;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: dense;
+    padding: 0.35rem 0.35rem 0 0.35rem;
+}
+
+.headerExitst,
+.bodyExitst {
+    display: grid;
+    grid-gap: 0.35rem;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-auto-flow: dense;
+    padding: 0.35rem 0.35rem 0 0.35rem;
+}
+
+.checador>.columns {
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.checador>.columns>.nameChecker {
+    font-weight: 500 !important;
+    font-size: 15px;
+}
+
+.checador>.columns,
+.headerExitst>.columns,
+.bodyExitst>.columns {
+    padding: 0.15rem;
+}
+
+.checador>.col2 {
+    text-align: end;
+}
+
+.headerExitst>.columns {
+    font-weight: bold;
+    font-size: 12px !important;
+}
+
+.bodyExitst>.columns {
+    font-size: 15px;
+}
+
+.headerExitst>.headerCol1,
+.bodyExitst>.bodyCol1 {
+    grid-column: span 2;
+}
+
+.headerExitst>.headerCol2,
+.bodyExitst>.bodyCol2 {
+    grid-column: span 2;
+    text-align: end;
+}
+
+.headerExitst>.headerCol3,
+.bodyExitst>.bodyCol3 {
+    text-align: end;
+}
+
+.btn-change {
+    text-align: end;
+    padding-bottom: 0.5rem;
+}

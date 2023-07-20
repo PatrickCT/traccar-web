@@ -580,5 +580,12 @@
     "sectionDialog": "Section",
     "minTime": "Min. time",
     "maxTime": "Max time",
-    "punishment": "Punishment"
+    "punishment": "Punishment",
+    "laps": "Lap #",
+    "checker": "Cheker",
+    "date": "Date",
+    "referencePoint": "Reference point",
+    "arrives": "Arrives ",
+    "exits": " Exits ",
+    "changeExitTime": "Change exit time"
 }
