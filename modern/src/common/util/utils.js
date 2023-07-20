@@ -368,11 +368,11 @@ export const valueParser = (obj, value) => {
       return `<b style="font-weight: bold;text-transform: uppercase;">Velocidad:</b> ${attsGetter(obj, value)}<br>`;
     case 'address':
       return `<div id='pop-up-address'><b style='font-weight: bold;text-transform: uppercase;'>Dirección:</b> ${attsGetter(obj, 'address')}</div>`;
-    case 'attribute.fuel':
+    case 'fuel':
       return `<b style="font-weight: bold;text-transform: uppercase;">Combustible:</b> ${attsGetter(obj, value)}<br>`;
-    case 'attribute.hours':
+    case 'hours':
       return `<b style="font-weight: bold;text-transform: uppercase;">Horas:</b> ${attsGetter(obj, value)}<br>`;
-    case 'attribute.totalDistance':
+    case 'totalDistance':
       return `<b style="font-weight: bold;text-transform: uppercase;">Distancia total :</b> ${attsGetter(obj, value)}<br>`;
     case 'temperaturaC':
       return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ${attsGetter(obj, value)}<br>`;

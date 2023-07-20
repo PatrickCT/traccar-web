@@ -173,6 +173,7 @@ const MainToolbar = ({
           <AddIcon style={{ color: 'white' }} />
         </Tooltip>
       </IconButton>
+
     </Toolbar>
   );
 };
