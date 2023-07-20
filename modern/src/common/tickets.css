@@ -64,3 +64,17 @@
     text-align: end;
     padding-bottom: 0.5rem;
 }
+
+.btn-change>button {
+    background-color: #163b61;
+    border: #163b61;
+}
+
+.btn-change>button:enabled:hover {
+    background-color: #164161;
+    background: #164161;
+}
+
+.picker>div {
+    height: 3rem;
+}

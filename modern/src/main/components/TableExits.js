@@ -1,9 +1,16 @@
 import { React, useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { Moment } from 'react-moment';
 import moment from 'moment';
-import Button from '@mui/material/Button';
+import 'moment-timezone';
+import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import DropdownComponents from '../../common/components/DropdownComponent';
 import { useEffectAsync } from '../../reactHelper';
 import '../../common/tickets.css';
@@ -15,6 +22,10 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   const [, setInfo] = useState({});
   const [toDay, setDate] = useState(null);
   const [optionSelected, setOption] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const [conductores, setConductores] = useState([]);
+  const [tickets, setTickets] = useState([]);
+  const [hourSelected, setHour] = useState(dayjs('2022-04-17T15:30'));
 
   const user = useSelector((state) => state.session.user);
 
@@ -29,6 +40,14 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
       const information = await response.json();
       setInfo(information);
       handleLoadInfo(information);
+      setConductores((information.choferes ?? []).map((e) => {
+        setOption(e.id);
+        return ({
+          label: e.name,
+          value: e.id,
+        });
+      }));
+      setTickets((information.ticket ?? []));
     } else {
       throw Error(await response.text());
     }
@@ -38,26 +57,34 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
     setOption(value);
   };
 
-  const handleChangeHour = () => {};
+  const handleChangeTime = async () => {
+  };
+
+  const footerContent = (
+    <div>
+      <Button label="No" icon="pi pi-times" onClick={() => setVisible(false)} className="p-button-text" />
+      <Button
+        label="Yes"
+        icon="pi pi-check"
+        onClick={() => {
+          setVisible(false);
+          handleChangeTime();
+        }}
+        autoFocus
+      />
+    </div>
+  );
 
   return (
     <div>
       <div className="btn-change">
-        <Button size="small" onClick={handleChangeHour}>
-          {t('changeExitTime')}
-        </Button>
+        <Button label={t('changeExitTime')} icon="pi pi-external-link" onClick={() => setVisible(true)} />
       </div>
       <DropdownComponents
         setOption={handleSelectedOption}
         selectOption={optionSelected}
         label=""
-        options={[
-          { label: 'New York', value: 'NY' },
-          { label: 'Rome', value: 'RM' },
-          { label: 'London', value: 'LDN' },
-          { label: 'Istanbul', value: 'IST' },
-          { label: 'Paris', value: 'PRS' },
-        ]}
+        options={conductores}
       />
       <div className="checador">
         <div className="columns col1">
@@ -84,19 +111,33 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
           #
         </div>
       </div>
-
-      <div className="bodyExitst">
-        <div className="columns bodyCol1">
-          Nombre de punto
+      {tickets.map((ticket) => (
+        <div className="bodyExitst">
+          <div className="columns bodyCol1">
+            {`${t('geofence')} ${ticket.geofenceId}`}
+          </div>
+          <div className="columns bodyCol2">
+            {('enterTime' in ticket) && `${t('arrive')}: ${moment(ticket.enterTime).tz('America/Mexico_City').format('hh:mm:ss')}`}
+          </div>
+          <div className="columns bodyCol3">
+            { ('enterTime' in ticket) && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10)}
+          </div>
         </div>
-        <div className="columns bodyCol2">
-          12:00
-          /
-          12:10
-        </div>
-        <div className="columns bodyCol3">
-          #
-        </div>
+      ))}
+      <div className="card flex justify-content-center">
+        <Dialog header={t('changeExitTime')} visible={visible} style={{ width: '16.5vw' }} breakpoints={{ '960px': '75vw', '641px': '100vw', '1500px': '35vm', '1200px': '50vm' }} onHide={() => setVisible(false)} footer={footerContent}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer
+              components={[
+                'DesktopTimePicker',
+              ]}
+            >
+              <DemoItem label="">
+                <TimePicker value={hourSelected} onChange={(newHour) => setHour(newHour)} defaultValue="" className="picker" />
+              </DemoItem>
+            </DemoContainer>
+          </LocalizationProvider>
+        </Dialog>
       </div>
     </div>
   );
