@@ -28,6 +28,7 @@ import {
   generateRoute,
 } from '../common/util/mapPopup';
 import { map } from '../map/core/MapView';
+import './MainPage.css';
 
 const style = {
   position: 'absolute',
@@ -84,6 +85,12 @@ const useStyles = makeStyles((theme) => ({
     gridArea: '1 / 1',
     zIndex: 4,
   },
+  custompopup: {
+    background: '#06376A',
+    padding: '10px',
+    color: 'black',
+  },
+
 }));
 
 const MainPage = () => {
@@ -207,7 +214,7 @@ const MainPage = () => {
             style={devicesOpen ? {} : { visibility: 'hidden' }}
           >
             {user.attributes.hasOwnProperty('Transporte') &&
-            user.attributes.Transporte ? (<DeviceListTransport devices={filteredDevices} />) : (<DeviceList devices={filteredDevices} />)}
+              user.attributes.Transporte ? (<DeviceListTransport devices={filteredDevices} />) : (<DeviceList devices={filteredDevices} />)}
           </Paper>
         </div>
         {desktop && (

@@ -65,7 +65,7 @@ const DriverPage = () => {
               <TextField
                 value={item.uniqueId || ''}
                 onChange={(event) => setItem({ ...item, uniqueId: event.target.value })}
-                label={t('deviceIdentifier')}
+                label={t('deviceAddress')}
               />
               <TextField
                 value={item.phone || ''}

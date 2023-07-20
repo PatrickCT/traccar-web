@@ -59,6 +59,7 @@ import SchedulePage from './settings/SchedulePage';
 import SectionsPage from './settings/SectionsPages';
 import SectionPage from './settings/SectionPage';
 import ScheduleConnectionsPage from './settings/ScheduleConnectionsPage';
+import DeviceConnectionGroupPage from './settings/DeviceConnectionGroupPage';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -125,6 +126,7 @@ const Navigation = () => {
           <Route path="attribute" element={<ComputedAttributePage />} />
           <Route path="devices" element={<DevicesPage />} />
           <Route path="device/:id/connections" element={<DeviceConnectionsPage />} />
+          <Route path="device/:id/groups" element={<DeviceConnectionGroupPage />} />
           <Route path="device/:id/command" element={<CommandDevicePage />} />
           <Route path="device/:id" element={<DevicePage />} />
           <Route path="device" element={<DevicePage />} />

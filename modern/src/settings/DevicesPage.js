@@ -4,6 +4,7 @@ import {
   Table, TableRow, TableCell, TableHead, TableBody,
 } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
+import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import makeStyles from '@mui/styles/makeStyles';
 import { useEffectAsync } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -59,6 +60,13 @@ const DevicesPage = () => {
     handler: (deviceId) => navigate(`/settings/device/${deviceId}/connections`),
   };
 
+  const groupConnections = {
+    key: 'groups',
+    title: t('settingsGroups'),
+    icon: <LinearScaleIcon fontSize="small" />,
+    handler: (deviceId) => navigate(`/settings/device/${deviceId}/groups`),
+  };
+
   return (
     <PageLayout menu={<SettingsMenu />} breadcrumbs={['settingsTitle', 'sharedDrivers']}>
       <SearchHeader keyword={searchKeyword} setKeyword={setSearchKeyword} />
@@ -93,7 +101,7 @@ const DevicesPage = () => {
                   editPath="/settings/device"
                   endpoint="devices"
                   setTimestamp={setTimestamp}
-                  customActions={[actionConnections]}
+                  customActions={[actionConnections, groupConnections]}
                   readonly={deviceReadonly}
                 />
               </TableCell>

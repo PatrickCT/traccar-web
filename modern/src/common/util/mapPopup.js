@@ -100,7 +100,7 @@ export const generateRoute = () => {
 
 export const test = () => { generateRoute(); };
 export const createPopUp = (position) => {
-  let html = '';
+  let html = '<div>';
   html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
   //   if (!Traccar.app.getUser().get('attributes').hasOwnProperty('ui.disableReport') || !Traccar.app.getUser().get('attributes')['ui.disableReport']) {
   //     html += `<span class='hover tooltipNotifications'><i class='fa fa-bell' aria-hidden='true' onClick='openNotifications(${attsGetter(position, 'deviceId')})'></i></span>`;
@@ -115,10 +115,10 @@ export const createPopUp = (position) => {
   html += valueParser(position, specialAtts(position, 'dateTime'));
   html += valueParser(position, specialAtts(position, 'status'));
   html += valueParser(position, specialAtts(position, 'direccion'));
-  html += valueParser(position, specialAtts(position, 'attribute.fuel'));
-  html += valueParser(position, specialAtts(position, 'attribute.totalDistance'));
+  html += valueParser(position, specialAtts(position, 'fuel'));
+  html += valueParser(position, specialAtts(position, 'totalDistance'));
   html += valueParser(position, specialAtts(position, 'speed'));
-  html += valueParser(position, specialAtts(position, 'attribute.hours'));
+  html += valueParser(position, specialAtts(position, 'hours'));
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
   html += valueParser(position, 'bateria');
@@ -159,7 +159,7 @@ export const createPopUp = (position) => {
   html += '<a class="link-google-maps" onClick="(function(){navigate(`/replay`);}());"><img src="./././images/botones-popup/replay.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
   html += '</div>';
-
+  html += '</div>';
   return html;
 };
 
