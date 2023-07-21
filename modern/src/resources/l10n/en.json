@@ -587,5 +587,9 @@
     "referencePoint": "Reference point",
     "arrives": "Arrives ",
     "exits": " Exits ",
-    "changeExitTime": "Change exit time"
+    "changeExitTime": "Change exit time",
+    "geofence": "Geofence",
+    "arrive": "Arrive",
+    "success": "Success",
+    "timeChangeSuccess": "Exit time success changed"
 }

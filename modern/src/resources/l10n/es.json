@@ -588,5 +588,9 @@
     "referencePoint": "Puntos de referencia",
     "arrives": "Llegadas ",
     "exits": " Salidas",
-    "changeExitTime": "Cambiar hora de salida"
+    "changeExitTime": "Cambiar hora de salida",
+    "geofence": "Geocerca",
+    "arrive": "Llegada",
+    "success": "Éxito",
+    "timeChangeSuccess": "Hora de salida cambada con éxito"
 }
