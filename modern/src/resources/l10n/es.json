@@ -590,5 +590,7 @@
     "exits": " Salidas",
     "changeExitTime": "Cambiar hora de salida",
     "geofence": "Geocerca",
-    "arrive": "Llegada"
+    "arrive": "Llegada",
+    "success": "Éxito",
+    "timeChangeSuccess": "Hora de salida cambada con éxito"
 }

@@ -589,5 +589,7 @@
     "exits": " Exits ",
     "changeExitTime": "Change exit time",
     "geofence": "Geofence",
-    "arrive": "Arrive"
+    "arrive": "Arrive",
+    "success": "Success",
+    "timeChangeSuccess": "Exit time success changed"
 }

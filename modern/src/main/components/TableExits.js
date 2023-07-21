@@ -19,13 +19,14 @@ import { useTranslation } from '../../common/components/LocalizationProvider';
 const TableExist = ({ deviceId, handleLoadInfo }) => {
   const t = useTranslation();
 
-  const [, setInfo] = useState({});
+  const [info, setInfo] = useState({});
   const [toDay, setDate] = useState(null);
   const [optionSelected, setOption] = useState(null);
   const [visible, setVisible] = useState(false);
   const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [hourSelected, setHour] = useState(dayjs('2022-04-17T15:30'));
+  const [loading, setLoading] = useState(false);
 
   const user = useSelector((state) => state.session.user);
 
@@ -35,7 +36,6 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
 
   useEffectAsync(async () => {
     const response = await fetch(`api/devices/${deviceId}/ticket`);
-    console.log(response);
     if (response.ok) {
       const information = await response.json();
       setInfo(information);
@@ -51,22 +51,52 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
     } else {
       throw Error(await response.text());
     }
-  }, []);
+  }, [info.vueltas]);
 
   const handleSelectedOption = (value) => {
     setOption(value);
   };
 
   const handleChangeTime = async () => {
+    setLoading(true);
+    const response = await fetch(`api/salidas/${info.salida.id}/adjustment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+      body: JSON.stringify({
+        time: moment(hourSelected.$d).format('HH:mm'),
+      }),
+    });
+    if (response.ok) {
+      setInfo({});
+    } else {
+      console.log('prueba');
+      throw Error(await response.text());
+    }
+    setLoading(false);
   };
 
   const footerContent = (
     <div>
-      <Button label="No" icon="pi pi-times" onClick={() => setVisible(false)} className="p-button-text" />
+      <Button
+        label="No"
+        icon="pi pi-times"
+        onClick={() => {
+          if (loading) {
+            return;
+          }
+          setVisible(false);
+        }}
+        className="p-button-text"
+      />
       <Button
         label="Yes"
         icon="pi pi-check"
         onClick={() => {
+          if (loading) {
+            return;
+          }
           setVisible(false);
           handleChangeTime();
         }}
@@ -133,7 +163,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
               ]}
             >
               <DemoItem label="">
-                <TimePicker value={hourSelected} onChange={(newHour) => setHour(newHour)} defaultValue="" className="picker" />
+                <TimePicker value={hourSelected} onChange={(newHour) => setHour(newHour)} defaultValue="" ampm={false} className="picker" />
               </DemoItem>
             </DemoContainer>
           </LocalizationProvider>
