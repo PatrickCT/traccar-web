@@ -25,9 +25,8 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   const [visible, setVisible] = useState(false);
   const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
-  const [geoNames, setGeonames] = useState([]);
+  const [, setGeonames] = useState([]);
   const [hourSelected, setHour] = useState(dayjs('2022-04-17T15:30'));
-  const [loading, setLoading] = useState(false);
 
   const user = useSelector((state) => state.session.user);
 
@@ -59,8 +58,23 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
     setOption(value);
   };
 
+  const handleChangeHour = (newHour) => {
+    setHour(newHour);
+  };
+
   const handleChangeTime = async () => {
-    setLoading(true);
+    // const timeZone = moment(tickets[0].expectedTime).format('Z');
+    // let hour = hourSelected;
+    // console.log(hour);
+    // console.log(tickets[0].expectedTime);
+    // console.log(tickets[0].enterTime);
+    // console.log(timeZone);
+    // if (timeZone.includes('-')) {
+    //   hour = dayjs(hour).subtract(parseInt(timeZone.replace('-', '').split(':')[0], 10), 'hours');
+    // } else {
+    //   hour = dayjs(hour).add(parseInt(timeZone.replace('+', '').split(':')[0], 10), 'hours');
+    // }
+    // console.log(hour);
     const response = await fetch(`api/salidas/${info.salida.id}/adjustment`, {
       method: 'POST',
       headers: {
@@ -76,7 +90,6 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
       console.log('prueba');
       throw Error(await response.text());
     }
-    setLoading(false);
   };
 
   const footerContent = (
@@ -85,9 +98,6 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         label="No"
         icon="pi pi-times"
         onClick={() => {
-          if (loading) {
-            return;
-          }
           setVisible(false);
         }}
         className="p-button-text"
@@ -96,9 +106,6 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         label="Yes"
         icon="pi pi-check"
         onClick={() => {
-          if (loading) {
-            return;
-          }
           setVisible(false);
           handleChangeTime();
         }}
@@ -146,12 +153,14 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
       {tickets.map((ticket) => (
         <div className="bodyExitst">
           <div className="columns bodyCol1">
-            {geoNames.find((geo) => geo.id === ticket.geofenceId).name ?? `${t('geofence')} - ${ticket.geofeceId}`}
+            {`${t('geofence')} - ${ticket.geofeceId}`}
           </div>
           <div className="columns bodyCol2">
-            {('enterTime' in ticket) ? `${t('arrive')}: ${moment(ticket.enterTime).tz('America/Mexico_City').format('hh:mm:ss')}` : `${t('no-data')}`}
+            {('expectedTime' in ticket) ? `${t('expectedTime')}: ${moment(ticket.expectedTime).tz('America/Mexico_City').format('HH:mm:ss')}` : `${t('no-data')}`}
+            <br />
+            {('enterTime' in ticket) ? `${t('arrive')}: ${moment(ticket.enterTime).tz('America/Mexico_City').format('HH:mm:ss')}` : `${t('no-data')}`}
           </div>
-          <div className="columns bodyCol3">
+          <div className="columns bodyCol3" style={parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > 0 ? { color: 'red' } : parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= 0 && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > -3 ? { color: 'green' } : { color: 'orange' }}>
             {('enterTime' in ticket) && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10)}
           </div>
         </div>
@@ -165,7 +174,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
               ]}
             >
               <DemoItem label="">
-                <TimePicker value={hourSelected} onChange={(newHour) => setHour(newHour)} defaultValue="" ampm={false} className="picker" />
+                <TimePicker value={hourSelected} onChange={handleChangeHour} defaultValue="" ampm={false} className="picker" timeSteps={{ hours: 1, minutes: 1 }} />
               </DemoItem>
             </DemoContainer>
           </LocalizationProvider>
