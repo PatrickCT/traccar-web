@@ -591,5 +591,6 @@
     "geofence": "Geofence",
     "arrive": "Arrive",
     "success": "Success",
-    "timeChangeSuccess": "Exit time success changed"
+    "timeChangeSuccess": "Exit time success changed",
+    "no-data": "No Data"
 }

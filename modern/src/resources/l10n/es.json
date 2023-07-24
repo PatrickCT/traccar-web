@@ -592,5 +592,6 @@
     "geofence": "Geocerca",
     "arrive": "Llegada",
     "success": "Éxito",
-    "timeChangeSuccess": "Hora de salida cambada con éxito"
+    "timeChangeSuccess": "Hora de salida cambada con éxito",
+    "no-data": "Sin datos"
 }

@@ -25,6 +25,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   const [visible, setVisible] = useState(false);
   const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
+  const [geoNames, setGeonames] = useState([]);
   const [hourSelected, setHour] = useState(dayjs('2022-04-17T15:30'));
   const [loading, setLoading] = useState(false);
 
@@ -48,6 +49,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         });
       }));
       setTickets((information.ticket ?? []));
+      setGeonames((information.geofencesNames ?? []));
     } else {
       throw Error(await response.text());
     }
@@ -144,13 +146,13 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
       {tickets.map((ticket) => (
         <div className="bodyExitst">
           <div className="columns bodyCol1">
-            {`${t('geofence')} ${ticket.geofenceId}`}
+            {geoNames.find((geo) => geo.id === ticket.geofenceId).name ?? `${t('geofence')} - ${ticket.geofeceId}`}
           </div>
           <div className="columns bodyCol2">
-            {('enterTime' in ticket) && `${t('arrive')}: ${moment(ticket.enterTime).tz('America/Mexico_City').format('hh:mm:ss')}`}
+            {('enterTime' in ticket) ? `${t('arrive')}: ${moment(ticket.enterTime).tz('America/Mexico_City').format('hh:mm:ss')}` : `${t('no-data')}`}
           </div>
           <div className="columns bodyCol3">
-            { ('enterTime' in ticket) && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10)}
+            {('enterTime' in ticket) && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10)}
           </div>
         </div>
       ))}
