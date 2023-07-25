@@ -93,6 +93,7 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
       clusterMaxZoom: 14,
       clusterRadius: 50,
     });
+
     map.addLayer({
       id,
       type: 'symbol',
@@ -114,6 +115,7 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
         'text-halo-width': 1,
       },
     });
+
     map.addLayer({
       id: clusters,
       type: 'symbol',
@@ -127,6 +129,7 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
         'text-size': 14,
       },
     });
+
     map.addLayer({
       id: direction,
       type: 'symbol',

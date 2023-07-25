@@ -162,6 +162,7 @@ const MainPage = () => {
     window.streetView = streetView;
     window.generateRoute = generateRoute;
     window.position = selectedPosition;
+    window.map = map;
 
     // Clean up the function when the component unmounts
     return () => {
@@ -170,6 +171,7 @@ const MainPage = () => {
       delete window.position;
       delete window.generateRoute;
       delete window.device;
+      delete window.map;
     };
   }, []);
 

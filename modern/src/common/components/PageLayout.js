@@ -52,15 +52,15 @@ const PageTitle = ({ breadcrumbs }) => {
 
   if (desktop) {
     return (
-      <Typography variant="h6" noWrap>{t(breadcrumbs[0])}</Typography>
+      <Typography color="white" variant="h6" noWrap>{t(breadcrumbs[0])}</Typography>
     );
   }
   return (
-    <Breadcrumbs>
+    <Breadcrumbs style={{ color: 'white' }}>
       {breadcrumbs.slice(0, -1).map((breadcrumb) => (
-        <Typography variant="h6" color="inherit" key={breadcrumb}>{t(breadcrumb)}</Typography>
+        <Typography variant="h6" color="white" key={breadcrumb}>{t(breadcrumb)}</Typography>
       ))}
-      <Typography variant="h6" color="textPrimary">{t(breadcrumbs[breadcrumbs.length - 1])}</Typography>
+      <Typography variant="h6" color="white">{t(breadcrumbs[breadcrumbs.length - 1])}</Typography>
     </Breadcrumbs>
   );
 };
@@ -83,7 +83,7 @@ const PageLayout = ({ menu, breadcrumbs, children }) => {
       >
         <Toolbar>
           <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => navigate('/')}>
-            <ArrowBackIcon />
+            <ArrowBackIcon style={{ color: 'white' }} />
           </IconButton>
           <PageTitle breadcrumbs={breadcrumbs} />
         </Toolbar>
@@ -105,7 +105,7 @@ const PageLayout = ({ menu, breadcrumbs, children }) => {
       <AppBar className={classes.mobileToolbar} position="static" color="inherit">
         <Toolbar>
           <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => setOpenDrawer(true)}>
-            <MenuIcon />
+            <MenuIcon style={{ color: 'white' }} />
           </IconButton>
           <PageTitle breadcrumbs={breadcrumbs} />
         </Toolbar>

@@ -102,14 +102,8 @@ export const test = () => { generateRoute(); };
 export const createPopUp = (position) => {
   let html = '<div>';
   html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
-  //   if (!Traccar.app.getUser().get('attributes').hasOwnProperty('ui.disableReport') || !Traccar.app.getUser().get('attributes')['ui.disableReport']) {
-  //     html += `<span class='hover tooltipNotifications'><i class='fa fa-bell' aria-hidden='true' onClick='openNotifications(${attsGetter(position, 'deviceId')})'></i></span>`;
-  //     html += '<span>                                                                                 </span>';
-  //     html += `<i class='fa fa-cogs' aria-hidden='true' onClick='openNotificationsConfig(${attsGetter(position, 'deviceId')})'></i>`;
-  //     html += '<span>                                                                                 </span>';
-  //     html += `<i class='fa fa-street-view' aria-hidden='true' onClick='openGeofences(${attsGetter(position, 'deviceId')})'></i>`;
-  //   }
-  html += `<h3><b>${attsGetter(position, 'name')}</b></h3></div>`;
+
+  html += `<h3><b>${attsGetter(position, 'name')}</b>  <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a></h3></div>`;
   html += valueParser(position, specialAtts(position, 'ignition'));
   html += valueParser(position, specialAtts(position, 'motion'));
   html += valueParser(position, specialAtts(position, 'dateTime'));
@@ -122,7 +116,7 @@ export const createPopUp = (position) => {
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
   html += valueParser(position, 'bateria');
-  //   html += valueParser(position, specialAtts(position, 'lastAlarm'));
+  html += valueParser(position, specialAtts(position, 'lastAlarm'));
   html += '<br>';
 
   html += "<div style='display: table; margin: auto'>";

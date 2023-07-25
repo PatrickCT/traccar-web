@@ -2,10 +2,11 @@ import React, { Fragment, useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  IconButton, Table, TableBody, TableCell, TableHead, TableRow,
+  Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
-import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
+import { useTheme } from '@mui/material/styles';
+// import GpsFixedIcon from '@mui/icons-material/GpsFixed';
+// import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import ReportFilter from './components/ReportFilter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
@@ -24,11 +25,14 @@ import TableShimmer from '../common/components/TableShimmer';
 import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
 import scheduleReport from './common/scheduleReport';
+import StatusCard from '../common/components/StatusCard';
 
 const RouteReportPage = () => {
   const navigate = useNavigate();
   const classes = useReportStyles();
   const t = useTranslation();
+
+  const theme = useTheme();
 
   const positionAttributes = usePositionAttributes(t);
 
@@ -123,18 +127,8 @@ const RouteReportPage = () => {
             </TableHead>
             <TableBody>
               {!loading ? items.slice(0, 4000).map((item) => (
-                <TableRow key={item.id} onClick={() => setSelectedItem(item)} style={{ backgroundColor: (selectedItem === item ? 'red' : 'transparent') }}>
-                  <TableCell className={classes.columnAction} padding="none">
-                    {selectedItem === item ? (
-                      <IconButton size="small" onClick={() => setSelectedItem(null)}>
-                        <GpsFixedIcon fontSize="small" />
-                      </IconButton>
-                    ) : (
-                      <IconButton size="small" onClick={() => setSelectedItem(item)}>
-                        <LocationSearchingIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                  </TableCell>
+                <TableRow key={item.id} onClick={() => setSelectedItem(item)} style={{ backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }}>
+                  <TableCell className={classes.columnAction} padding="none" />
                   <TableCell>{devices[item.deviceId].name}</TableCell>
                   {columns.map((key) => (
                     <TableCell key={key}>
@@ -151,6 +145,14 @@ const RouteReportPage = () => {
           </Table>
         </div>
       </div>
+      {selectedItem && (
+        <StatusCard
+          deviceId={selectedItem.id}
+          position={selectedItem}
+          onClose={() => setSelectedItem(null)}
+          desktopPadding={theme.dimensions.drawerWidthDesktop}
+        />
+      )}
     </PageLayout>
   );
 };

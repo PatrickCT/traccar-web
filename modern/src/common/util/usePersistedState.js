@@ -4,10 +4,10 @@ export const savePersistedState = (key, value) => {
   window.localStorage.setItem(key, JSON.stringify(value));
 };
 
-export default (key, defaultValue) => {
+export default (key, defaultValue, force = false) => {
   const [value, setValue] = useState(() => {
     const stickyValue = window.localStorage.getItem(key);
-    return stickyValue ? JSON.parse(stickyValue) : defaultValue;
+    return stickyValue && !force ? JSON.parse(stickyValue) : defaultValue;
   });
 
   useEffect(() => {
