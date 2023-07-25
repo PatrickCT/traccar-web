@@ -1,6 +1,7 @@
 import { React, useState } from 'react';
 // import { Popup } from 'maplibre-gl';
 import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
 import makeStyles from '@mui/styles/makeStyles';
 import {
   IconButton,
@@ -8,10 +9,8 @@ import {
   ListItemButton,
 } from '@mui/material';
 import Collapse from 'react-collapse';
-import moment from 'moment';
 import { devicesActions } from '../store';
 import {
-  formatStatus,
   getStatusColor,
 } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -49,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const DeviceRowTransporte = ({ data, index, style }) => {
+const DeviceRowTransporte = ({ data, index }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const t = useTranslation();
@@ -64,9 +63,9 @@ const DeviceRowTransporte = ({ data, index, style }) => {
   const [info, setInfo] = useState({});
 
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
-  const deviceSecondary = useAttributePreference('deviceSecondary', '');
 
   const formatProperty = (key) => {
+    console.log(item);
     if (key === 'geofenceIds') {
       const geofenceIds = item[key] || [];
       return geofenceIds
@@ -74,34 +73,24 @@ const DeviceRowTransporte = ({ data, index, style }) => {
         .map((id) => geofences[id].name)
         .join(', ');
     }
-    return item[key];
-  };
-
-  const secondaryText = () => {
-    let status = 'online';
-    if (item.status === 'online') {
-      status = formatStatus(item.status, t);
-    } else {
-      status = moment(item.lastUpdate).fromNow();
-    }
     return (
       <>
-        {deviceSecondary &&
-          item[deviceSecondary] &&
-          `${formatProperty(deviceSecondary)} • `}
-        <span className={classes[getStatusColor(item.status)]}>{`${status}`}</span>
+        <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{`${item[key]} `}</span>
+        <span style={{ fontSize: '11px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
       </>
     );
   };
+
+  const secondaryText = () => <span className={classes[getStatusColor(item.status)]}>{`${item.uniqueId ?? 'Sin IMEI registrado'}`}</span>;
 
   const handleLoadInfo = (infoChild) => {
     setInfo(infoChild);
   };
 
   return (
-    <div style={style}>
+    <div style={{ position: 'relative' }}>
       <ListItemButton
-        style={isOpened ? { backgroundColor: '#cccccc' } : { backgroundColor: '#ffffff' }}
+        style={isOpened ? { backgroundColor: '#cccccc', position: 'relative' } : { backgroundColor: '#ffffff', position: 'relative' }}
         key={item.id}
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
@@ -121,9 +110,10 @@ const DeviceRowTransporte = ({ data, index, style }) => {
             {`${t('laps')}${info.vueltas}`}
           </IconButton>
         ) : <div />}
+
       </ListItemButton>
       <Collapse isOpened={isOpened}>
-        <div className="text" style={{ padding: '1rem' }}><TableExist deviceId={item.id} handleLoadInfo={handleLoadInfo} /></div>
+        <div className="text" style={{ padding: '1rem', width: '100%' }}><TableExist deviceId={item.id} handleLoadInfo={handleLoadInfo} /></div>
       </Collapse>
     </div>
   );

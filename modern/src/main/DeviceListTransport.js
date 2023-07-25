@@ -55,6 +55,7 @@ const DeviceListTransport = ({ devices }) => {
           itemSize={72}
           overscanCount={10}
           innerRef={listInnerEl}
+          position="relative"
         >
           {DeviceRowTransporte}
         </FixedSizeList>
