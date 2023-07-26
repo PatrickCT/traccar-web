@@ -61,7 +61,7 @@ const DeviceRow = ({ data, index, style }) => {
   const geofences = useSelector((state) => state.geofences.items);
 
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
-  const deviceSecondary = useAttributePreference('deviceSecondary', '');
+  // const deviceSecondary = useAttributePreference('deviceSecondary', '');
 
   const formatProperty = (key) => {
     if (key === 'geofenceIds') {
@@ -71,7 +71,13 @@ const DeviceRow = ({ data, index, style }) => {
         .map((id) => geofences[id].name)
         .join(', ');
     }
-    return item[key];
+    return (
+      <>
+        <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{`${item[key]} `}</span>
+        {' • '}
+        <span style={{ fontSize: '15px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
+      </>
+    );
   };
 
   const secondaryText = () => {
@@ -83,7 +89,7 @@ const DeviceRow = ({ data, index, style }) => {
     }
     return (
       <>
-        {deviceSecondary && item[deviceSecondary] && `${formatProperty(deviceSecondary)} • `}
+        {`${item.uniqueId} • `}
         <span className={classes[getStatusColor(item.status)]}>{status}</span>
       </>
     );

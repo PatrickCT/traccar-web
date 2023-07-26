@@ -94,7 +94,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MainPage = () => {
-  const navigate = useNavigate();
   const classes = useStyles();
   // const dispatch = useDispatch();
   const theme = useTheme();
@@ -128,7 +127,7 @@ const MainPage = () => {
   const handleClose = () => setOpen(false);
 
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (!desktop && mapOnSelect && selectedDeviceId) {
       setDevicesOpen(false);
@@ -148,12 +147,12 @@ const MainPage = () => {
   if (selectedPosition) {
     Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
+    window.position = selectedPosition;
     new Popup()
       .setMaxWidth('400px')
       .setHTML(createPopUp(selectedPosition))
       .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
       .addTo(map);
-    window.position = selectedPosition;
   }
 
   useEffect(() => {

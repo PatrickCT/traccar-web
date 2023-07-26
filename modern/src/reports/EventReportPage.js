@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FormControl, InputLabel, Select, MenuItem, Table, TableHead, TableRow, TableCell, TableBody, Link, IconButton,
@@ -23,7 +23,9 @@ import MapGeofence from '../map/MapGeofence';
 import MapPositions from '../map/MapPositions';
 import MapCamera from '../map/MapCamera';
 import scheduleReport from './common/scheduleReport';
+import MapRoutePoints from '../map/MapRoutePoints';
 
+const filters = ['Unknown', 'Offline', 'Online'];
 const columnsArray = [
   ['eventTime', 'positionFixTime'],
   ['type', 'sharedType'],
@@ -96,7 +98,10 @@ const EventReportPage = () => {
           headers: { Accept: 'application/json' },
         });
         if (response.ok) {
-          setItems(await response.json());
+          const i = await response.json();
+          console.log(i);
+          setItems(i);
+          setSelectedItem(i.filter((it) => !filters.some((term) => it.type.includes(term)))[0]);
         } else {
           throw Error(await response.text());
         }
@@ -160,6 +165,11 @@ const EventReportPage = () => {
           <div className={classes.containerMap}>
             <MapView>
               <MapGeofence />
+              {position && [...new Set(items.map((it) => it.deviceId))].map((deviceId) => (
+                <Fragment key={deviceId}>
+                  <MapRoutePoints positions={[position]} onClick={setSelectedItem} />
+                </Fragment>
+              ))}
               {position && <MapPositions positions={[position]} titleField="fixTime" />}
             </MapView>
             {position && <MapCamera latitude={position.latitude} longitude={position.longitude} />}
@@ -202,7 +212,7 @@ const EventReportPage = () => {
             </TableHead>
             <TableBody>
               {!loading ? items.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item.id} onClick={() => (!filters.some((term) => item.type.includes(term)) ? setSelectedItem(item) : null)} style={{ backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }}>
                   <TableCell className={classes.columnAction} padding="none">
                     {item.positionId ? selectedItem === item ? (
                       <IconButton size="small" onClick={() => setSelectedItem(null)}>
@@ -214,6 +224,7 @@ const EventReportPage = () => {
                       </IconButton>
                     ) : ''}
                   </TableCell>
+
                   {columns.map((key) => (
                     <TableCell key={key}>
                       {formatValue(item, key)}

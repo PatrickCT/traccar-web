@@ -4,6 +4,7 @@ import React, {
 import {
   IconButton, Paper, Slider, Toolbar, Typography,
 } from '@mui/material';
+import { Popup } from 'maplibre-gl';
 import makeStyles from '@mui/styles/makeStyles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -14,7 +15,7 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import FastRewindIcon from '@mui/icons-material/FastRewind';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import MapView from '../map/core/MapView';
+import MapView, { map } from '../map/core/MapView';
 import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapPositions from '../map/MapPositions';
@@ -26,6 +27,7 @@ import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
 import StatusCard from '../common/components/StatusCard';
 import { usePreference } from '../common/util/preferences';
+import { createPopUpReport } from '../common/util/mapPopup';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -94,6 +96,7 @@ const ReplayPage = () => {
   const [to, setTo] = useState();
   const [expanded, setExpanded] = useState(true);
   const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(500);
 
   const deviceName = useSelector((state) => {
     if (selectedDeviceId) {
@@ -105,17 +108,53 @@ const ReplayPage = () => {
     return null;
   });
 
+  // useEffect(() => {
+  //   if (playing && positions.length > 0) {
+  //     timerRef.current = setInterval(() => {
+  //       console.log(index, positions[index].latitude, positions[index].longitude);
+
+  //       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+  //       new Popup()
+  //         .setMaxWidth('400px')
+  //         .setHTML(createPopUpReport(positions[index + 1]))
+  //         .setLngLat([positions[index + 1].longitude, positions[index + 1].latitude])
+  //         .addTo(map);
+
+  //       setIndex((index) => index + 1);
+  //     }, 500);
+  //   } else {
+  //     clearInterval(timerRef.current);
+  //   }
+
+  //   return () => clearInterval(timerRef.current);
+  // }, [playing, positions]);
+
   useEffect(() => {
     if (playing && positions.length > 0) {
       timerRef.current = setInterval(() => {
-        setIndex((index) => index + 1);
-      }, 500);
+        setIndex((index) => {
+          // Check if the next index is within the bounds of the positions array
+          if (index + 1 < positions.length) {
+            console.log(index, positions[index].latitude, positions[index].longitude);
+
+            Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+            new Popup()
+              .setMaxWidth('400px')
+              .setHTML(createPopUpReport(positions[index + 1]))
+              .setLngLat([positions[index + 1].longitude, positions[index + 1].latitude])
+              .addTo(map);
+          }
+
+          // Return the next index value for the state update
+          return index + 1;
+        });
+      }, speed);
     } else {
       clearInterval(timerRef.current);
     }
 
     return () => clearInterval(timerRef.current);
-  }, [playing, positions]);
+  }, [playing, positions, speed]);
 
   useEffect(() => {
     if (index >= positions.length - 1) {
@@ -205,13 +244,22 @@ const ReplayPage = () => {
                   <FastRewindIcon />
                 </IconButton>
                 <IconButton onClick={() => setPlaying(!playing)} disabled={index >= positions.length - 1}>
-                  {playing ? <PauseIcon /> : <PlayArrowIcon /> }
+                  {playing ? <PauseIcon /> : <PlayArrowIcon />}
                 </IconButton>
                 <IconButton onClick={() => setIndex((index) => index + 1)} disabled={playing || index >= positions.length - 1}>
                   <FastForwardIcon />
                 </IconButton>
                 {formatTime(positions[index].fixTime, 'seconds', hours12)}
               </div>
+              <Slider
+                className={classes.slider}
+                value={1001 - speed}
+                onChange={(_, value) => setSpeed(1001 - value)}
+                max={1001}
+                step={1}
+                valueLabelDisplay="auto"
+                marks={Array.from({ length: 1001 }, (_, index) => ({ value: 1000 - index }))}
+              />
             </>
           ) : (
             <ReportFilter handleSubmit={handleSubmit} fullScreen showOnly />

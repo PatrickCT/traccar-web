@@ -16,6 +16,7 @@
 //   }
 //   return -1;
 // };
+const requestCache = {};
 const alarmTranslator = (alarm) => {
   switch (alarm.toUpperCase()) {
     case 'General'.toUpperCase():
@@ -226,16 +227,48 @@ const formatDateToCustomString = (date) => {
 };
 
 const getEvent = () => {
+  // const today = new Date();
+  // const nextday = new Date();
+  // nextday.setDate(nextday.getDate() + 1);
+  // const request = new XMLHttpRequest();
+  // request.open('GET', `${window.location.protocol}//${window.location.host}/api/reports/events?deviceId=${window.device.id}&from=${formatDateToCustomString(today)}T06%3A00%3A00.000Z&to=${formatDateToCustomString(nextday)}T05%3A59%3A59.999Z&type=allEvents`, false);
+  // request.setRequestHeader('Accept', 'application/json');
+  // request.send();
+
+  // if (request.status === 200) {
+  //   const data = JSON.parse(request.responseText);
+  //   return data[data.length - 1];
+  // }
+  // return null;
   const today = new Date();
   const nextday = new Date();
   nextday.setDate(nextday.getDate() + 1);
+  const url = `${window.location.protocol}//${window.location.host}/api/reports/events?deviceId=1&from=${formatDateToCustomString(today)}T06%3A00%3A00.000Z&to=${formatDateToCustomString(nextday)}T05%3A59%3A59.999Z&type=allEvents`;
+
+  // Check if the response is cached and not older than 3 minutes
+  if (requestCache[url] && Date.now() - requestCache[url].timestamp < 1 * 60 * 1000) {
+    console.log('Using cached response:', requestCache[url].data);
+    return requestCache[url].data;
+  }
+
+  // If not cached or expired, make the actual request and update the cache
   const request = new XMLHttpRequest();
-  request.open('GET', `${window.location.protocol}//${window.location.host}/api/reports/events?deviceId=1&from=${formatDateToCustomString(today)}T06%3A00%3A00.000Z&to=${formatDateToCustomString(nextday)}T05%3A59%3A59.999Z&type=allEvents`, false);
+  request.open('GET', url, false);
+  request.setRequestHeader('Accept', 'application/json');
   request.send();
 
   if (request.status === 200) {
     const data = JSON.parse(request.responseText);
-    return data[data.length - 1];
+    const value = data[data.length - 1];
+
+    // Store the response in the cache along with the timestamp
+    requestCache[url] = {
+      data: value,
+      timestamp: Date.now(),
+    };
+
+    console.log('New request:', value);
+    return value;
   }
   return null;
 };
@@ -322,9 +355,9 @@ export const attsGetter = (obj, attribute) => {
       return value;
     }
     case 'dateTime': {
-      let value = attsGetter(obj, 'serverTime');
+      let value = attsGetter(obj, 'fixTime');
       const dt = new Date(value);
-      value = dt.toISOString();
+      value = dt.toLocaleString();
       return value;
     }
     case 'fixTime': {
@@ -351,7 +384,7 @@ export const attsGetter = (obj, attribute) => {
     }
     case 'lastAlarm': {
       const event = getEvent();
-      return alarmTranslator(event.type.toUpperCase());
+      return alarmTranslator((event?.type || '').toUpperCase());
     }
     default: {
       return (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));

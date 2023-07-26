@@ -67,7 +67,9 @@ const StopReportPage = () => {
           headers: { Accept: 'application/json' },
         });
         if (response.ok) {
-          setItems(await response.json());
+          const i = await response.json();
+          setItems(i);
+          setSelectedItem(i[0] || null);
         } else {
           throw Error(await response.text());
         }
