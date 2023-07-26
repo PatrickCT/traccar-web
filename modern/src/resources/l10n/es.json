@@ -594,5 +594,6 @@
     "success": "Éxito",
     "timeChangeSuccess": "Hora de salida cambada con éxito",
     "no-data": "Sin datos",
-    "expectedTime": "Esp."
+    "expectedTime": "Esp.",
+    "no-imei": "Sin IMEI"
 }

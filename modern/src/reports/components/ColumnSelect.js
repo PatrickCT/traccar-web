@@ -8,7 +8,6 @@ import useReportStyles from '../common/useReportStyles';
 const ColumnSelect = ({
   columns, setColumns, columnsArray, columnsObject,
 }) => {
-  console.log(`col select ${columns}`);
   const classes = useReportStyles();
   const t = useTranslation();
 

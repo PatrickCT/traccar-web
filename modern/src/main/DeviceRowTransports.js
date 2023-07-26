@@ -65,7 +65,6 @@ const DeviceRowTransporte = ({ data, index }) => {
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
 
   const formatProperty = (key) => {
-    console.log(item);
     if (key === 'geofenceIds') {
       const geofenceIds = item[key] || [];
       return geofenceIds
@@ -81,7 +80,7 @@ const DeviceRowTransporte = ({ data, index }) => {
     );
   };
 
-  const secondaryText = () => <span className={classes[getStatusColor(item.status)]}>{`${item.uniqueId ?? 'Sin IMEI registrado'}`}</span>;
+  const secondaryText = () => <span className={classes[getStatusColor(item.status)]}>{`${item.uniqueId ?? t('no-imei')}`}</span>;
 
   const handleLoadInfo = (infoChild) => {
     setInfo(infoChild);

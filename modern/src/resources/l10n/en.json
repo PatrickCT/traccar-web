@@ -592,5 +592,6 @@
     "arrive": "Arrive",
     "success": "Success",
     "timeChangeSuccess": "Exit time success changed",
-    "no-data": "No Data"
+    "no-data": "No Data",
+    "no-imei": "Sin IMEI"
 }

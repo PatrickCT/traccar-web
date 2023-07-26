@@ -157,6 +157,29 @@ export const createPopUp = (position) => {
   return html;
 };
 
+export const createPopUpReport = (position) => {
+  let html = '<div>';
+  html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
+
+  html += `<h3><b>${attsGetter(position, 'name')}</b></h3></div>`;
+  html += valueParser(position, specialAtts(position, 'ignition'));
+  html += valueParser(position, specialAtts(position, 'motion'));
+  html += valueParser(position, specialAtts(position, 'dateTime'));
+  html += valueParser(position, specialAtts(position, 'status'));
+  html += valueParser(position, specialAtts(position, 'direccion'));
+  html += valueParser(position, specialAtts(position, 'fuel'));
+  html += valueParser(position, specialAtts(position, 'totalDistance'));
+  html += valueParser(position, specialAtts(position, 'speed'));
+  html += valueParser(position, specialAtts(position, 'hours'));
+  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
+  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
+  html += valueParser(position, 'bateria');
+
+  html += '</div>';
+  html += '</div>';
+  return html;
+};
+
 export const streetView = () => {
   if (window.position.latitude != null && window.position.longitude != null) {
     window.jsPanel.create({

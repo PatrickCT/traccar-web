@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Popup } from 'maplibre-gl';
 // import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 // import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import ReportFilter from './components/ReportFilter';
@@ -16,7 +16,7 @@ import PositionValue from '../common/components/PositionValue';
 import ColumnSelect from './components/ColumnSelect';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import { useCatch } from '../reactHelper';
-import MapView from '../map/core/MapView';
+import MapView, { map } from '../map/core/MapView';
 import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapPositions from '../map/MapPositions';
@@ -25,14 +25,14 @@ import TableShimmer from '../common/components/TableShimmer';
 import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
 import scheduleReport from './common/scheduleReport';
-import StatusCard from '../common/components/StatusCard';
+import {
+  createPopUpReport,
+} from '../common/util/mapPopup';
 
 const RouteReportPage = () => {
   const navigate = useNavigate();
   const classes = useReportStyles();
   const t = useTranslation();
-
-  const theme = useTheme();
 
   const positionAttributes = usePositionAttributes(t);
 
@@ -44,7 +44,13 @@ const RouteReportPage = () => {
   const [selectedItem, setSelectedItem] = useState(null);
 
   const onMapPointClick = useCallback((positionId) => {
+    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     setSelectedItem(items.find((it) => it.id === positionId));
+    new Popup()
+      .setMaxWidth('400px')
+      .setHTML(createPopUpReport(items.find((it) => it.id === positionId)))
+      .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
+      .addTo(map);
   }, [items, setSelectedItem]);
 
   const handleSubmit = useCatch(async ({ deviceIds, from, to, type }) => {
@@ -127,7 +133,7 @@ const RouteReportPage = () => {
             </TableHead>
             <TableBody>
               {!loading ? items.slice(0, 4000).map((item) => (
-                <TableRow key={item.id} onClick={() => setSelectedItem(item)} style={{ backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }}>
+                <TableRow key={item.id} onClick={() => onMapPointClick(item.id)} style={{ backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }}>
                   <TableCell className={classes.columnAction} padding="none" />
                   <TableCell>{devices[item.deviceId].name}</TableCell>
                   {columns.map((key) => (
@@ -145,14 +151,6 @@ const RouteReportPage = () => {
           </Table>
         </div>
       </div>
-      {selectedItem && (
-        <StatusCard
-          deviceId={selectedItem.id}
-          position={selectedItem}
-          onClose={() => setSelectedItem(null)}
-          desktopPadding={theme.dimensions.drawerWidthDesktop}
-        />
-      )}
     </PageLayout>
   );
 };
