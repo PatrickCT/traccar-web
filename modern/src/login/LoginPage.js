@@ -1,3 +1,5 @@
+/* eslint-disable import/no-extraneous-dependencies */
+
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import {
@@ -9,6 +11,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { encode } from 'base-64';
 import { sessionActions } from '../store';
 import { useLocalization, useTranslation } from '../common/components/LocalizationProvider';
 import LoginLayout from './LoginLayout';
@@ -93,6 +96,7 @@ const LoginPage = () => {
         body: new URLSearchParams(`email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`),
       });
       if (response.ok) {
+        localStorage.setItem('UGFzc3dvcmRVc2Vy', encode(password));
         const user = await response.json();
         generateLoginToken();
         dispatch(sessionActions.updateUser(user));
@@ -130,6 +134,7 @@ const LoginPage = () => {
   useEffect(() => nativePostMessage('authentication'), []);
 
   useEffect(() => {
+    localStorage.removeItem('UGFzc3dvcmRVc2Vy');
     const listener = (token) => handleTokenLogin(token);
     handleLoginTokenListeners.add(listener);
     return () => handleLoginTokenListeners.delete(listener);
