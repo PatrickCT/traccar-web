@@ -99,7 +99,6 @@ const EventReportPage = () => {
         });
         if (response.ok) {
           const i = await response.json();
-          console.log(i);
           setItems(i);
           setSelectedItem(i.filter((it) => !filters.some((term) => it.type.includes(term)))[0]);
         } else {

@@ -87,7 +87,6 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
     if (response.ok) {
       setInfo({});
     } else {
-      console.log('prueba');
       throw Error(await response.text());
     }
   };

@@ -247,7 +247,6 @@ const getEvent = () => {
 
   // Check if the response is cached and not older than 3 minutes
   if (requestCache[url] && Date.now() - requestCache[url].timestamp < 1 * 60 * 1000) {
-    console.log('Using cached response:', requestCache[url].data);
     return requestCache[url].data;
   }
 
@@ -266,8 +265,6 @@ const getEvent = () => {
       data: value,
       timestamp: Date.now(),
     };
-
-    console.log('New request:', value);
     return value;
   }
   return null;

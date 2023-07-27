@@ -135,8 +135,6 @@ const ReplayPage = () => {
         setIndex((index) => {
           // Check if the next index is within the bounds of the positions array
           if (index + 1 < positions.length) {
-            console.log(index, positions[index].latitude, positions[index].longitude);
-
             Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
             new Popup()
               .setMaxWidth('400px')

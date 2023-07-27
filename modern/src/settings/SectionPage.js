@@ -104,7 +104,7 @@ const SectionPage = () => {
             />
             <TextField
               value={item.punishment || ''}
-              onChange={(event) => { console.log(event.target.value); if (/^[0-9]*$/.test(event.target.value)) { setItem({ ...item, punishment: event.target.value }); } }}
+              onChange={(event) => { if (/^[0-9]*$/.test(event.target.value)) { setItem({ ...item, punishment: event.target.value }); } }}
               label={t('punishment')}
             />
             <FormControl fullWidth>

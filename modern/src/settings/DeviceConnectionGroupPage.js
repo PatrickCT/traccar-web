@@ -17,11 +17,8 @@ const DeviceConnectionGroupPage = () => {
   }, []);
 
   const handleChange = (event) => {
-    console.log(event.target.value);
     if (group) {
       const item = devices.find((device) => device.id === Number(event.target.value));
-      console.log(devices);
-      console.log(item);
       if (event.target.checked) {
         fetch(`/api/devices/${event.target.value}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...item, groupId: group }) });
         fetch('/api/devices', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
@@ -35,8 +32,6 @@ const DeviceConnectionGroupPage = () => {
       }
     }
   };
-
-  useEffect(() => { console.log(devices); }, [devices]);
 
   return (
     <PageLayout menu={<SettingsMenu />} breadcrumbs={['settingsTitle', 'sharedDrivers']}>
