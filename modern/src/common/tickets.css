@@ -78,3 +78,16 @@
 .picker>div {
     height: 3rem;
 }
+
+.card {
+    height: 35% !important;
+    text-align: center;
+}
+
+.passwordUser {
+    margin-top: 1rem;
+}
+
+.passwordUser>div>input {
+    height: 100% !important;
+}

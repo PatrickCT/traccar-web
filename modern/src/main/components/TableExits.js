@@ -1,3 +1,5 @@
+/* eslint-disable import/no-extraneous-dependencies */
+
 import { React, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
@@ -11,6 +13,8 @@ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { TextField } from '@mui/material';
+import { decode } from 'base-64';
 import DropdownComponents from '../../common/components/DropdownComponent';
 import { useEffectAsync } from '../../reactHelper';
 import '../../common/tickets.css';
@@ -27,12 +31,24 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   const [tickets, setTickets] = useState([]);
   const [, setGeonames] = useState([]);
   const [hourSelected, setHour] = useState(dayjs('2022-04-17T15:30'));
+  const [passwordUser, setPasswordUser] = useState('');
+  const [passwordSaved, setPasswordSaved] = useState('');
 
   const user = useSelector((state) => state.session.user);
+
+  const handleChangePassword = (event) => {
+    setPasswordUser(event.target.value);
+  };
+
+  const passwordEquals = () => passwordUser === passwordSaved;
 
   useEffect(() => {
     setDate(moment().format('YYYY-MM-D'));
   }, [toDay]);
+
+  useEffect(() => {
+    setPasswordSaved(decode((localStorage.getItem('UGFzc3dvcmRVc2Vy') ?? '')));
+  }, []);
 
   useEffectAsync(async () => {
     const response = await fetch(`api/devices/${deviceId}/ticket`);
@@ -105,8 +121,11 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         label="Yes"
         icon="pi pi-check"
         onClick={() => {
-          setVisible(false);
-          handleChangeTime();
+          if (passwordEquals()) {
+            setVisible(false);
+            handleChangeTime();
+            setPasswordUser('');
+          }
         }}
         autoFocus
       />
@@ -177,6 +196,8 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
               </DemoItem>
             </DemoContainer>
           </LocalizationProvider>
+          <TextField className="passwordUser" style={{ height: '3rem', width: '100%' }} label="Contraseña" value={passwordUser} onChange={handleChangePassword} />
+          {(passwordUser !== '' && !passwordEquals()) && <span style={{ color: 'red' }}>{t('password_wrong')}</span>}
         </Dialog>
       </div>
     </div>

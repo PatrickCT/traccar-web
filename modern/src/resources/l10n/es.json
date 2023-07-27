@@ -595,5 +595,6 @@
     "timeChangeSuccess": "Hora de salida cambada con éxito",
     "no-data": "Sin datos",
     "expectedTime": "Esp.",
+    "password_wrong": "Contraseña incorrecta",
     "no-imei": "Sin IMEI"
 }
