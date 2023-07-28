@@ -1,9 +1,9 @@
 import React from 'react';
-// import { Popup } from 'maplibre-gl';
+import { useTheme } from '@emotion/react';
 import { useDispatch, useSelector } from 'react-redux';
 import makeStyles from '@mui/styles/makeStyles';
 import {
-  IconButton, Tooltip, ListItemText, ListItemButton,
+  IconButton, Tooltip, ListItemText, ListItemButton, useMediaQuery,
 } from '@mui/material';
 import { Popup } from 'maplibre-gl';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
@@ -54,14 +54,12 @@ const DeviceRow = ({ data, index, style }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const t = useTranslation();
-
+  const theme = useTheme();
+  const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const admin = useAdministrator();
-
   const item = data[index];
   const position = useSelector((state) => state.session.positions[item.id]);
-
   const geofences = useSelector((state) => state.geofences.items);
-
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
   // const deviceSecondary = useAttributePreference('deviceSecondary', '');
 
@@ -103,6 +101,7 @@ const DeviceRow = ({ data, index, style }) => {
         key={item.id}
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
+          if (!desktop) { window.showDevicesList(false); }
           if (position !== undefined) {
             map.jumpTo({
               center: [position.longitude, position.latitude],

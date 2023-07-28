@@ -162,6 +162,7 @@ const MainPage = () => {
     window.generateRoute = generateRoute;
     window.position = selectedPosition;
     window.map = map;
+    window.showDevicesList = setDevicesOpen;
 
     // Clean up the function when the component unmounts
     return () => {
@@ -171,6 +172,7 @@ const MainPage = () => {
       delete window.generateRoute;
       delete window.device;
       delete window.map;
+      delete window.showDevicesList;
     };
   }, []);
 

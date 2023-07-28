@@ -593,5 +593,6 @@
     "success": "Success",
     "timeChangeSuccess": "Exit time success changed",
     "no-data": "No Data",
-    "no-imei": "Sin IMEI"
+    "no-imei": "Sin IMEI",
+    "help": "Help"
 }

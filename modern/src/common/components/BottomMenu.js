@@ -111,7 +111,7 @@ const BottomMenu = () => {
           value="map"
         />
         {!disableReports && (
-          <BottomNavigationAction label={t('reportTitle')} icon={<DescriptionIcon style={{ color: 'white' }} />} value="reports" />
+          <BottomNavigationAction id="btn-reports" label={t('reportTitle')} icon={<DescriptionIcon style={{ color: 'white' }} />} value="reports" />
         )}
         <BottomNavigationAction label={t('settingsTitle')} icon={<SettingsIcon style={{ color: 'white' }} />} value="settings" />
         {readonly ? (

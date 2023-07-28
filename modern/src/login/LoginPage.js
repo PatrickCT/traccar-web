@@ -5,6 +5,7 @@ import moment from 'moment';
 import {
   useMediaQuery, InputLabel, Select, MenuItem, FormControl, Button, TextField, Link, Snackbar, IconButton, Tooltip, LinearProgress,
 } from '@mui/material';
+import { InfoOutlined } from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
 import CloseIcon from '@mui/icons-material/Close';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
@@ -19,6 +20,7 @@ import usePersistedState from '../common/util/usePersistedState';
 import { handleLoginTokenListeners, nativeEnvironment, nativePostMessage } from '../common/components/NativeInterface';
 import LogoImage from './LogoImage';
 import { useCatch } from '../reactHelper';
+import { loginTour } from './login_tour';
 
 const useStyles = makeStyles((theme) => ({
   options: {
@@ -140,6 +142,15 @@ const LoginPage = () => {
     return () => handleLoginTokenListeners.delete(listener);
   }, []);
 
+  useEffect(() => {
+    // Attach the function to the global window object
+    window.loginTour = loginTour;
+    // Clean up the function when the component unmounts
+    return () => {
+      delete window.loginTour;
+    };
+  }, []);
+
   if (openIdForced) {
     handleOpenIdLogin();
     return (<LinearProgress />);
@@ -169,6 +180,7 @@ const LoginPage = () => {
           onChange={(e) => setEmail(e.target.value)}
           onKeyUp={handleSpecialKey}
           helperText={failed && 'Invalid username or password'}
+          id="user"
         />
         <TextField
           required
@@ -181,6 +193,7 @@ const LoginPage = () => {
           autoFocus={!!email}
           onChange={(e) => setPassword(e.target.value)}
           onKeyUp={handleSpecialKey}
+          id="pass"
         />
         <Button
           onClick={handlePasswordLogin}
@@ -188,6 +201,7 @@ const LoginPage = () => {
           variant="contained"
           color="secondary"
           disabled={!email || !password}
+          id="btn-login"
         >
           {t('loginLogin')}
         </Button>
@@ -228,6 +242,17 @@ const LoginPage = () => {
             {t('loginReset')}
           </Link>
         )}
+
+        <Tooltip title={`${t('help')} ${t('loginTitle')}`}>
+          <Link
+            onClick={() => loginTour()}
+            className={classes.resetPassword}
+            underline="none"
+            variant="caption"
+          >
+            <InfoOutlined style={{ width: '20px' }} />
+          </Link>
+        </Tooltip>
       </div>
       <Snackbar
         open={!!announcement && !announcementShown}

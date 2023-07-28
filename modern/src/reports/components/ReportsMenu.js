@@ -34,7 +34,7 @@ const ReportsMenu = () => {
 
   return (
     <>
-      <List>
+      <List id="lst-reports">
         <MenuItem
           title={t('reportCombined')}
           link="/reports/combined"

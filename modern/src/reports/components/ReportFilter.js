@@ -95,6 +95,7 @@ const ReportFilter = ({ children, handleSubmit, handleSchedule, showOnly, ignore
           <FormControl fullWidth>
             <InputLabel>{t(multiDevice ? 'deviceTitle' : 'reportDevice')}</InputLabel>
             <Select
+              id="cmb-report-devices"
               label={t(multiDevice ? 'deviceTitle' : 'reportDevice')}
               value={multiDevice ? deviceIds : deviceId || ''}
               onChange={(e) => dispatch(multiDevice ? devicesActions.selectIds(e.target.value) : devicesActions.selectId(e.target.value))}
@@ -127,7 +128,7 @@ const ReportFilter = ({ children, handleSubmit, handleSchedule, showOnly, ignore
       {button !== 'schedule' ? (
         <>
           <div className={classes.filterItem}>
-            <FormControl fullWidth>
+            <FormControl id="cmb-report-from" fullWidth>
               <InputLabel>{t('reportPeriod')}</InputLabel>
               <Select label={t('reportPeriod')} value={period} onChange={(e) => dispatch(reportsActions.updatePeriod(e.target.value))}>
                 <MenuItem value="today">{t('reportToday')}</MenuItem>
@@ -188,6 +189,7 @@ const ReportFilter = ({ children, handleSubmit, handleSchedule, showOnly, ignore
       <div className={classes.filterItem}>
         {showOnly ? (
           <Button
+            id="cmb-report-btn-search"
             fullWidth
             variant="outlined"
             color="secondary"
@@ -198,6 +200,7 @@ const ReportFilter = ({ children, handleSubmit, handleSchedule, showOnly, ignore
           </Button>
         ) : (
           <SplitButton
+            id="cmb-report-btn-search"
             fullWidth
             variant="outlined"
             color="secondary"
