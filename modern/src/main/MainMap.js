@@ -33,8 +33,8 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
 
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
+    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     if (selectedPosition) {
-      Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
       new Popup()
         .setMaxWidth('400px')
         .setHTML(createPopUp(selectedPosition))

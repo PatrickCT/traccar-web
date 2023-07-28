@@ -45,7 +45,7 @@ const DeviceList = ({ devices }) => {
   }, []);
 
   return (
-    <AutoSizer className={classes.list}>
+    <AutoSizer onClick={() => dispatch(devicesActions.select(null))} className={classes.list}>
       {({ height, width }) => (
         <FixedSizeList
           width={width}

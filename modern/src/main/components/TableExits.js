@@ -30,7 +30,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [, setGeonames] = useState([]);
-  const [hourSelected, setHour] = useState(dayjs('2022-04-17T15:30'));
+  const [hourSelected, setHour] = useState(dayjs(new Date().toISOString()));
   const [passwordUser, setPasswordUser] = useState('');
   const [passwordSaved, setPasswordSaved] = useState('');
 
@@ -79,18 +79,6 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   };
 
   const handleChangeTime = async () => {
-    // const timeZone = moment(tickets[0].expectedTime).format('Z');
-    // let hour = hourSelected;
-    // console.log(hour);
-    // console.log(tickets[0].expectedTime);
-    // console.log(tickets[0].enterTime);
-    // console.log(timeZone);
-    // if (timeZone.includes('-')) {
-    //   hour = dayjs(hour).subtract(parseInt(timeZone.replace('-', '').split(':')[0], 10), 'hours');
-    // } else {
-    //   hour = dayjs(hour).add(parseInt(timeZone.replace('+', '').split(':')[0], 10), 'hours');
-    // }
-    // console.log(hour);
     const response = await fetch(`api/salidas/${info.salida.id}/adjustment`, {
       method: 'POST',
       headers: {
@@ -110,7 +98,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   const footerContent = (
     <div>
       <Button
-        label="No"
+        label={t('sharedNo')}
         icon="pi pi-times"
         onClick={() => {
           setVisible(false);
@@ -118,7 +106,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         className="p-button-text"
       />
       <Button
-        label="Yes"
+        label={t('sharedYes')}
         icon="pi pi-check"
         onClick={() => {
           if (passwordEquals()) {
@@ -138,6 +126,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         <Button label={t('changeExitTime')} icon="pi pi-external-link" onClick={() => setVisible(true)} />
       </div>
       <DropdownComponents
+        key={`dd-${deviceId}`}
         setOption={handleSelectedOption}
         selectOption={optionSelected}
         label=""
@@ -169,7 +158,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         </div>
       </div>
       {tickets.map((ticket) => (
-        <div className="bodyExitst">
+        <div key={`t-${ticket.id}`} className="bodyExitst">
           <div className="columns bodyCol1">
             {`${t('geofence')} - ${ticket.geofeceId}`}
           </div>
@@ -184,7 +173,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         </div>
       ))}
       <div className="card flex justify-content-center">
-        <Dialog header={t('changeExitTime')} visible={visible} style={{ width: '16.5vw' }} breakpoints={{ '960px': '75vw', '641px': '100vw', '1500px': '35vm', '1200px': '50vm' }} onHide={() => setVisible(false)} footer={footerContent}>
+        <Dialog header={t('changeExitTime')} visible={visible} style={{ width: '16.5vw' }} breakpoints={{ '960px': '75vw', '641px': '100vw', '1500px': '35vm', '1200px': '50vm' }} onHide={() => setVisible(false)} footer={(passwordEquals() && passwordUser !== '') ? footerContent : <div />}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer
               components={[
@@ -196,7 +185,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
               </DemoItem>
             </DemoContainer>
           </LocalizationProvider>
-          <TextField className="passwordUser" style={{ height: '3rem', width: '100%' }} label="Contraseña" value={passwordUser} onChange={handleChangePassword} />
+          <TextField type="password" className="passwordUser" style={{ height: '3rem', width: '100%' }} label="Contraseña" value={passwordUser} onChange={handleChangePassword} />
           {(passwordUser !== '' && !passwordEquals()) && <span style={{ color: 'red' }}>{t('password_wrong')}</span>}
         </Dialog>
       </div>

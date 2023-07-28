@@ -144,19 +144,19 @@ const CalendarPage = () => {
                 <>
                   <TextField
                     label={t('reportFrom')}
-                    type="datetime-local"
-                    value={moment(lines[5].slice(-15)).locale('en').format(moment.HTML5_FMT.DATETIME_LOCAL)}
+                    type="time"
+                    value={moment(lines[5].slice(-15)).locale('en').format(moment.HTML5_FMT.TIME)}
                     onChange={(e) => {
-                      const time = formatCalendarTime(moment(e.target.value, moment.HTML5_FMT.DATETIME_LOCAL));
+                      const time = formatCalendarTime(moment(e.target.value, moment.HTML5_FMT.TIME));
                       setItem({ ...item, data: updateCalendar(lines, 5, `DTSTART;${time}`) });
                     }}
                   />
                   <TextField
                     label={t('reportTo')}
-                    type="datetime-local"
-                    value={moment(lines[6].slice(-15)).locale('en').format(moment.HTML5_FMT.DATETIME_LOCAL)}
+                    type="time"
+                    value={moment(lines[6].slice(-15)).locale('en').format(moment.HTML5_FMT.TIME)}
                     onChange={(e) => {
-                      const time = formatCalendarTime(moment(e.target.value, moment.HTML5_FMT.DATETIME_LOCAL));
+                      const time = formatCalendarTime(moment(e.target.value, moment.HTML5_FMT.TIME));
                       setItem({ ...item, data: updateCalendar(lines, 6, `DTEND;${time}`) });
                     }}
                   />
@@ -167,7 +167,7 @@ const CalendarPage = () => {
                       value={rule.frequency}
                       onChange={(e) => setItem({ ...item, data: updateCalendar(lines, 7, formatRule({ frequency: e.target.value })) })}
                     >
-                      {['ONCE', 'DAILY', 'WEEKLY', 'MONTHLY'].map((it) => (
+                      {['DAILY', 'WEEKLY', 'MONTHLY'].map((it) => (
                         <MenuItem key={it} value={it}>{t(prefixString('calendar', it.toLowerCase()))}</MenuItem>
                       ))}
                     </Select>

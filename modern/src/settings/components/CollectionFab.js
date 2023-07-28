@@ -25,7 +25,7 @@ const CollectionFab = ({ editPath, disabled }) => {
   if (!readonly && !disabled) {
     return (
       <Fab size="medium" color="primary" className={classes.fab} onClick={() => navigate(editPath)}>
-        <AddIcon />
+        <AddIcon style={{ color: 'white' }} />
       </Fab>
     );
   }
