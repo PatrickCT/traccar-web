@@ -39,7 +39,7 @@ const SettingsMenu = () => {
   const admin = useAdministrator();
   const manager = useManager();
   const userId = useSelector((state) => state.session.user.id);
-
+  const user = useSelector((state) => state.session.user);
   const features = useFeatures();
 
   return (
@@ -85,26 +85,36 @@ const SettingsMenu = () => {
                 selected={location.pathname.startsWith('/settings/group')}
               />
             )}
-            <MenuItem
-              title={t('settingsSchedules')}
-              link="/settings/schedules"
-              icon={<ScheduleOutlined />}
-              selected={location.pathname.startsWith('/settings/schedule')}
-            />
-            <MenuItem
-              title={t('settingsSections')}
-              link="/settings/sections"
-              icon={<SegmentOutlined />}
-              selected={location.pathname.startsWith('/settings/section')}
-            />
-            {!features.disableDrivers && (
-              <MenuItem
-                title={t('sharedDrivers')}
-                link="/settings/drivers"
-                icon={<PersonIcon />}
-                selected={location.pathname.startsWith('/settings/driver')}
-              />
-            )}
+            {user.attributes.hasOwnProperty('Transporte') &&
+              user.attributes.Transporte &&
+              (
+                <MenuItem
+                  title={t('settingsSchedules')}
+                  link="/settings/schedules"
+                  icon={<ScheduleOutlined />}
+                  selected={location.pathname.startsWith('/settings/schedule')}
+                />
+              )}
+            {user.attributes.hasOwnProperty('Transporte') &&
+              user.attributes.Transporte &&
+              (
+                <MenuItem
+                  title={t('settingsSections')}
+                  link="/settings/sections"
+                  icon={<SegmentOutlined />}
+                  selected={location.pathname.startsWith('/settings/section')}
+                />
+              )}
+            {user.attributes.hasOwnProperty('Transporte') &&
+              user.attributes.Transporte && !features.disableDrivers &&
+              (
+                <MenuItem
+                  title={t('sharedDrivers')}
+                  link="/settings/drivers"
+                  icon={<PersonIcon />}
+                  selected={location.pathname.startsWith('/settings/driver')}
+                />
+              )}
             {!features.disableCalendars && (
               <MenuItem
                 title={t('sharedCalendars')}
