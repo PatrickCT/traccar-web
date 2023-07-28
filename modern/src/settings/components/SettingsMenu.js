@@ -105,16 +105,12 @@ const SettingsMenu = () => {
                   selected={location.pathname.startsWith('/settings/section')}
                 />
               )}
-            {user.attributes.hasOwnProperty('Transporte') &&
-              user.attributes.Transporte && !features.disableDrivers &&
-              (
-                <MenuItem
-                  title={t('sharedDrivers')}
-                  link="/settings/drivers"
-                  icon={<PersonIcon />}
-                  selected={location.pathname.startsWith('/settings/driver')}
-                />
-              )}
+            <MenuItem
+              title={t('sharedDrivers')}
+              link="/settings/drivers"
+              icon={<PersonIcon />}
+              selected={location.pathname.startsWith('/settings/driver')}
+            />
             {!features.disableCalendars && (
               <MenuItem
                 title={t('sharedCalendars')}
