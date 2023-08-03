@@ -144,17 +144,6 @@ const MainPage = () => {
     setFilteredPositions,
   );
 
-  if (selectedPosition) {
-    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-    window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
-    window.position = selectedPosition;
-    new Popup()
-      .setMaxWidth('400px')
-      .setHTML(createPopUp(selectedPosition))
-      .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
-      .addTo(map);
-  }
-
   useEffect(() => {
     // Attach the function to the global window object
     window.navigate = navigate;
@@ -175,6 +164,21 @@ const MainPage = () => {
       delete window.showDevicesList;
     };
   }, []);
+
+  try {
+    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+    window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
+    window.position = selectedPosition;
+    if (window.position) {
+      new Popup()
+        .setMaxWidth('400px')
+        .setHTML(createPopUp(selectedPosition))
+        .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
+        .addTo(map);
+    }
+  } catch (error) {
+    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+  }
 
   return (
     <div className={classes.root}>

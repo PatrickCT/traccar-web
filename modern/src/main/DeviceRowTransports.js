@@ -1,6 +1,5 @@
 import { React, useState } from 'react';
 import { useTheme } from '@emotion/react';
-import { Popup } from 'maplibre-gl';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import makeStyles from '@mui/styles/makeStyles';
@@ -19,8 +18,6 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useAdministrator } from '../common/util/permissions';
 import { useAttributePreference } from '../common/util/preferences';
 import TableExist from './components/TableExits';
-import { map } from '../map/core/MapView';
-import { createPopUp } from '../common/util/mapPopup';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -58,7 +55,6 @@ const DeviceRowTransporte = ({ data, index }) => {
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const admin = useAdministrator();
   const item = data[index];
-  const position = useSelector((state) => state.session.positions[item.id]);
   const geofences = useSelector((state) => state.geofences.items);
   const [isOpened, setIsOpen] = useState(false);
   const [info, setInfo] = useState({});
@@ -95,19 +91,6 @@ const DeviceRowTransporte = ({ data, index }) => {
           dispatch(devicesActions.selectId(item.id));
           setIsOpen(!isOpened);
           if (!desktop) { window.showDevicesList(false); }
-          if (position !== undefined) {
-            map.jumpTo({
-              center: [position.longitude, position.latitude],
-              zoom: Math.max(map.getZoom(), 16),
-            });
-            Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-
-            new Popup()
-              .setMaxWidth('400px')
-              .setHTML(createPopUp(position))
-              .setLngLat([position.longitude, position.latitude])
-              .addTo(map);
-          }
         }}
         disabled={!admin && item.disabled}
       >

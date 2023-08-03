@@ -1,11 +1,11 @@
 import React from 'react';
+// import { Popup } from 'maplibre-gl';
 import { useTheme } from '@emotion/react';
 import { useDispatch, useSelector } from 'react-redux';
 import makeStyles from '@mui/styles/makeStyles';
 import {
   IconButton, Tooltip, ListItemText, ListItemButton, useMediaQuery,
 } from '@mui/material';
-import { Popup } from 'maplibre-gl';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
 import Battery60Icon from '@mui/icons-material/Battery60';
@@ -22,8 +22,8 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useAdministrator } from '../common/util/permissions';
 import { ReactComponent as EngineIcon } from '../resources/images/data/engine.svg';
 import { useAttributePreference } from '../common/util/preferences';
-import { map } from '../map/core/MapView';
-import { createPopUp } from '../common/util/mapPopup';
+// import { map } from '../map/core/MapView';
+// import { createPopUp } from '../common/util/mapPopup';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -102,19 +102,6 @@ const DeviceRow = ({ data, index, style }) => {
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
           if (!desktop) { window.showDevicesList(false); }
-          if (position !== undefined) {
-            map.jumpTo({
-              center: [position.longitude, position.latitude],
-              zoom: Math.max(map.getZoom(), 16),
-            });
-            Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-
-            new Popup()
-              .setMaxWidth('400px')
-              .setHTML(createPopUp(position))
-              .setLngLat([position.longitude, position.latitude])
-              .addTo(map);
-          }
         }}
         disabled={!admin && item.disabled}
       >

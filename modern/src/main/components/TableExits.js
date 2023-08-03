@@ -29,28 +29,14 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   const [visible, setVisible] = useState(false);
   const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
-  const [, setGeonames] = useState([]);
+  const [geonames, setGeonames] = useState([]);
   const [hourSelected, setHour] = useState(dayjs(new Date().toISOString()));
   const [passwordUser, setPasswordUser] = useState('');
   const [passwordSaved, setPasswordSaved] = useState('');
 
   const user = useSelector((state) => state.session.user);
 
-  const handleChangePassword = (event) => {
-    setPasswordUser(event.target.value);
-  };
-
-  const passwordEquals = () => passwordUser === passwordSaved;
-
-  useEffect(() => {
-    setDate(moment().format('YYYY-MM-D'));
-  }, [toDay]);
-
-  useEffect(() => {
-    setPasswordSaved(decode((localStorage.getItem('UGFzc3dvcmRVc2Vy') ?? '')));
-  }, []);
-
-  useEffectAsync(async () => {
+  const loadInfoTable = async () => {
     const response = await fetch(`api/devices/${deviceId}/ticket`);
     if (response.ok) {
       const information = await response.json();
@@ -68,7 +54,25 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
     } else {
       throw Error(await response.text());
     }
-  }, [info.vueltas]);
+  };
+
+  const handleChangePassword = (event) => {
+    setPasswordUser(event.target.value);
+  };
+
+  const passwordEquals = () => passwordUser === passwordSaved;
+
+  useEffect(() => {
+    setDate(moment().format('YYYY-MM-D'));
+  }, [toDay]);
+
+  useEffect(() => {
+    setPasswordSaved(decode((localStorage.getItem('UGFzc3dvcmRVc2Vy') ?? '')));
+  }, []);
+
+  useEffectAsync(async () => {
+    await loadInfoTable();
+  }, []);
 
   const handleSelectedOption = (value) => {
     setOption(value);
@@ -94,6 +98,10 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
       throw Error(await response.text());
     }
   };
+
+  setInterval(async () => {
+    await loadInfoTable();
+  }, 5 * 60 * 1000);
 
   const footerContent = (
     <div>
@@ -160,7 +168,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
       {tickets.map((ticket) => (
         <div key={`t-${ticket.id}`} className="bodyExitst">
           <div className="columns bodyCol1">
-            {`${t('geofence')} - ${ticket.geofeceId}`}
+            {geonames.find((g) => g.id === ticket.geofenceId) !== undefined ? `${geonames.find((g) => g.id === ticket.geofenceId).name}` : `${t('geofence')} - ${ticket.geofeceId}`}
           </div>
           <div className="columns bodyCol2">
             {('expectedTime' in ticket) ? `${t('expectedTime')}: ${moment(ticket.expectedTime).tz('America/Mexico_City').format('HH:mm:ss')}` : `${t('no-data')}`}

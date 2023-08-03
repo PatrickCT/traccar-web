@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.3.slim.min.js"
+        integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-3.2.6.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+    <script src="https://www.pogomap.info/js/others/s2cells.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/ext-all.js"></script>
+    <title>Compartir ubicacion</title>
+
+    <style>
+        #map {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        let _markers = [];
+        let prevArray = [];
+        window.onload = async () => {
+
+            await init();
+
+        }
+
+        let sleep = (s) => {
+            return new Promise(resolve => setTimeout(resolve, s * 1000));
+        };
+
+        const init = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.get('code')) {
+                Notiflix.Report.failure(
+                    'Notiflix Success',
+                    'OK',
+                    'Okay',
+                );
+            } else {
+
+                await verifyCode(urlParams.get('code'));
+            }
+        };
+
+        const verifyCode = async (_code) => {
+            verifyPass('', '');
+            var r = await fetch('./api/links/verify', {
+                method: 'POST', // or 'PUT'
+                body: JSON.stringify({ code: _code }), // data can be `string` or {object}!
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            if (r.ok) {
+                var obj = await r.json();
+                verifyPass(obj.pass, obj.code);
+            } else {
+                Notiflix.Report.failure(
+                    'Notiflix Success',
+                    'Enlace invalido',
+                    'Okay',
+                );
+            }
+
+        };
+
+        const verifyPass = (code, link) => {
+            Notiflix.Confirm.ask(
+                'Mover-T',
+                'Ingrese el codigo del enlace (deje en blanco si no requiere contraseña)',
+                code,
+                'Verificar',
+                'Cancelar',
+                async () => {
+                    initMap();
+                    await getPositions(link);
+                    interval = setInterval(async () => {
+                        await getPositions(link);
+                    }, 1000);
+                },
+                function cancelCb() {
+                    setTimeout(() => {
+                        verifyPass(code, link);
+                    }, 500);
+                }
+            );
+        };
+
+        const initMap = () => {
+
+            var lati = '19.701720919861913';
+            var logi = '-101.20639801025392';
+
+            map = L.map('map').setView([lati, logi], 14);
+
+            var token = 'pk.eyJ1IjoiZG9tb3JpdHoiLCJhIjoiY2o0OHZuY3MwMGo1cTMybGM4MTFrM2dxbCJ9.yCQe43DMRqobazKewlhi9w';
+            var mapboxUrl = 'https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/{z}/{x}/{y}@2x?access_token=' + token;
+            var capas2 = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}';
+
+            // access_token=pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2p0MG01MXRqMW45cjQzb2R6b2ptc3J4MSJ9.zA2W0IkI0c6KaAhJfk9bWg
+
+            layer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                tileSize: 512,
+                maxZoom: 18,
+                zoomOffset: -1,
+                id: 'mapbox/streets-v11',
+                accessToken: 'pk.eyJ1IjoiYmVydGYiLCJhIjoiY2piNDU5ZXdqMnM4ZDJ3cWsxazlxeWZxMyJ9.7Wgr37jGzWrjk6cqLcJRBQ'
+            }).addTo(map);
+
+            $('#map').height($(window).height() - 17).width($(window).width() - 15);
+            map.invalidateSize();
+        };
+
+        const createMarker = (lat, lon, popup) => {
+            var m = L.marker([lat, lon]).addTo(map),
+                p = new L.Popup({ autoClose: false, closeOnClick: false })
+                    .setContent(popup)
+                    .setLatLng([lat, lon]);
+            m.bindPopup(p).openPopup();
+
+            return m;
+        }
+
+        const updateMarker = (marker, lat, lon) => {
+            marker.setLatLng([lat, lon]);
+        }
+
+        const getPositions = async (_code) => {
+            var r = await fetch('./api/links/positions', {
+                method: 'POST', // or 'PUT'
+                body: JSON.stringify({ code: _code }), // data can be `string` or {object}!
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            if (r.ok) {
+                var obj = await r.json();
+                //console.log(detectChanges(obj))
+
+                // $(".leaflet-marker-icon").remove();
+                // $(".leaflet-popup").remove();
+                // $(".leaflet-pane.leaflet-shadow-pane").remove();
+                for (var a of obj) {
+                    console.log(a);
+                    m = _markers.find((m) => m.id == a.deviceId);
+                    if (m == undefined) {
+
+                        marker = createMarker(a.latitude, a.longitude, createPopup(a));
+                        _markers.push({ marker: marker, id: a.deviceId });
+                    } else {
+
+                        updateMarker(m.marker, a.latitude, a.longitude);
+                    }
+
+                }
+
+            } else {
+                Notiflix.Report.failure(
+                    'Notiflix Success',
+                    'Link expiro',
+                    'Okay',
+                );
+
+            }
+
+
+        }
+
+        function detectChanges(currentArray) {
+            let added = [], removed = [], changed = [];
+
+            // Compare lengths to detect additions and removals
+            if (currentArray.length > prevArray.length) {
+                added = currentArray.filter(item => !prevArray.includes(item));
+            } else if (currentArray.length < prevArray.length) {
+                removed = prevArray.filter(item => !currentArray.includes(item));
+            }
+
+            // Convert objects to strings to detect changes
+            for (let i = 0; i < currentArray.length; i++) {
+                if (JSON.stringify(currentArray[i]) !== JSON.stringify(prevArray[i])) {
+                    changed.push(currentArray[i]);
+                }
+            }
+
+            // Save current array for next comparison
+            prevArray = currentArray.slice();
+
+            return { added, removed, changed };
+        }
+
+        function createPopup(position) {
+            console.log(position);
+            var html = '';
+            html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>"
+            html += "<h3><b>" + attsGetter(position, 'name') + "</b></h3></div>";
+            html += valueParser(position, specialAtts(position, 'ignition'));
+            html += valueParser(position, specialAtts(position, 'motion'));
+            html += valueParser(position, specialAtts(position, 'dateTime'));
+            html += valueParser(position, specialAtts(position, 'status'));
+            html += valueParser(position, specialAtts(position, 'attribute.fuel'));
+            html += valueParser(position, specialAtts(position, 'attribute.totalDistance'));
+            html += valueParser(position, specialAtts(position, 'speed'))
+            html += valueParser(position, specialAtts(position, 'attribute.hours'));
+            html += valueParser(position, specialAtts(position, 'temperaturaC')) != '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
+            html += valueParser(position, specialAtts(position, 'temperaturaC')) != '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
+            html += valueParser(position, specialAtts(position, 'temp2')) != '' ? valueParser(position, specialAtts(position, 'temp2')) : '';
+            html += valueParser(position, 'bateria')
+            html += valueParser(position, specialAtts(position, 'lastAlarm'))
+            html += '<br>'
+
+
+
+            return html;
+
+        };
+
+        function specialAtts(obj, attribute) {
+            switch (obj.data?.protocol ? obj.data.protocol : '') {
+                case 'ruptela':
+                    {
+                        switch (attribute) {
+                            case 'ignition':
+                                {
+                                    return 'io409';
+                                }
+                            case 'motion':
+                                {
+                                    return 'motion';
+                                }
+                            case 'odometer':
+                                {
+                                    return 'io65';
+                                }
+                            default:
+                                {
+                                    return attribute;
+                                }
+                        }
+                    }
+                case 'teltonika': {
+                    switch (attribute) {
+                        case 'bateria':
+                            {
+                                return 'io113';
+                            }
+                        default:
+                            {
+                                return attribute;
+                            }
+                    }
+                }
+                default:
+                    {
+                        return attribute;
+                    }
+            }
+        }
+
+        function alarmTranslator(alarm) {
+            switch (alarm.toUpperCase()) {
+                case 'General'.toUpperCase():
+                    {
+                        return 'General';
+                        break;
+                    }
+                case 'Sos'.toUpperCase():
+                    {
+                        return 'SOS';
+                        break;
+                    }
+                case 'Vibration'.toUpperCase():
+                    {
+                        return 'Vibración';
+                        break;
+                    }
+                case 'Movement'.toUpperCase():
+                    {
+                        return 'En movimiento';
+                        break;
+                    }
+                case 'Lowspeed'.toUpperCase():
+                    {
+                        return 'Baja velocidad';
+                        break;
+                    }
+                case 'Overspeed'.toUpperCase():
+                    {
+                        return 'Exceso de velocidad';
+                        break;
+                    }
+                case 'FallDown'.toUpperCase():
+                    {
+                        return 'Alarma';
+                        break;
+                    }
+                case 'LowPower'.toUpperCase():
+                    {
+                        return 'Energia baja';
+                        break;
+                    }
+                case 'LowBattery'.toUpperCase():
+                    {
+                        return 'Bateria baja';
+                        break;
+                    }
+                case 'Fault'.toUpperCase():
+                    {
+                        return 'Alarma de fallo';
+                        break;
+                    }
+                case 'PowerOff'.toUpperCase():
+                    {
+                        return 'Apagado';
+                        break;
+                    }
+                case 'PowerOn'.toUpperCase():
+                    {
+                        return 'Encendido';
+                        break;
+                    }
+                case 'Door'.toUpperCase():
+                    {
+                        return 'Puerta';
+                        break;
+                    }
+                case 'Lock'.toUpperCase():
+                    {
+                        return 'Bloqueado';
+                        break;
+                    }
+                case 'Unlock'.toUpperCase():
+                    {
+                        return 'Desbloqueado';
+                        break;
+                    }
+                case 'Geofence'.toUpperCase():
+                    {
+                        return 'Geocerca';
+                        break;
+                    }
+                case 'GeofenceEnter'.toUpperCase():
+                    {
+                        return 'Ingreso a la geocerca';
+                        break;
+                    }
+                case 'GeofenceExit'.toUpperCase():
+                    {
+                        return 'Salio de la geocerca';
+                        break;
+                    }
+                case 'GpsAntennaCut'.toUpperCase():
+                    {
+                        return 'Señal de antena del GPS perdida';
+                        break;
+                    }
+                case 'Accident'.toUpperCase():
+                    {
+                        return 'Accidente';
+                        break;
+                    }
+                case 'Tow'.toUpperCase():
+                    {
+                        return 'Remolque';
+                        break;
+                    }
+                case 'Idle'.toUpperCase():
+                    {
+                        return 'Reposo';
+                        break;
+                    }
+                case 'HighRpm'.toUpperCase():
+                    {
+                        return 'Revoluciones altas';
+                        break;
+                    }
+                case 'HardAcceleration'.toUpperCase():
+                    {
+                        return 'Aceleración brusca';
+                        break;
+                    }
+                case 'HardBraking'.toUpperCase():
+                    {
+                        return 'Frenado brusco';
+                        break;
+                    }
+                case 'HardCornering'.toUpperCase():
+                    {
+                        return 'Giro brusco';
+                        break;
+                    }
+                case 'LaneChange'.toUpperCase():
+                    {
+                        return 'Cambio de carril';
+                        break;
+                    }
+                case 'FatigueDriving'.toUpperCase():
+                    {
+                        return 'Conduciendo con cansancio';
+                        break;
+                    }
+                case 'PowerCut'.toUpperCase():
+                    {
+                        return 'Desconexión de bateria';
+                        break;
+                    }
+                case 'PowerRestored'.toUpperCase():
+                    {
+                        return 'Fuente de poder restaurada';
+                        break;
+                    }
+                case 'Jamming'.toUpperCase():
+                    {
+                        return 'Interferencia';
+                        break;
+                    }
+                case 'Temperature'.toUpperCase():
+                    {
+                        return 'Temperatura';
+                        break;
+                    }
+                case 'alarmMaxTemp'.toUpperCase():
+                    {
+                        return 'Limite de temperatura maxima';
+                        break;
+                    }
+                case 'alarmMinTemp'.toUpperCase():
+                    {
+                        return 'Limite de temperatura minima';
+                        break;
+                    }
+                case 'Parking'.toUpperCase():
+                    {
+                        return 'Se estaciono';
+                        break;
+                    }
+                case 'Shock'.toUpperCase():
+                    {
+                        return 'Choque';
+                        break;
+                    }
+                case 'Bonnet'.toUpperCase():
+                    {
+                        return 'Alarma';
+                        break;
+                    }
+                case 'FootBrake'.toUpperCase():
+                    {
+                        return 'Freno de mano';
+                        break;
+                    }
+                case 'FuelLeak'.toUpperCase():
+                    {
+                        return 'Perdida de combustible';
+                        break;
+                    }
+                case 'Tampering'.toUpperCase():
+                    {
+                        return 'Manipulación';
+                        break;
+                    }
+                case 'Removing'.toUpperCase():
+                    {
+                        return 'Removiendo';
+                        break;
+                    }
+                case 'BleeTagLowPower'.toUpperCase():
+                    {
+                        return 'Energia baja';
+                        break;
+                    }
+                case 'BleeTagDriver'.toUpperCase():
+                    {
+                        return 'Conductor';
+                        break;
+                    }
+                case 'BleeOpenDoor'.toUpperCase():
+                    {
+                        return 'Puerta abierta';
+                        break;
+                    }
+                case 'BleeCloseDoor'.toUpperCase():
+                    {
+                        return 'Puerta cerrada';
+                        break;
+                    }
+                case 'DeviceOnline'.toUpperCase():
+                    {
+                        return 'Dispositivo en linea';
+                        break;
+                    }
+                case 'DeviceOffline'.toUpperCase():
+                    {
+                        return 'Dispositivo fuera de linea';
+                        break;
+                    }
+                case 'ignitionOn'.toUpperCase():
+                    {
+                        return 'Encendido';
+                        break;
+                    }
+                case 'ignitionOff'.toUpperCase():
+                    {
+                        return 'Apagado';
+                        break;
+                    }
+            }
+        }
+
+        function attsGetter(obj, attribute) {
+            //obj has the form {att, att2, att..., data{data_att, data_att2, data_att..., attributes:{atribute...}}}
+            //access att like obj.get('att'), data_att like obj.get('data').get('data_att')
+            if (obj == null || obj == undefined) {
+                return null;
+            }
+            switch (attribute) {
+                case 'status':
+                    {
+                        var status = (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] ? obj.attributes[attribute] : ''))
+                        return (status == 'online') ? 'En linea' : status == 'offline' ? 'Fuera de linea' : ''
+                        break;
+                    }
+                case 'temperaturaC':
+                    {
+                        var temperature = attsGetter(obj, 'temperature');
+                        return temperature;
+                        break;
+                    }
+                case 'temperaturaF':
+                    {
+                        var temperature = attsGetter(obj, 'temperature');
+                        return temperature != null ? ((temperature * 1.8) + 32) : null;
+                        break;
+                    }
+
+                case 'temperature':
+                    {
+                        var temperature = attsGetter(obj, 'deviceTemp') ? attsGetter(obj, 'deviceTemp') : attsGetter(obj, 'temp1') ? attsGetter(obj, 'temp1') : attsGetter(obj, 'bleeTemperature') ? attsGetter(obj, 'bleeTemperature') : null;
+                        return temperature;
+                        break;
+                    }
+
+                case 'attributes.deviceTemp':
+                    {
+                        var temperature = attsGetter(obj, 'temp1') != '' ? attsGetter(obj, 'temp1') : attsGetter(obj);
+                        return temperature;
+                        break;
+                    }
+                case 'name':
+                    {
+                        var value = (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] ? obj.attributes[attribute] : ''))
+                        return value ? value : '';
+                        break;
+                    }
+                case 'ignition':
+                    {
+                        var motion = attsGetter(obj, 'motion')
+                        var value = (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] != undefined ? obj.attributes[attribute] : (obj['attribute.' + attribute] ? obj['attribute.' + attribute] : null)))
+                        return value ? 'Si' : (motion == 'Si') ? 'Si' : 'No';
+                    }
+                case 'motion':
+                    {
+                        var value = (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] ? obj.attributes[attribute] : ''))
+                        return value ? 'Si' : 'No';
+                        break;
+                    }
+                case 'fuel':
+                    {
+                        var value = (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] ? obj.attributes[attribute] : ''))
+                        return (value ? Number(value).toFixed(1) + ' I' : (attsGetter(obj, 'adc1') ? ((attsGetter(obj, 'adc1') * 50) / 100) : ''));
+                        break;
+
+                    }
+                case 'hours':
+                    {
+                        var value = (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] ? obj.attributes[attribute] : ''))
+                        return (value ? msToTime(value) : '');
+                        break;
+
+                    }
+
+                case 'totalDistance':
+                    {
+                        var value = (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] ? obj.attributes[attribute] : ''))
+                        return (value ? (value / 1000).toFixed(2) + ' Km' : '');
+                        break;
+
+                    }
+                case 'dateTime':
+                    {
+                        var value = attsGetter(obj, 'fixTime');
+
+                        var dt = new Date((value.toString()))
+
+                        value = Ext.Date.format(dt, 'd/m/Y H:i:s a');
+
+                        return value;
+                        break;
+
+                    }
+                case 'speed':
+                    {
+                        var value = (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] ? obj.attributes[attribute] : ''))
+                        return (value ? (value).toFixed(1) + ' km/h' : (0).toFixed(1) + ' km/h')
+                        break;
+                    }
+                case 'direccion':
+                    {
+                        return 'direccion'
+                        break;
+                    }
+                default:
+                    {
+                        return (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] ? obj.attributes[attribute] : ''))
+                        break;
+                    }
+            }
+
+        }
+
+
+        function valueParser(obj, value) {
+            if (!attsGetter(obj, value)) {
+                return '';
+            }
+            switch (value) {
+                case 'name':
+                    {
+                        return '<h3><b>' + attsGetter(obj, value) + '</b></h3>';
+                        break;
+                    }
+                case 'ignition':
+                    {
+                        return '<b style="font-weight: bold;text-transform: uppercase;">Encendido:</b> ' + attsGetter(obj, value) + '<br>';
+                        break;
+                    }
+                case 'motion':
+                    {
+                        return '<b style="font-weight: bold;text-transform: uppercase;">Movimiento:</b> ' + attsGetter(obj, value) + '<br>';
+                        break;
+                    }
+                case 'dateTime':
+                    {
+                        return '<b style="font-weight: bold;text-transform: uppercase;">Fecha:</b> ' + attsGetter(obj, value) + '<br>';
+                        break;
+                    }
+                case 'status':
+                    {
+                        return '<b style="font-weight: bold;text-transform: uppercase;">Estado:</b> ' + attsGetter(obj, value) + '<br>';
+                        break;
+                    }
+                case 'speed':
+                    {
+                        return '<b style="font-weight: bold;text-transform: uppercase;">Velocidad:</b> ' + attsGetter(obj, value) + '<br>';
+                        break;
+                    }
+                case 'direccion':
+                    {
+                        return "<div id='pop-up-address'><b style='font-weight: bold;text-transform: uppercase;'>Dirección:</b> " + "<a href='#' onclick='Ext.fireEvent(\"stategeocode\")' style='font-weight: bold; color:white;'>Click para ver</a></div>";
+                        break;
+                    }
+                case 'fuel':
+                    {
+                        return '<b style="font-weight: bold;text-transform: uppercase;">Combustible:</b> ' + attsGetter(obj, value) + '<br>';
+                        break;
+
+                    }
+                case 'hours':
+                    {
+                        return '<b style="font-weight: bold;text-transform: uppercase;">Horas:</b> ' + attsGetter(obj, value) + '<br>';
+                        break;
+
+                    }
+
+                case 'totalDistance':
+                    {
+                        return '<b style="font-weight: bold;text-transform: uppercase;">Distancia total :</b> ' + attsGetter(obj, value) + '<br>';
+                        break;
+
+                    }
+                case 'temperaturaC':
+                    {
+                        return attsGetter(obj, value) != null ? '<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ' + attsGetter(obj, value) + '<br>' : '';
+                        break;
+
+                    }
+                case 'temperaturaF':
+                    {
+                        return attsGetter(obj, value) != null ? '<b style="font-weight: bold;text-transform: uppercase;">Temperatura °F:</b> ' + attsGetter(obj, value) + '<br>' : '';
+                        break;
+                    }
+            }
+        }
+    </script>
+</body>
+
+</html>

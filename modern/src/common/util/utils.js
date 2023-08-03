@@ -430,6 +430,8 @@ export const valueParser = (obj, value) => {
       return `<b style="font-weight: bold;text-transform: uppercase;">Nivel de bateria:</b> ${attsGetter(obj, specialAtts(obj, value))}%<br>`;
     case 'lastAlarm':
       return `<b style="font-weight: bold;text-transform: uppercase;">Ultima alarma:</b> ${attsGetter(obj, value)}<br>`;
+    case 'protocol':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Protocolo:</b> ${attsGetter(obj, value)}<br>`;
   }
   return '';
 };

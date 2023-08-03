@@ -117,6 +117,7 @@ export const createPopUp = (position) => {
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
   html += valueParser(position, 'bateria');
   html += valueParser(position, specialAtts(position, 'lastAlarm'));
+  html += valueParser(position, specialAtts(position, 'protocol'));
   html += '<br>';
 
   html += "<div style='display: table; margin: auto'>";

@@ -45,12 +45,16 @@ const SettingsMenu = () => {
   return (
     <>
       <List>
-        <MenuItem
-          title={t('sharedPreferences')}
-          link="/settings/preferences"
-          icon={<SettingsIcon />}
-          selected={location.pathname === '/settings/preferences'}
-        />
+        {
+          !user.attributes.hasOwnProperty('Demo') && (
+            <MenuItem
+              title={t('sharedPreferences')}
+              link="/settings/preferences"
+              icon={<SettingsIcon />}
+              selected={location.pathname === '/settings/preferences'}
+            />
+          )
+        }
         {!readonly && (
           <>
             <MenuItem
@@ -59,12 +63,15 @@ const SettingsMenu = () => {
               icon={<NotificationsIcon />}
               selected={location.pathname.startsWith('/settings/notification')}
             />
-            <MenuItem
-              title={t('settingsUser')}
-              link={`/settings/user/${userId}`}
-              icon={<PersonIcon />}
-              selected={location.pathname === `/settings/user/${userId}`}
-            />
+
+            {!user.attributes.hasOwnProperty('Demo') && (
+              <MenuItem
+                title={t('settingsUser')}
+                link={`/settings/user/${userId}`}
+                icon={<PersonIcon />}
+                selected={location.pathname === `/settings/user/${userId}`}
+              />
+            )}
             <MenuItem
               title={t('deviceTitle')}
               link="/settings/devices"
@@ -119,7 +126,7 @@ const SettingsMenu = () => {
                 selected={location.pathname.startsWith('/settings/calendar')}
               />
             )}
-            {!features.disableComputedAttributes && (
+            {!features.disableComputedAttributes && !user.attributes.hasOwnProperty('Demo') && (
               <MenuItem
                 title={t('sharedComputedAttributes')}
                 link="/settings/attributes"
@@ -127,7 +134,7 @@ const SettingsMenu = () => {
                 selected={location.pathname.startsWith('/settings/attribute')}
               />
             )}
-            {!features.disableMaintenance && (
+            {!features.disableMaintenance && !user.attributes.hasOwnProperty('Demo') && (
               <MenuItem
                 title={t('sharedMaintenance')}
                 link="/settings/maintenances"
@@ -135,12 +142,14 @@ const SettingsMenu = () => {
                 selected={location.pathname.startsWith('/settings/maintenance')}
               />
             )}
-            <MenuItem
-              title={t('sharedSavedCommands')}
-              link="/settings/commands"
-              icon={<PublishIcon />}
-              selected={location.pathname.startsWith('/settings/command')}
-            />
+            {!user.attributes.hasOwnProperty('Demo') && (
+              <MenuItem
+                title={t('sharedSavedCommands')}
+                link="/settings/commands"
+                icon={<PublishIcon />}
+                selected={location.pathname.startsWith('/settings/command')}
+              />
+            )}
           </>
         )}
       </List>
