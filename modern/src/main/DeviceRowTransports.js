@@ -1,5 +1,4 @@
 import { React, useState } from 'react';
-import { useTheme } from '@emotion/react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import makeStyles from '@mui/styles/makeStyles';
@@ -7,7 +6,6 @@ import {
   IconButton,
   ListItemText,
   ListItemButton,
-  useMediaQuery,
 } from '@mui/material';
 import Collapse from 'react-collapse';
 import { devicesActions } from '../store';
@@ -51,8 +49,7 @@ const DeviceRowTransporte = ({ data, index }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const t = useTranslation();
-  const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+
   const admin = useAdministrator();
   const item = data[index];
   const geofences = useSelector((state) => state.geofences.items);
@@ -90,7 +87,6 @@ const DeviceRowTransporte = ({ data, index }) => {
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
           setIsOpen(!isOpened);
-          if (!desktop) { window.showDevicesList(false); }
         }}
         disabled={!admin && item.disabled}
       >
