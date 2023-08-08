@@ -13,6 +13,13 @@ import { useAttributePreference } from './common/util/preferences';
 
 const logoutCode = 4000;
 
+function importAll(r) {
+  return r.keys().map(r);
+}
+
+const sosFiles = importAll(require.context('./resources/alarms/sos', false, /\.(mp3|wav)$/));
+const powerCutFiles = importAll(require.context('./resources/alarms/powerCut', false, /\.(mp3|wav)$/));
+
 const SocketController = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -109,7 +116,21 @@ const SocketController = () => {
   useEffect(() => {
     events.forEach((event) => {
       if (soundEvents.includes(event.type) || (event.type === 'alarm' && soundAlarms.includes(event.attributes.alarm))) {
-        new Audio(alarm).play();
+        let audioFile = alarm;
+
+        if (event.attributes.alarm) {
+          switch (event.attributes.alarm) {
+            case 'sos':
+              audioFile = sosFiles[Math.floor(Math.random() * sosFiles.length)];
+              break;
+            case 'powerCut':
+              audioFile = powerCutFiles[Math.floor(Math.random() * powerCutFiles.length)];
+              break;
+            default: break;
+          }
+        }
+
+        new Audio(audioFile).play();
       }
     });
   }, [events, soundEvents, soundAlarms]);
