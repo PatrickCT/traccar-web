@@ -61,12 +61,12 @@ const MainToolbar = ({
   return (
     <Toolbar ref={toolbarRef} className={classes.toolbar}>
       <IconButton edge="start" onClick={() => setDevicesOpen(!devicesOpen)}>
-        {devicesOpen ? <MapIcon style={{ color: 'white' }} /> : <ViewListIcon />}
+        {devicesOpen ? <MapIcon style={{ color: 'white' }} /> : <ViewListIcon style={{ color: 'white' }} />}
       </IconButton>
       <OutlinedInput
         ref={inputRef}
         placeholder={user.attributes.hasOwnProperty('Transporte') &&
-        user.attributes.Transporte ? t('sharedSearchDevicesTransport') : t('sharedSearchDevices')}
+          user.attributes.Transporte ? t('sharedSearchDevicesTransport') : t('sharedSearchDevices')}
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         onFocus={() => setDevicesAnchorEl(toolbarRef.current)}
@@ -168,11 +168,14 @@ const MainToolbar = ({
           </FormGroup>
         </div>
       </Popover>
-      <IconButton edge="end" onClick={() => navigate('/settings/device')} disabled={deviceReadonly}>
-        <Tooltip open={!deviceReadonly && Object.keys(devices).length === 0} title={t('deviceRegisterFirst')} arrow>
-          <AddIcon style={{ color: 'white' }} />
-        </Tooltip>
-      </IconButton>
+      {((user.deviceLimit > 0 && filteredDevices.length < user.deviceLimit) || user.deviceLimit === -1) &&
+        (
+          <IconButton edge="end" onClick={() => navigate('/settings/device')} disabled={deviceReadonly}>
+            <Tooltip open={!deviceReadonly && Object.keys(devices).length === 0} title={t('deviceRegisterFirst')} arrow>
+              <AddIcon style={{ color: 'white' }} />
+            </Tooltip>
+          </IconButton>
+        )}
 
     </Toolbar>
   );

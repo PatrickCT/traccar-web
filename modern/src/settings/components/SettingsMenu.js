@@ -126,14 +126,14 @@ const SettingsMenu = () => {
                 selected={location.pathname.startsWith('/settings/calendar')}
               />
             )}
-            {!features.disableComputedAttributes && !user.attributes.hasOwnProperty('Demo') && (
+            {/* {!features.disableComputedAttributes && !user.attributes.hasOwnProperty('Demo') && (
               <MenuItem
                 title={t('sharedComputedAttributes')}
                 link="/settings/attributes"
                 icon={<StorageIcon />}
                 selected={location.pathname.startsWith('/settings/attribute')}
               />
-            )}
+            )} */}
             {!features.disableMaintenance && !user.attributes.hasOwnProperty('Demo') && (
               <MenuItem
                 title={t('sharedMaintenance')}
@@ -142,7 +142,7 @@ const SettingsMenu = () => {
                 selected={location.pathname.startsWith('/settings/maintenance')}
               />
             )}
-            {!user.attributes.hasOwnProperty('Demo') && (
+            {!user.attributes.hasOwnProperty('Demo') && user.administrator && (
               <MenuItem
                 title={t('sharedSavedCommands')}
                 link="/settings/commands"

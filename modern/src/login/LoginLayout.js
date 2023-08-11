@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     alignItems: 'center',
     // background: theme.palette.primary.main,
-    background: 'blue', // cambiar color login
+    background: '#163b61', // cambiar color login
     paddingBottom: theme.spacing(5),
     width: theme.dimensions.sidebarWidth,
     [theme.breakpoints.down('lg')]: {
@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down('sm')]: {
       width: '0px',
     },
+    zIndex: 2,
   },
   paper: {
     display: 'flex',

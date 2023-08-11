@@ -103,6 +103,30 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
     await loadInfoTable();
   }, 5 * 60 * 1000);
 
+  const calcDiffColor = (ticket) => {
+    let border = '#163b61';
+    let backgroundColor = '#9dc5ff  ';
+
+    if (ticket.enterTime === undefined || ticket.enterTime === null) {
+      border = '#163b61';
+      backgroundColor = '#9dc5ff';
+    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= -3) {
+      border = '#cc9c00';
+      backgroundColor = '#ffe798';
+    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= 0 && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > -3) {
+      border = '#065f46';
+      backgroundColor = '#d1fae5';
+    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > 0) {
+      border = '#ff185d';
+      backgroundColor = '#fde1f0';
+    } else {
+      border = '#163b61';
+      backgroundColor = '#9dc5ff';
+    }
+
+    return { backgroundColor, border, borderStyle: 'solid', borderWidth: '3px', marginBottom: '3px', borderRadius: '8px' };
+  };
+
   const footerContent = (
     <div>
       <Button
@@ -166,7 +190,8 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         </div>
       </div>
       {tickets.map((ticket) => (
-        <div key={`t-${ticket.id}`} className="bodyExitst">
+
+        <div style={calcDiffColor(ticket)} key={`t-${ticket.id}`} className="bodyExitst">
           <div className="columns bodyCol1">
             {geonames.find((g) => g.id === ticket.geofenceId) !== undefined ? `${geonames.find((g) => g.id === ticket.geofenceId).name}` : `${t('geofence')} - ${ticket.geofeceId}`}
           </div>
@@ -175,7 +200,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
             <br />
             {('enterTime' in ticket) ? `${t('arrive')}: ${moment(ticket.enterTime).tz('America/Mexico_City').format('HH:mm:ss')}` : `${t('no-data')}`}
           </div>
-          <div className="columns bodyCol3" style={parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > 0 ? { color: 'red' } : parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= 0 && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > -3 ? { color: 'green' } : { color: 'orange' }}>
+          <div className="columns bodyCol3" style={{ color: 'black' }}>
             {('enterTime' in ticket) && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10)}
           </div>
         </div>

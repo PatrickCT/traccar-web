@@ -141,7 +141,7 @@ const MaintenancePage = () => {
                   value={item.type || ''}
                   onChange={onMaintenanceTypeChange}
                 >
-                  {convertToList(positionAttributes).map(({ key, name }) => (
+                  {convertToList(positionAttributes).filter((key) => (key.key === 'odometer' || key.key === 'deviceTime' || key.key === 'hours')).map(({ key, name }) => (
                     <MenuItem key={key} value={key}>{name}</MenuItem>
                   ))}
                 </Select>

@@ -29,6 +29,7 @@ const CombinedReportPage = () => {
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const fontSize = 14;
 
   const createMarkers = () => items.flatMap((item) => item.events.map((event) => {
     const position = item.positions.find((p) => event.positionId === p.id);
@@ -90,8 +91,8 @@ const CombinedReportPage = () => {
               {!loading ? items.flatMap((item) => item.events.map((event, index) => (
                 <TableRow key={event.id}>
                   <TableCell>{index ? '' : devices[item.deviceId].name}</TableCell>
-                  <TableCell>{formatTime(event.eventTime, 'seconds', hours12)}</TableCell>
-                  <TableCell>{t(prefixString('event', event.type))}</TableCell>
+                  <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }}>{formatTime(event.eventTime, 'seconds', hours12)}</TableCell>
+                  <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }}>{t(prefixString('event', event.type))}</TableCell>
                 </TableRow>
               ))) : (<TableShimmer columns={3} />)}
             </TableBody>

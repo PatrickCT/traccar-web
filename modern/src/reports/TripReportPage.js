@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  IconButton, Table, TableBody, TableCell, TableHead, TableRow,
+  Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
-import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
+
 import {
   formatDistance, formatSpeed, formatHours, formatVolume, formatTime,
 } from '../common/util/formatter';
@@ -57,6 +56,7 @@ const TripReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [route, setRoute] = useState(null);
+  const fontSize = 14;
 
   const createMarkers = () => ([
     {
@@ -109,7 +109,9 @@ const TripReportPage = () => {
           headers: { Accept: 'application/json' },
         });
         if (response.ok) {
-          setItems(await response.json());
+          const t = await response.json();
+          setItems(t);
+          setSelectedItem(t[0]);
         } else {
           throw Error(await response.text());
         }
@@ -186,20 +188,14 @@ const TripReportPage = () => {
             </TableHead>
             <TableBody>
               {!loading ? items.map((item) => (
-                <TableRow key={item.startPositionId}>
-                  <TableCell className={classes.columnAction} padding="none">
-                    {selectedItem === item ? (
-                      <IconButton size="small" onClick={() => setSelectedItem(null)}>
-                        <GpsFixedIcon fontSize="small" />
-                      </IconButton>
-                    ) : (
-                      <IconButton size="small" onClick={() => setSelectedItem(item)}>
-                        <LocationSearchingIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                  </TableCell>
+                <TableRow
+                  key={item.id}
+                  onClick={() => setSelectedItem(item)}
+                  style={{ backgroundColor: selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent' }}
+                >
+                  <TableCell className={classes.columnAction} padding="none" />
                   {columns.map((key) => (
-                    <TableCell key={key}>
+                    <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }} key={key}>
                       {formatValue(item, key)}
                     </TableCell>
                   ))}

@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  IconButton,
   Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
-import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
+
 import {
   formatDistance, formatHours, formatVolume, formatTime,
 } from '../common/util/formatter';
@@ -45,6 +43,7 @@ const StopReportPage = () => {
   const distanceUnit = useAttributePreference('distanceUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
   const hours12 = usePreference('twelveHourFormat');
+  const fontSize = 14;
 
   const [columns, setColumns] = usePersistedState('stopColumns', ['startTime', 'endTime', 'startOdometer', 'address']);
   const [items, setItems] = useState([]);
@@ -144,20 +143,14 @@ const StopReportPage = () => {
             </TableHead>
             <TableBody>
               {!loading ? items.map((item) => (
-                <TableRow key={item.positionId}>
-                  <TableCell className={classes.columnAction} padding="none">
-                    {selectedItem === item ? (
-                      <IconButton size="small" onClick={() => setSelectedItem(null)}>
-                        <GpsFixedIcon fontSize="small" />
-                      </IconButton>
-                    ) : (
-                      <IconButton size="small" onClick={() => setSelectedItem(item)}>
-                        <LocationSearchingIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                  </TableCell>
+                <TableRow
+                  key={item.id}
+                  onClick={() => setSelectedItem(item)}
+                  style={{ backgroundColor: selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent' }}
+                >
+                  <TableCell className={classes.columnAction} padding="none" />
                   {columns.map((key) => (
-                    <TableCell key={key}>
+                    <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }} key={key}>
                       {formatValue(item, key)}
                     </TableCell>
                   ))}

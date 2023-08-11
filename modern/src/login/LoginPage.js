@@ -21,6 +21,8 @@ import { handleLoginTokenListeners, nativeEnvironment, nativePostMessage } from 
 import LogoImage from './LogoImage';
 import { useCatch } from '../reactHelper';
 import { loginTour } from './login_tour';
+import VideoPlayer from '../common/components/VideoPlayer';
+import ctheme from '../common/theme';
 
 const useStyles = makeStyles((theme) => ({
   options: {
@@ -28,10 +30,23 @@ const useStyles = makeStyles((theme) => ({
     top: theme.spacing(1),
     right: theme.spacing(1),
   },
+  loginContainer: {
+    backgroundColor: '#ffffffb3',
+    zIndex: 9,
+    position: 'relative',
+    padding: '30px',
+  },
   container: {
     display: 'flex',
     flexDirection: 'column',
     gap: theme.spacing(2),
+  },
+  videocontainer: {
+    position: 'fixed',
+    right: 0,
+    bottom: -100,
+    minWidth: '100%',
+    minHeight: '105%',
   },
   extraContainer: {
     display: 'flex',
@@ -39,12 +54,14 @@ const useStyles = makeStyles((theme) => ({
   },
   registerButton: {
     minWidth: 'unset',
+    display: 'none',
   },
   resetPassword: {
     cursor: 'pointer',
     textAlign: 'center',
     marginTop: theme.spacing(2),
   },
+
 }));
 
 const LoginPage = () => {
@@ -70,6 +87,7 @@ const LoginPage = () => {
 
   const [announcementShown, setAnnouncementShown] = useState(false);
   const announcement = useSelector((state) => state.session.server.announcement);
+  const desktop = useMediaQuery(ctheme.breakpoints.up('md'));
 
   const generateLoginToken = async () => {
     if (nativeEnvironment) {
@@ -167,92 +185,117 @@ const LoginPage = () => {
           </Tooltip>
         )}
       </div>
-      <div className={classes.container}>
-        {useMediaQuery(theme.breakpoints.down('lg')) && <LogoImage color={theme.palette.primary.main} />}
-        <TextField
-          required
-          error={failed}
-          label={t('userEmail')}
-          name="email"
-          value={email}
-          autoComplete="email"
-          autoFocus={!email}
-          onChange={(e) => setEmail(e.target.value)}
-          onKeyUp={handleSpecialKey}
-          helperText={failed && 'Invalid username or password'}
-          id="user"
-        />
-        <TextField
-          required
-          error={failed}
-          label={t('userPassword')}
-          name="password"
-          value={password}
-          type="password"
-          autoComplete="current-password"
-          autoFocus={!!email}
-          onChange={(e) => setPassword(e.target.value)}
-          onKeyUp={handleSpecialKey}
-          id="pass"
-        />
-        <Button
-          onClick={handlePasswordLogin}
-          onKeyUp={handleSpecialKey}
-          variant="contained"
-          color="secondary"
-          disabled={!email || !password}
-          id="btn-login"
-        >
-          {t('loginLogin')}
-        </Button>
-        {openIdEnabled && (
+      <div className={classes.videocontainer}>
+        <VideoPlayer videoSrc="./videos/file.mp4" />
+      </div>
+      <div style={{ backgroundColor: desktop ? '#ffffffb3' : '#163b6100' }} className={classes.loginContainer}>
+        <div className={classes.container}>
+
+          {useMediaQuery(theme.breakpoints.down('lg')) && <LogoImage color={theme.palette.primary.main} />}
+          <TextField
+            required
+            error={failed}
+            label={t('userEmail')}
+            name="email"
+            value={email}
+            autoComplete="email"
+            autoFocus={!email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyUp={handleSpecialKey}
+            helperText={failed && 'Invalid username or password'}
+            id="user"
+            InputLabelProps={{ style: { color: desktop ? '#000000' : '#fff' } }}
+            inputProps={{ style: { color: desktop ? '#000000' : '#ffffff', backgroundColor: desktop ? '#ffffff' : '#163b61' } }}
+          />
+          <TextField
+            required
+            error={failed}
+            label={t('userPassword')}
+            name="password"
+            value={password}
+            type="password"
+            autoComplete="current-password"
+            autoFocus={!!email}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyUp={handleSpecialKey}
+            id="pass"
+            InputLabelProps={{ style: { color: desktop ? '#000000' : '#fff' } }}
+            inputProps={{
+              style: {
+                color: desktop ? '#000000' : '#ffffff',
+                backgroundColor: desktop ? '#ffffff' : '#163b61',
+                WebkitBoxShadow: desktop
+                  ? '0 0 0 1000px #ffffff inset' // Set the background color even for autofilled input
+                  : '0 0 0 1000px #163b61 inset', // Set the background color for autofilled input
+              },
+            }}
+          />
           <Button
-            onClick={() => handleOpenIdLogin()}
+            onClick={handlePasswordLogin}
+            onKeyUp={handleSpecialKey}
             variant="contained"
             color="secondary"
+            disabled={!email || !password}
+            id="btn-login"
           >
-            {t('loginOpenId')}
+            {t('loginLogin')}
           </Button>
-        )}
-        <div className={classes.extraContainer}>
-          <Button
-            className={classes.registerButton}
-            onClick={() => navigate('/register')}
-            disabled={!registrationEnabled}
-            color="secondary"
-          >
-            {t('loginRegister')}
-          </Button>
-          {languageEnabled && (
-            <FormControl fullWidth>
-              <InputLabel>{t('loginLanguage')}</InputLabel>
-              <Select label={t('loginLanguage')} value={language} onChange={(e) => setLanguage(e.target.value)}>
-                {languageList.map((it) => <MenuItem key={it.code} value={it.code}>{it.name}</MenuItem>)}
-              </Select>
-            </FormControl>
+          {openIdEnabled && (
+            <Button
+              onClick={() => handleOpenIdLogin()}
+              variant="contained"
+              color="secondary"
+            >
+              {t('loginOpenId')}
+            </Button>
           )}
-        </div>
-        {emailEnabled && (
-          <Link
-            onClick={() => navigate('/reset-password')}
-            className={classes.resetPassword}
-            underline="none"
-            variant="caption"
-          >
-            {t('loginReset')}
-          </Link>
-        )}
+          <div className={classes.extraContainer}>
+            <Button
+              className={classes.registerButton}
+              onClick={() => navigate('/register')}
+              disabled={!registrationEnabled}
+              color="secondary"
+            >
+              {t('loginRegister')}
+            </Button>
+            {languageEnabled && (
+              <FormControl fullWidth>
+                <InputLabel style={{ color: desktop ? '#000' : '#fff' }}>{t('loginLanguage')}</InputLabel>
+                <Select
+                  label={t('loginLanguage')}
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  InputLabelProps={{ style: { color: desktop ? '#000000' : '#fff' } }}
+                  style={{ color: desktop ? '#000' : '#fff', backgroundColor: desktop ? '#fff' : '#163b61' }}
+                >
+                  {languageList.map((it) => <MenuItem key={it.code} value={it.code}>{it.name}</MenuItem>)}
+                </Select>
+              </FormControl>
+            )}
+          </div>
+          {emailEnabled && (
+            <Link
+              style={{ color: desktop ? '#000000' : '#ffffff' }}
+              onClick={() => navigate('/reset-password')}
+              className={classes.resetPassword}
+              underline="none"
+              variant="caption"
+            >
+              {t('loginReset')}
+            </Link>
+          )}
 
-        <Tooltip title={`${t('help')} ${t('loginTitle')}`}>
-          <Link
-            onClick={() => loginTour()}
-            className={classes.resetPassword}
-            underline="none"
-            variant="caption"
-          >
-            <InfoOutlined style={{ width: '20px' }} />
-          </Link>
-        </Tooltip>
+          <Tooltip title={`${t('help')} ${t('loginTitle')}`}>
+            <Link
+              onClick={() => loginTour()}
+              className={classes.resetPassword}
+              underline="none"
+              variant="caption"
+            >
+              <InfoOutlined style={{ width: '20px', color: desktop ? '#000000' : '#ffffff' }} />
+            </Link>
+          </Tooltip>
+        </div>
       </div>
       <Snackbar
         open={!!announcement && !announcementShown}

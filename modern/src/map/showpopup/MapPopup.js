@@ -1,17 +1,18 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { map } from '../core/MapView';
 import './showpopup.css';
 
 const statusClass = (status) => `maplibregl-ctrl-icon maplibre-ctrl-showpopup maplibre-ctrl-showpopup-${status}`;
 
 class PopUpControl {
-  constructor(eventHandler) {
+  constructor(enabled, eventHandler) {
+    this.enabled = enabled;
     this.eventHandler = eventHandler;
   }
 
   onAdd() {
     this.button = document.createElement('button');
-    this.button.className = statusClass('off');
+    this.button.className = statusClass(this.enabled ? 'on' : 'off');
     this.button.type = 'button';
     this.button.onclick = () => this.eventHandler(this);
 
@@ -31,8 +32,17 @@ class PopUpControl {
   }
 }
 
-const MapPopup = ({ enabled, onClick }) => {
-  const control = useMemo(() => new PopUpControl(onClick), [onClick]);
+const MapPopup = () => {
+  console.log((window.localStorage.getItem('showMapPopup') === 'true'));
+  const [enabled, setEnabled] = useState((window.localStorage.getItem('showMapPopup') === 'true'));
+  console.log('enabeld', enabled);
+
+  const onClick = () => {
+    window.localStorage.setItem('showMapPopup', !enabled);
+    setEnabled(!enabled);
+  };
+
+  const control = useMemo(() => new PopUpControl(enabled, onClick));
 
   useEffect(() => {
     map.addControl(control);

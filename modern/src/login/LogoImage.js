@@ -9,6 +9,7 @@ const useStyles = makeStyles(() => ({
     maxHeight: '120px',
     width: 'auto',
     height: 'auto',
+    zIndex: 10,
   },
 }));
 

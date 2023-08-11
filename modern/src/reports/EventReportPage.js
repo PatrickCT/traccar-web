@@ -54,6 +54,7 @@ const EventReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [position, setPosition] = useState(null);
+  const fontSize = 14;
 
   useEffectAsync(async () => {
     if (selectedItem) {
@@ -225,7 +226,7 @@ const EventReportPage = () => {
                   </TableCell>
 
                   {columns.map((key) => (
-                    <TableCell key={key}>
+                    <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }} key={key}>
                       {formatValue(item, key)}
                     </TableCell>
                   ))}

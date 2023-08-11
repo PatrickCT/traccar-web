@@ -152,6 +152,7 @@ const MainPage = () => {
     window.position = selectedPosition;
     window.map = map;
     window.showDevicesList = setDevicesOpen;
+    window.showPopup = true;
 
     // Clean up the function when the component unmounts
     return () => {
@@ -162,6 +163,7 @@ const MainPage = () => {
       delete window.device;
       delete window.map;
       delete window.showDevicesList;
+      delete window.showPopup;
     };
   }, []);
 
@@ -169,7 +171,8 @@ const MainPage = () => {
     Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
     window.position = selectedPosition;
-    if (window.position) {
+    console.log(window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true');
+    if (window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
       new Popup()
         .setMaxWidth('400px')
         .setHTML(createPopUp(selectedPosition))

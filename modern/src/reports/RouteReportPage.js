@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -26,7 +26,7 @@ import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
 import scheduleReport from './common/scheduleReport';
 import {
-  createPopUpReport,
+  createPopUpReportRoute, generateRoute, streetView,
 } from '../common/util/mapPopup';
 
 const RouteReportPage = () => {
@@ -42,15 +42,17 @@ const RouteReportPage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const fontSize = 14;
 
   const onMapPointClick = useCallback((positionId) => {
     Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     setSelectedItem(items.find((it) => it.id === positionId));
     new Popup()
       .setMaxWidth('400px')
-      .setHTML(createPopUpReport(items.find((it) => it.id === positionId)))
+      .setHTML(createPopUpReportRoute(items.find((it) => it.id === positionId)))
       .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
       .addTo(map);
+    window.position = items.find((it) => it.id === positionId);
   }, [items, setSelectedItem]);
 
   const handleSubmit = useCatch(async ({ deviceIds, from, to, type }) => {
@@ -91,6 +93,23 @@ const RouteReportPage = () => {
       navigate('/reports/scheduled');
     }
   });
+
+  useEffect(() => {
+    // Attach the function to the global window object
+    window.navigate = navigate;
+    window.streetView = streetView;
+    window.generateRoute = generateRoute;
+    window.position = selectedItem;
+    window.map = map;
+
+    // Clean up the function when the component unmounts
+    return () => {
+      delete window.navigate;
+      delete window.streetView;
+      delete window.position;
+      delete window.map;
+    };
+  }, []);
 
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportRoute']}>
@@ -133,11 +152,15 @@ const RouteReportPage = () => {
             </TableHead>
             <TableBody>
               {!loading ? items.slice(0, 4000).map((item) => (
-                <TableRow key={item.id} onClick={() => onMapPointClick(item.id)} style={{ backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }}>
+                <TableRow
+                  key={item.id}
+                  onClick={() => onMapPointClick(item.id)}
+                  style={{ backgroundColor: selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent' }}
+                >
                   <TableCell className={classes.columnAction} padding="none" />
-                  <TableCell>{devices[item.deviceId].name}</TableCell>
+                  <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }}>{devices[item.deviceId].name}</TableCell>
                   {columns.map((key) => (
-                    <TableCell key={key}>
+                    <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }} key={key}>
                       <PositionValue
                         position={item}
                         property={item.hasOwnProperty(key) ? key : null}
@@ -146,7 +169,9 @@ const RouteReportPage = () => {
                     </TableCell>
                   ))}
                 </TableRow>
-              )) : (<TableShimmer columns={columns.length + 2} startAction />)}
+              )) : (
+                <TableShimmer columns={columns.length + 2} startAction />
+              )}
             </TableBody>
           </Table>
         </div>

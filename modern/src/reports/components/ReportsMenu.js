@@ -8,6 +8,7 @@ import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import { AirplaneTicketOutlined } from '@mui/icons-material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import RouteIcon from '@mui/icons-material/Route';
@@ -81,6 +82,12 @@ const ReportsMenu = () => {
           title={t('reportReplay')}
           link="/replay"
           icon={<RouteIcon />}
+        />
+
+        <MenuItem
+          title={t('reportTicket')}
+          link="/reports/tickets"
+          icon={<AirplaneTicketOutlined />}
         />
       </List>
       {(admin || !readonly) && (

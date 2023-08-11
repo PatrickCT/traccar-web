@@ -3,7 +3,7 @@ import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Accordion, AccordionSummary, AccordionDetails, Typography, Container, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, FormGroup, InputAdornment, IconButton, OutlinedInput, Autocomplete, TextField, createFilterOptions, Button,
+  Accordion, AccordionSummary, AccordionDetails, Typography, Container, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, FormGroup, InputAdornment, IconButton, OutlinedInput, TextField, Button,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -12,7 +12,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useTranslation, useTranslationKeys } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
 import SettingsMenu from './components/SettingsMenu';
-import usePositionAttributes from '../common/attributes/usePositionAttributes';
+
 import { prefixString, unprefixString } from '../common/util/stringUtils';
 import SelectField from '../common/components/SelectField';
 import useMapStyles from '../map/core/useMapStyles';
@@ -76,9 +76,9 @@ const PreferencesPage = () => {
   const mapStyles = useMapStyles();
   const mapOverlays = useMapOverlays();
 
-  const positionAttributes = usePositionAttributes(t);
+  // const positionAttributes = usePositionAttributes(t);
 
-  const filter = createFilterOptions();
+  // const filter = createFilterOptions();
 
   const generateToken = useCatch(async () => {
     const expiration = moment(tokenExpiration, moment.HTML5_FMT.DATE).toISOString();
@@ -209,7 +209,7 @@ const PreferencesPage = () => {
                     ))}
                   </Select>
                 </FormControl>
-                <Autocomplete
+                {/* <Autocomplete
                   multiple
                   freeSolo
                   options={Object.keys(positionAttributes)}
@@ -231,7 +231,7 @@ const PreferencesPage = () => {
                       label={t('attributePopupInfo')}
                     />
                   )}
-                />
+                /> */}
                 <FormControl>
                   <InputLabel>{t('mapLiveRoutes')}</InputLabel>
                   <Select

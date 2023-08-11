@@ -60,6 +60,7 @@ import SectionsPage from './settings/SectionsPages';
 import SectionPage from './settings/SectionPage';
 import ScheduleConnectionsPage from './settings/ScheduleConnectionsPage';
 import DeviceConnectionGroupPage from './settings/DeviceConnectionGroupPage';
+import TicketReportPage from './reports/TicketReportPage';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -171,6 +172,7 @@ const Navigation = () => {
           <Route path="trip" element={<TripReportPage />} />
           <Route path="scheduled" element={<ScheduledPage />} />
           <Route path="statistics" element={<StatisticsPage />} />
+          <Route path="tickets" element={<TicketReportPage />} />
         </Route>
       </Route>
     </Routes>

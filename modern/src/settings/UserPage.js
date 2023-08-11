@@ -147,6 +147,7 @@ const UserPage = () => {
               )}
             </AccordionDetails>
           </Accordion>
+
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">
@@ -159,6 +160,19 @@ const UserPage = () => {
                 onChange={(event) => setItem({ ...item, phone: event.target.value })}
                 label={t('sharedPhone')}
               />
+
+              <TextField
+                value={item.offlineTimeout || ''}
+                onChange={(event) => setItem({ ...item, offlineTimeout: Number(event.target.value) })}
+                label={t('sharedOfflineTimeout')}
+              />
+
+              <TextField
+                value={item.stopTimeout || ''}
+                onChange={(event) => setItem({ ...item, stopTimeout: Number(event.target.value) })}
+                label={t('sharedStopTimeout')}
+              />
+
               <FormControl>
                 <InputLabel>{t('mapDefault')}</InputLabel>
                 <Select

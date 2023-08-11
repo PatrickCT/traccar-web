@@ -47,11 +47,7 @@ window.engineLock = () => {
     },
     callback: (panel) => {
       document.getElementById('myButton').addEventListener('click', async () => {
-        await window.makeRequest('./api/commands/send', 'POST', {
-          type: 'engineStop',
-          attributes: {},
-          deviceId: window.position.deviceId,
-        });
+        window.confirmDialog(1);
         panel.close();
       });
     },
@@ -74,6 +70,42 @@ window.engineReactivate = () => {
     },
     callback: (panel) => {
       document.getElementById('myButton').addEventListener('click', async () => {
+        window.confirmDialog(2);
+        panel.close();
+      });
+    },
+  });
+};
+
+window.confirmDialog = (type) => {
+  const html = `
+    <div class="simple-confirm dialog-sm" style="display:block">
+    <p>Estas segur@?</p>
+    <div class="buttonbar">
+        <button name='yes' class="..." data-dismiss value="YES">Si</button>
+        <button name='no' class="..." data-dismiss data-cancel value="No">No</button>
+
+    </div>
+    </div>
+    `;
+  window.jsPanel.dialog.modal(html, {
+    theme: '#163b61',
+    border: '1px solid gray',
+    borderRadius: '.5rem',
+    headerTitle: 'Reactivar',
+    headerControls: {
+      minimize: 'remove',
+      smallify: 'remove',
+      maximize: 'remove',
+    },
+    onclick_yes: async () => {
+      if (type === 1) {
+        await window.makeRequest('./api/commands/send', 'POST', {
+          type: 'engineStop',
+          attributes: {},
+          deviceId: window.position.deviceId,
+        });
+      } else if (type === 2) {
         await window.makeRequest('./api/commands/send', 'POST', {
           id: 0,
           attributes: {},
@@ -82,9 +114,12 @@ window.engineReactivate = () => {
           textChannel: false,
           description: null,
         });
-        panel.close();
-      });
+      }
     },
+    onclick_no: () => { },
+    // onclick_cancel: (panel, elmts, event) => {
+    //   console.log(panel, elmts, event);
+    // },
   });
 };
 
@@ -181,6 +216,40 @@ export const createPopUpReport = (position) => {
   return html;
 };
 
+export const createPopUpReportRoute = (position) => {
+  let html = '<div>';
+  html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
+
+  html += `<h3><b>${attsGetter(position, 'name')}</b></h3></div>`;
+  html += valueParser(position, specialAtts(position, 'ignition'));
+  html += valueParser(position, specialAtts(position, 'motion'));
+  html += valueParser(position, specialAtts(position, 'dateTime'));
+  html += valueParser(position, specialAtts(position, 'status'));
+  html += valueParser(position, specialAtts(position, 'direccion'));
+  html += valueParser(position, specialAtts(position, 'fuel'));
+  html += valueParser(position, specialAtts(position, 'totalDistance'));
+  html += valueParser(position, specialAtts(position, 'speed'));
+  html += valueParser(position, specialAtts(position, 'hours'));
+  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
+  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
+  html += valueParser(position, 'bateria');
+
+  html += '<br>';
+  html += "<div style='display: table; margin: auto'>";
+
+  html += "<div style='float: left; padding: 2px;' >";
+  html += "<a class='link-google-maps' onclick='(function(){streetView();}());' ><img src='../images/botones-popup/calle.svg' width='35' height='35' style='border-radius:6px;'/></a>";
+  html += '</div>';
+
+  html += "<div style='float: left; padding: 2px;'>";
+  html += '<a class="link-google-maps" onclick="(function(){generateRoute();}());"><img src="../images/botones-popup/maps.svg" width="35" height="35" style="border-radius:6px;"/></a>';
+  html += '</div>';
+
+  html += '</div>';
+  html += '</div>';
+  return html;
+};
+
 export const streetView = () => {
   if (window.position.latitude != null && window.position.longitude != null) {
     window.jsPanel.create({
@@ -188,7 +257,7 @@ export const streetView = () => {
         colorHeader: '#fff',
         bgPanel: 'rgb(49,80,126)',
       },
-      content: `<iframe src="./VistaCalle.html?lat=${window.position.latitude}&lng=${window.position.longitude}" style="position:relative; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">Your browser doesnt support iframes</iframe>`,
+      content: `<iframe src="../VistaCalle.html?lat=${window.position.latitude}&lng=${window.position.longitude}" style="position:relative; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">Your browser doesnt support iframes</iframe>`,
       contentSize: {
         width: window.innerWidth * (isMobile() ? 0.9 : 0.6),
         height: window.innerHeight * (isMobile() ? 0.8 : 0.6),

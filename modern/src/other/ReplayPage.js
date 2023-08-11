@@ -49,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    color: 'white',
   },
   slider: {
     width: '100%',
@@ -209,16 +210,16 @@ const ReplayPage = () => {
         <Paper elevation={3} square>
           <Toolbar>
             <IconButton edge="start" sx={{ mr: 2 }} onClick={() => navigate(-1)}>
-              <ArrowBackIcon />
+              <ArrowBackIcon style={{ color: 'white' }} />
             </IconButton>
             <Typography variant="h6" className={classes.title}>{t('reportReplay')}</Typography>
             {!expanded && (
               <>
                 <IconButton onClick={handleDownload}>
-                  <DownloadIcon />
+                  <DownloadIcon style={{ color: 'white' }} />
                 </IconButton>
                 <IconButton edge="end" onClick={() => setExpanded(true)}>
-                  <TuneIcon />
+                  <TuneIcon style={{ color: 'white' }} />
                 </IconButton>
               </>
             )}

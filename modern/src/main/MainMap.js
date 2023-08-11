@@ -20,21 +20,20 @@ import MapScale from '../map/MapScale';
 import MapNotification from '../map/notification/MapNotification';
 import useFeatures from '../common/util/useFeatures';
 import { createPopUp } from '../common/util/mapPopup';
+import MapPopup from '../map/showpopup/MapPopup';
 
 const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
-
   const eventsAvailable = useSelector((state) => !!state.events.items.length);
-
   const features = useFeatures();
 
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
     Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-    if (selectedPosition) {
+    if (selectedPosition !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
       new Popup()
         .setMaxWidth('400px')
         .setHTML(createPopUp(selectedPosition))
@@ -69,6 +68,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
       {desktop && (
         <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)} />
       )}
+      <MapPopup />
     </>
   );
 };

@@ -37,7 +37,8 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: '0.875rem',
   },
   positive: {
-    color: theme.palette.colors.positive,
+    // color: theme.palette.colors.positive,
+    color: '#036104',
   },
   medium: {
     color: theme.palette.colors.medium,
@@ -98,6 +99,7 @@ const DeviceRow = ({ data, index, style }) => {
   return (
     <div style={style}>
       <ListItemButton
+        style={{ backgroundColor: item.status === 'online' ? '#99d2f0' : 'transparent' }}
         key={item.id}
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));

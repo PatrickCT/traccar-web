@@ -14,20 +14,24 @@ export default (t) => useMemo(() => ({
     name: t('attributeDeviceImage'),
     type: 'string',
   },
-  'processing.copyAttributes': {
-    name: t('attributeProcessingCopyAttributes'),
-    type: 'string',
-  },
-  'decoder.timezone': {
-    name: t('sharedTimezone'),
-    type: 'string',
-  },
+  // 'processing.copyAttributes': {
+  //   name: t('attributeProcessingCopyAttributes'),
+  //   type: 'string',
+  // },
+  // 'decoder.timezone': {
+  //   name: t('sharedTimezone'),
+  //   type: 'string',
+  // },
   deviceInactivityStart: {
     name: t('attributeDeviceInactivityStart'),
     type: 'number',
   },
   deviceInactivityPeriod: {
     name: t('attributeDeviceInactivityPeriod'),
+    type: 'number',
+  },
+  fuelEfficiency: {
+    name: t('attributeFuelEfficiency'),
     type: 'number',
   },
 }), [t]);
