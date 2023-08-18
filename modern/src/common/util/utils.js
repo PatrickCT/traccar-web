@@ -226,6 +226,19 @@ const formatDateToCustomString = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+export const formatDate = (date, template = 'dd-MM-yyyy HH:mm:ss') => {
+  const replacements = {
+    dd: String(date.getDate()).padStart(2, '0'),
+    MM: String(date.getMonth() + 1).padStart(2, '0'),
+    yyyy: date.getFullYear(),
+    HH: String(date.getHours()).padStart(2, '0'),
+    mm: String(date.getMinutes()).padStart(2, '0'),
+    ss: String(date.getSeconds()).padStart(2, '0'),
+  };
+
+  return template.replace(/dd|MM|yyyy|HH|mm|ss/g, (token) => replacements[token] || token);
+};
+
 const getEvent = () => {
   // const today = new Date();
   // const nextday = new Date();

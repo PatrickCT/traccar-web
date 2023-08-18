@@ -134,11 +134,16 @@ export const generateRoute = () => {
 };
 
 export const test = () => { generateRoute(); };
+
 export const createPopUp = (position) => {
   let html = '<div>';
   html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
+  html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());" ><img src="./././images/botones-popup/connection.svg" width="14" height="14" /></a>`;
+  html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
+  html += window.localStorage.getItem(btoa('isAdmin')) === 'true' ? ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>` : '';
 
-  html += `<h3><b>${attsGetter(position, 'name')}</b>  <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a></h3></div>`;
+  html += `<h3><b>${attsGetter(position, 'name')}</b>`;
+  html += '</h3></div>';
   html += valueParser(position, specialAtts(position, 'ignition'));
   html += valueParser(position, specialAtts(position, 'motion'));
   html += valueParser(position, specialAtts(position, 'dateTime'));
@@ -157,9 +162,9 @@ export const createPopUp = (position) => {
 
   html += "<div style='display: table; margin: auto'>";
 
-  html += "<div style='float: left; padding: 2px;' >";
-  html += `<a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());" ><img src="./././images/botones-popup/connection.svg" width="35" height="35" style="border-radius:6px;"/></a>`;
-  html += '</div>';
+  // html += "<div style='float: left; padding: 2px;' >";
+  // html += `<a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());" ><img src="./././images/botones-popup/connection.svg" width="35" height="35" style="border-radius:6px;"/></a>`;
+  // html += '</div>';
 
   html += "<div style='float: left; padding: 2px;' >";
   html += '<a class="link-google-maps" onclick="(function(){engineLock();}());" ><img src="./././images/botones-popup/apagar.svg" width="35" height="35" style="border-radius:6px;"/></a>';

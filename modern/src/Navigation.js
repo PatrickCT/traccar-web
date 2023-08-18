@@ -58,6 +58,8 @@ import SchedulesPage from './settings/SchedulesPage';
 import SchedulePage from './settings/SchedulePage';
 import SectionsPage from './settings/SectionsPages';
 import SectionPage from './settings/SectionPage';
+import HoursPage from './settings/HoursPage';
+import HourPage from './settings/HourPage';
 import ScheduleConnectionsPage from './settings/ScheduleConnectionsPage';
 import DeviceConnectionGroupPage from './settings/DeviceConnectionGroupPage';
 import TicketReportPage from './reports/TicketReportPage';
@@ -160,6 +162,9 @@ const Navigation = () => {
           <Route path="sections" element={<SectionsPage />} />
           <Route path="section/:id" element={<SectionPage />} />
           <Route path="section" element={<SectionPage />} />
+          <Route path="hours" element={<HoursPage />} />
+          <Route path="hour" element={<HourPage />} />
+          <Route path="hour/:horas" element={<HourPage />} />
         </Route>
 
         <Route path="reports">

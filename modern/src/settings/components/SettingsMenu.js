@@ -106,8 +106,8 @@ const SettingsMenu = () => {
               user.attributes.Transporte &&
               (
                 <MenuItem
-                  title={t('settingsSections')}
-                  link="/settings/sections"
+                  title={t('settingsHours')}
+                  link="/settings/hours"
                   icon={<SegmentOutlined />}
                   selected={location.pathname.startsWith('/settings/section')}
                 />

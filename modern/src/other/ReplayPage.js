@@ -4,7 +4,8 @@ import React, {
 import {
   IconButton, Paper, Slider, Toolbar, Typography,
 } from '@mui/material';
-import { Popup } from 'maplibre-gl';
+
+// import { Popup } from 'maplibre-gl';
 import makeStyles from '@mui/styles/makeStyles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -15,7 +16,7 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import FastRewindIcon from '@mui/icons-material/FastRewind';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import MapView, { map } from '../map/core/MapView';
+import MapView from '../map/core/MapView';
 import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapPositions from '../map/MapPositions';
@@ -27,7 +28,7 @@ import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
 import StatusCard from '../common/components/StatusCard';
 import { usePreference } from '../common/util/preferences';
-import { createPopUpReport } from '../common/util/mapPopup';
+import { attsGetter, formatDate, isMobile } from '../common/util/utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -69,13 +70,16 @@ const useStyles = makeStyles((theme) => ({
   content: {
     display: 'flex',
     flexDirection: 'column',
-    padding: theme.spacing(2),
+    padding: '1px',
     [theme.breakpoints.down('md')]: {
       margin: theme.spacing(1),
     },
     [theme.breakpoints.up('md')]: {
       marginTop: theme.spacing(1),
     },
+    lineHeight: '1px',
+    backgroundColor: 'transparent',
+
   },
 }));
 
@@ -133,20 +137,18 @@ const ReplayPage = () => {
   useEffect(() => {
     if (playing && positions.length > 0) {
       timerRef.current = setInterval(() => {
-        setIndex((index) => {
-          // Check if the next index is within the bounds of the positions array
-          if (index + 1 < positions.length) {
-            Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-            new Popup()
-              .setMaxWidth('400px')
-              .setHTML(createPopUpReport(positions[index + 1]))
-              .setLngLat([positions[index + 1].longitude, positions[index + 1].latitude])
-              .addTo(map);
-          }
+        setIndex((index) => index + 1);
+        // Check if the next index is within the bounds of the positions array
+        // if (index + 1 < positions.length) {
+        //   Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+        //   new Popup()
+        //     .setMaxWidth('400px')
+        //     .setHTML(createPopUpReport(positions[index + 1]))
+        //     .setLngLat([positions[index + 1].longitude, positions[index + 1].latitude])
+        //     .addTo(map);
+        // }
 
-          // Return the next index value for the state update
-          return index + 1;
-        });
+        // Return the next index value for the state update
       }, speed);
     } else {
       clearInterval(timerRef.current);
@@ -204,6 +206,30 @@ const ReplayPage = () => {
         {index < positions.length && (
           <MapPositions positions={[positions[index]]} onClick={onMarkerClick} titleField="fixTime" />
         )}
+        {playing && index < positions.length && (
+          <div style={{ zIndex: 999999, position: 'absolute', bottom: isMobile() ? '60px' : '10px', left: '2px', backgroundColor: 'aliceblue', width: '99vw' }}>
+            <p>
+              Nombre:
+              {deviceName}
+              ,
+              Encendido:
+              {attsGetter(positions[index], 'ignition')}
+              ,
+              Movimiento:
+              {attsGetter(positions[index], 'motion')}
+              ,
+              Fecha:
+              {formatDate(new Date(attsGetter(positions[index], 'fixTime')), 'yyyy-MM-dd mm:HH:ss')}
+              ,
+              Velocidad:
+              {attsGetter(positions[index], 'speed')}
+              ,
+              Bateria:
+              {attsGetter(positions[index], 'bateria')}
+              %
+            </p>
+          </div>
+        )}
       </MapView>
       <MapCamera positions={positions} />
       <div className={classes.sidebar}>
@@ -225,10 +251,10 @@ const ReplayPage = () => {
             )}
           </Toolbar>
         </Paper>
+
         <Paper className={classes.content} square>
           {!expanded ? (
             <>
-              <Typography variant="subtitle1" align="center">{deviceName}</Typography>
               <Slider
                 className={classes.slider}
                 max={positions.length - 1}
@@ -264,6 +290,7 @@ const ReplayPage = () => {
             <ReportFilter handleSubmit={handleSubmit} fullScreen showOnly />
           )}
         </Paper>
+
       </div>
       {showCard && index < positions.length && (
         <StatusCard

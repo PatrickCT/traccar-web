@@ -1,8 +1,10 @@
 import { useId, useCallback, useEffect } from 'react';
+import { useTheme } from '@mui/styles';
 import { map } from './core/MapView';
 
 const MapPositions = ({ positions, onClick }) => {
   const id = useId();
+  const theme = useTheme();
   const onMouseEnter = () => map.getCanvas().style.cursor = 'pointer';
   const onMouseLeave = () => map.getCanvas().style.cursor = '';
 
@@ -22,20 +24,30 @@ const MapPositions = ({ positions, onClick }) => {
         features: [],
       },
     });
+
     map.addLayer({
       id,
-      type: 'symbol',
+      type: 'circle',
       source: id,
-      layout: {
-        'icon-image': 'arrow', // Assuming you have an arrow icon registered in your map resources
-        'icon-rotate': ['get', 'course'], // Adjust the rotation to orient the arrow correctly
-        'icon-size': 0.9,
-        'icon-allow-overlap': true,
-      },
       paint: {
-        'icon-opacity': 1,
+        'circle-radius': 5,
+        'circle-color': theme.palette.colors.geometry,
       },
     });
+    // map.addLayer({
+    //   id,
+    //   type: 'symbol',
+    //   source: id,
+    //   layout: {
+    //     'icon-image': 'arrow', // Assuming you have an arrow icon registered in your map resources
+    //     'icon-rotate': ['get', 'course'], // Adjust the rotation to orient the arrow correctly
+    //     'icon-size': 0.9,
+    //     'icon-allow-overlap': true,
+    //   },
+    //   paint: {
+    //     'icon-opacity': 1,
+    //   },
+    // });
 
     map.on('mouseenter', id, onMouseEnter);
     map.on('mouseleave', id, onMouseLeave);

@@ -4,7 +4,7 @@ import { useTheme } from '@emotion/react';
 import { useDispatch, useSelector } from 'react-redux';
 import makeStyles from '@mui/styles/makeStyles';
 import {
-  IconButton, Tooltip, ListItemText, ListItemButton, useMediaQuery,
+  ListItemText, ListItemButton, useMediaQuery, Tooltip, IconButton,
 } from '@mui/material';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
@@ -13,15 +13,17 @@ import BatteryCharging60Icon from '@mui/icons-material/BatteryCharging60';
 import Battery20Icon from '@mui/icons-material/Battery20';
 import BatteryCharging20Icon from '@mui/icons-material/BatteryCharging20';
 import ErrorIcon from '@mui/icons-material/Error';
-import moment from 'moment';
+import { ReactComponent as EngineIcon } from '../resources/images/data/engine.svg';
+// import moment from 'moment';
 import { devicesActions } from '../store';
-import {
-  formatAlarm, formatBoolean, formatPercentage, formatStatus, getStatusColor,
-} from '../common/util/formatter';
+// import {
+//   formatStatus, getStatusColor,
+// } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useAdministrator } from '../common/util/permissions';
-import { ReactComponent as EngineIcon } from '../resources/images/data/engine.svg';
+
 import { useAttributePreference } from '../common/util/preferences';
+import { formatAlarm, formatBoolean, formatPercentage } from '../common/util/formatter';
 // import { map } from '../map/core/MapView';
 // import { createPopUp } from '../common/util/mapPopup';
 
@@ -49,6 +51,10 @@ const useStyles = makeStyles((theme) => ({
   neutral: {
     color: theme.palette.colors.neutral,
   },
+  customTooltip: {
+    backgroundColor: 'white',
+    color: 'black',
+  },
 }));
 
 const DeviceRow = ({ data, index, style }) => {
@@ -65,6 +71,12 @@ const DeviceRow = ({ data, index, style }) => {
   // const deviceSecondary = useAttributePreference('deviceSecondary', '');
 
   const formatProperty = (key) => {
+    let status;
+    if (item.status === 'online' || !item.lastUpdate) {
+      status = 'Reportando';
+    } else {
+      status = 'Sin reportar';
+    }
     if (key === 'geofenceIds') {
       const geofenceIds = item[key] || [];
       return geofenceIds
@@ -74,32 +86,34 @@ const DeviceRow = ({ data, index, style }) => {
     }
     return (
       <>
-        <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{`${item[key]} `}</span>
+        <span style={{ fontWeight: 'bold', fontSize: '14px' }}>{`${item[key]} `}</span>
         {' • '}
-        <span style={{ fontSize: '15px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
+        <span style={{ color: item.status === 'online' ? 'green' : 'red', fontWeight: 'normal', fontSize: '14px' }}>{status}</span>
+        {/*
+        <span style={{ fontSize: '15px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span> */}
       </>
     );
   };
 
-  const secondaryText = () => {
-    let status;
-    if (item.status === 'online' || !item.lastUpdate) {
-      status = formatStatus(item.status, t);
-    } else {
-      status = moment(item.lastUpdate).fromNow();
-    }
-    return (
-      <>
-        {`${item.uniqueId} • `}
-        <span className={classes[getStatusColor(item.status)]}>{status}</span>
-      </>
-    );
-  };
+  // const secondaryText = () => {
+  //   let status;
+  //   if (item.status === 'online' || !item.lastUpdate) {
+  //     status = formatStatus(item.status, t);
+  //   } else {
+  //     status = moment(item.lastUpdate).fromNow();
+  //   }
+  //   return (
+  //     <>
+  //       {`${item.uniqueId} • `}
+  //       <span className={classes[getStatusColor(item.status)]}>{status}</span>
+  //     </>
+  //   );
+  // };
 
   return (
     <div style={style}>
       <ListItemButton
-        style={{ backgroundColor: item.status === 'online' ? '#99d2f0' : 'transparent' }}
+        style={{ backgroundColor: item.status === 'online' ? '#99d2f0' : '#F4757B44', marginTop: '2px', marginBottom: '4px', lineHeight: '1px', padding: '2px' }}
         key={item.id}
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
@@ -107,12 +121,13 @@ const DeviceRow = ({ data, index, style }) => {
         }}
         disabled={!admin && item.disabled}
       >
-        <ListItemText
-          primary={formatProperty(devicePrimary)}
-          primaryTypographyProps={{ noWrap: true }}
-          secondary={secondaryText()}
-          secondaryTypographyProps={{ noWrap: true }}
-        />
+        <Tooltip classes={{ tooltip: classes.customTooltip }} title={formatProperty(devicePrimary)}>
+          <ListItemText
+            primary={formatProperty(devicePrimary)}
+            primaryTypographyProps={{ noWrap: true }}
+
+          />
+        </Tooltip>
         {position && (
           <>
             {position.attributes.hasOwnProperty('alarm') && (

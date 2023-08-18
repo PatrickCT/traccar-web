@@ -33,9 +33,7 @@ class PopUpControl {
 }
 
 const MapPopup = () => {
-  console.log((window.localStorage.getItem('showMapPopup') === 'true'));
   const [enabled, setEnabled] = useState((window.localStorage.getItem('showMapPopup') === 'true'));
-  console.log('enabeld', enabled);
 
   const onClick = () => {
     window.localStorage.setItem('showMapPopup', !enabled);

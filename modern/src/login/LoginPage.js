@@ -118,6 +118,7 @@ const LoginPage = () => {
       if (response.ok) {
         localStorage.setItem('UGFzc3dvcmRVc2Vy', encode(password));
         const user = await response.json();
+        localStorage.setItem('aXNBZG1pbg==', user.administrator);
         generateLoginToken();
         dispatch(sessionActions.updateUser(user));
         navigate('/');
@@ -155,6 +156,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     localStorage.removeItem('UGFzc3dvcmRVc2Vy');
+    localStorage.removeItem('aXNBZG1pbg==');
     const listener = (token) => handleTokenLogin(token);
     handleLoginTokenListeners.add(listener);
     return () => handleLoginTokenListeners.delete(listener);

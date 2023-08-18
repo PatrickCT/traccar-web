@@ -171,7 +171,7 @@ const MainPage = () => {
     Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
     window.position = selectedPosition;
-    console.log(window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true');
+
     if (window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
       new Popup()
         .setMaxWidth('400px')

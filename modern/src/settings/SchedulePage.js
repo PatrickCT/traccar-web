@@ -8,11 +8,20 @@ import Checkbox from '@mui/material/Checkbox';
 import {
   Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, FormLabel, MenuItem, InputLabel, Select,
 } from '@mui/material';
-import dayjs from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Close';
+import {
+  GridRowModes,
+  DataGrid,
+  GridToolbarContainer,
+  GridActionsCellItem,
+  GridRowEditStopReasons,
+} from '@mui/x-data-grid';
 import makeStyles from '@mui/styles/makeStyles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditItemView from './components/EditItemView';
@@ -30,6 +39,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const EditToolbar = (props) => {
+  const { setRows, setRowModesModel } = props;
+
+  const handleClick = () => {
+    const id = 1;
+    setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
+    setRowModesModel((oldModel) => ({
+      ...oldModel,
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+    }));
+  };
+
+  return (
+    <GridToolbarContainer>
+      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+        Agregar tramo
+      </Button>
+    </GridToolbarContainer>
+  );
+};
+
 const SchedulePage = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -45,13 +75,9 @@ const SchedulePage = () => {
     domingo: 64,
   };
 
-  const newDateStart = new Date();
+  // const newDateStart = new Date();
   const [item, setItem] = useState();
-  const [hoursStart, minutesStart] = ((item?.start) || '00:00').split(':');
-  newDateStart.setHours(hoursStart);
-  newDateStart.setMinutes(minutesStart);
 
-  const [start, setStart] = useState(dayjs(newDateStart));
   const binaryString = (item?.days ?? 0).toString(2).padStart(7, '0'); // Convert to binary and pad with leading zeros
 
   const [days, setDays] = useState({
@@ -78,6 +104,131 @@ const SchedulePage = () => {
   const [subruta, setSubruta] = useState(0);
   const [geofences, setGeofences] = useState([]);
   const [geofence, setGeofence] = useState(0);
+  const [hours, setHours] = useState([]);
+  const [hour, setHour] = useState(0);
+
+  /// Alta de tramos
+
+  const [rows, setRows] = React.useState([]);
+  const [rowModesModel, setRowModesModel] = React.useState({});
+
+  const updateTramo = (item) => {
+    fetch(`/api/tramos/${item.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(item) }).then((response) => response.json()).then((data) => console.log(data));
+  };
+
+  const handleRowEditStop = (params, event) => {
+    console.log('handleRowEditStop');
+    console.log(params);
+    console.log(event);
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
+    }
+  };
+
+  const handleEditClick = (id) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  };
+
+  const handleSaveClick = (id) => () => {
+    console.log('save edit');
+    console.log(id);
+    console.log({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+  };
+
+  const handleDeleteClick = (id) => () => {
+    setRows(rows.filter((row) => row.id !== id));
+  };
+
+  const handleCancelClick = (id) => () => {
+    setRowModesModel({
+      ...rowModesModel,
+      [id]: { mode: GridRowModes.View, ignoreModifications: true },
+    });
+
+    const editedRow = rows.find((row) => row.id === id);
+    if (editedRow.isNew) {
+      setRows(rows.filter((row) => row.id !== id));
+    }
+  };
+
+  const processRowUpdate = (newRow) => {
+    console.log('processRowUpdate');
+    console.log(newRow);
+    const updatedRow = { ...newRow, isNew: false };
+    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+    updateTramo(newRow);
+    return updatedRow;
+  };
+
+  const handleRowModesModelChange = (newRowModesModel) => {
+    console.log('handleRowModesModelChange');
+    console.log(newRowModesModel);
+    setRowModesModel(newRowModesModel);
+  };
+
+  const columns = [
+    { field: 'name', headerName: 'Nombre', width: 180, editable: true },
+    { field: 'minTime', headerName: 'Tiempo de llegada', width: 180, editable: true },
+    { field: 'delay', headerName: 'Tiempo de holgura', width: 180, editable: true },
+    { field: 'punishment', headerName: 'Castigo', width: 180, editable: true },
+    {
+      field: 'geofenceId',
+      headerName: 'Geocerca',
+      width: 220,
+      editable: true,
+      type: 'singleSelect',
+      valueOptions: ['a', 'b', 'c'],
+    },
+    {
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Opciones',
+      width: 100,
+      cellClassName: 'actions',
+      getActions: ({ id }) => {
+        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+
+        if (isInEditMode) {
+          return [
+            <GridActionsCellItem
+              icon={<SaveIcon />}
+              label="Save"
+              sx={{
+                color: 'primary.main',
+              }}
+              onClick={handleSaveClick(id)}
+            />,
+            <GridActionsCellItem
+              icon={<CancelIcon />}
+              label="Cancel"
+              className="textPrimary"
+              onClick={handleCancelClick(id)}
+              color="inherit"
+            />,
+          ];
+        }
+
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            onClick={handleEditClick(id)}
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={handleDeleteClick(id)}
+            color="inherit"
+          />,
+        ];
+      },
+    },
+  ];
+
+  /// fin alta de tramos
 
   const handleChange = (event) => {
     const newDays = {
@@ -85,14 +236,6 @@ const SchedulePage = () => {
       [event.target.name]: event.target.checked,
     };
     setDays(newDays);
-  };
-
-  const updateStart = (newstart) => {
-    setStart(dayjs(newstart));
-    setItem({
-      ...item,
-      start: `${newstart.hour().toString().padStart(2, '0')}:${newstart.minute().toString().padStart(2, '0')}`,
-    });
   };
 
   useEffect(() => {
@@ -106,7 +249,7 @@ const SchedulePage = () => {
       domingo: binaryString.charAt(0) === '1',
     };
     setDays(initialDaysState);
-    setStart(dayjs(newDateStart));
+    // setStart(dayjs(newDateStart));
     fetch('/api/subroutes')
       .then((response) => response.json())
       .then((data) => setSubrutas(data));
@@ -115,6 +258,12 @@ const SchedulePage = () => {
       .then((response) => response.json())
       .then((data) => setGeofences(data));
     setGeofence(item?.geofenceId ?? 0);
+
+    fetch('/api/horasalidas').then((response) => response.json()).then((data) => setHours(data.filter((item, index, self) => self.findIndex((t) => t.name === item.name) === index)));
+
+    if (item?.id) {
+      fetch('/api/tramos?scheduleId=9').then((response) => response.json()).then((data) => { setRows(data); });
+    }
   }, [item?.id]);
 
   useEffect(() => {
@@ -153,6 +302,11 @@ const SchedulePage = () => {
   });
 
   const validate = () => item && item.name && item.days && item.subrouteId;
+
+  // const linkTramo = (link = true) => {
+  //   fetch('http://localhost:3090/api/permissions', { method: link ? 'POST' : 'DELETE', body: JSON.stringify({ itinerarioId: item.id, tramoId: 5 }) });
+  // };
+
   return (
     <EditItemView
       endpoint="itinerarios"
@@ -164,109 +318,152 @@ const SchedulePage = () => {
       breadcrumbs={['settingsTitle', 'scheduleDialog']}
     >
       {item && (
-        <Accordion defaultExpanded>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1">
-              {t('sharedRequired')}
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails className={classes.details}>
-            <TextField
-              value={item.name || ''}
-              onChange={(event) => setItem({ ...item, name: event.target.value })}
-              label={t('sharedName')}
-            />
-            <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
-              <FormLabel component="legend">{t('days')}</FormLabel>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={lunes} onChange={handleChange} name="lunes" />
-                  }
-                  label="Lunes"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={martes} onChange={handleChange} name="martes" />
-                  }
-                  label="Martes"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={miercoles} onChange={handleChange} name="miercoles" />
-                  }
-                  label="Miercoles"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={jueves} onChange={handleChange} name="jueves" />
-                  }
-                  label="Jueves"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={viernes} onChange={handleChange} name="viernes" />
-                  }
-                  label="Viernes"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={sabado} onChange={handleChange} name="sabado" />
-                  }
-                  label="Sabado"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={domingo} onChange={handleChange} name="domingo" />
-                  }
-                  label="Domingo"
-                />
-              </FormGroup>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel id="subroute">{t('subroutes')}</InputLabel>
-              <Select
-                labelId="subrouteid-label"
-                id="subrouteid"
-                value={subruta ?? 0}
-                label={t('subroutes')}
-                onChange={updateSubruta}
-              >
-                {subrutas && (
-                  subrutas.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
-                )}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel id="geofence">{t('geofences')}</InputLabel>
-              <Select
-                labelId="geofenceid-label"
-                id="geofenceid"
-                value={geofence ?? 0}
-                label={t('geofences')}
-                onChange={updateGeocerca}
-              >
-                {geofences && (
-                  geofences.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
-                )}
-              </Select>
-            </FormControl>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={['TimePicker', 'TimePicker']}>
-                <DemoItem>
-                  <TimePicker
-                    label={t('reportStartTime')}
-                    value={start}
-                    onChange={(newValue) => updateStart(newValue)}
+        <>
+          <Accordion defaultExpanded>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle1">
+                {t('sharedRequired')}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails className={classes.details}>
+              <TextField
+                value={item.name || ''}
+                onChange={(event) => setItem({ ...item, name: event.target.value })}
+                label={t('sharedName')}
+              />
+              <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+                <FormLabel component="legend">{t('days')}</FormLabel>
+                <FormGroup>
+                  <FormControlLabel
+                    control={
+                      <Checkbox checked={lunes} onChange={handleChange} name="lunes" />
+                    }
+                    label="Lunes"
                   />
-                </DemoItem>
+                  <FormControlLabel
+                    control={
+                      <Checkbox checked={martes} onChange={handleChange} name="martes" />
+                    }
+                    label="Martes"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox checked={miercoles} onChange={handleChange} name="miercoles" />
+                    }
+                    label="Miercoles"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox checked={jueves} onChange={handleChange} name="jueves" />
+                    }
+                    label="Jueves"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox checked={viernes} onChange={handleChange} name="viernes" />
+                    }
+                    label="Viernes"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox checked={sabado} onChange={handleChange} name="sabado" />
+                    }
+                    label="Sabado"
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox checked={domingo} onChange={handleChange} name="domingo" />
+                    }
+                    label="Domingo"
+                  />
+                </FormGroup>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel id="subroute">{t('subroutes')}</InputLabel>
+                <Select
+                  labelId="subrouteid-label"
+                  id="subrouteid"
+                  value={subruta ?? 0}
+                  label={t('subroutes')}
+                  onChange={updateSubruta}
+                >
+                  {subrutas && (
+                    subrutas.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
+                  )}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel id="geofence">Geocerca</InputLabel>
+                <Select
+                  labelId="geofence"
+                  id="geofenceid"
+                  value={geofence ?? 0}
+                  label="Geocerca"
+                  onChange={updateGeocerca}
+                >
+                  {geofences && (
+                    geofences.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
+                  )}
+                </Select>
+              </FormControl>
 
-              </DemoContainer>
-            </LocalizationProvider>
-          </AccordionDetails>
-        </Accordion>
+              <FormControl fullWidth>
+                <InputLabel id="horas">Tabla de salidas</InputLabel>
+                <Select
+                  labelId="horas"
+                  id="geofenceid"
+                  value={hour ?? 0}
+                  label="Tabla de salidas"
+                  onChange={(event) => setHour(event.target.value)}
+                >
+                  <MenuItem value={0}>--Sin horario--</MenuItem>
+                  {hours && (
+                    hours.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
+                  )}
+                </Select>
+              </FormControl>
+            </AccordionDetails>
+          </Accordion>
+          {
+            item.id && (
+              <>
+                <p>Tramos</p>
+                <Box
+                  sx={{
+                    height: 500,
+                    width: '100%',
+                    '& .actions': {
+                      color: 'text.secondary',
+                    },
+                    '& .textPrimary': {
+                      color: 'text.primary',
+                    },
+                  }}
+                >
+                  <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    editMode="row"
+                    rowModesModel={rowModesModel}
+                    onRowModesModelChange={handleRowModesModelChange}
+                    onRowEditStop={handleRowEditStop}
+                    processRowUpdate={processRowUpdate}
+                    slots={{
+                      toolbar: EditToolbar,
+                    }}
+                    slotProps={{
+                      toolbar: { setRows, setRowModesModel },
+                    }}
+
+                  />
+                </Box>
+              </>
+            )
+          }
+        </>
       )}
     </EditItemView>
+
   );
 };
 
