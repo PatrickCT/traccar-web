@@ -8,6 +8,7 @@ import Checkbox from '@mui/material/Checkbox';
 import {
   Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, FormLabel, MenuItem, InputLabel, Select,
 } from '@mui/material';
+import moment from 'moment';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
@@ -22,6 +23,11 @@ import {
   GridActionsCellItem,
   GridRowEditStopReasons,
 } from '@mui/x-data-grid';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import makeStyles from '@mui/styles/makeStyles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditItemView from './components/EditItemView';
@@ -90,6 +96,16 @@ const SchedulePage = () => {
     domingo: false,
   });
 
+  const [horas, setHoras] = useState(item?.attributes?.hours || {
+    1: { desde: [], hasta: [] },
+    2: { desde: [], hasta: [] },
+    4: { desde: [], hasta: [] },
+    8: { desde: [], hasta: [] },
+    16: { desde: [], hasta: [] },
+    32: { desde: [], hasta: [] },
+    64: { desde: [], hasta: [] },
+  });
+
   const {
     lunes,
     martes,
@@ -112,14 +128,36 @@ const SchedulePage = () => {
   const [rows, setRows] = React.useState([]);
   const [rowModesModel, setRowModesModel] = React.useState({});
 
-  const updateTramo = (item) => {
-    fetch(`/api/tramos/${item.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(item) }).then((response) => response.json()).then((data) => console.log(data));
+  const linkTramo = (tramo, link = true) => {
+    fetch('http://localhost:3090/api/permissions', { method: link ? 'POST' : 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ itinerarioId: item.id, tramoId: tramo }) });
+  };
+
+  const saveTramo = (tramo) => {
+    const { isNew } = tramo;
+    tramo.geofenceId = (geofences.find((geofence) => geofence.name === tramo.geofenceId))?.id || (item?.geofenceId || null);
+    tramo.minTime = Number(tramo.minTime);
+    tramo.delay = Number(tramo.delay);
+    tramo.punishment = Number(tramo.punishment);
+    if (tramo.isNew) {
+      delete tramo.id; // Remove the 'id' key
+    }
+    delete tramo.age; // Remove the '
+    delete tramo.isNew;
+
+    fetch(`/api/tramos/${isNew ? '' : tramo.id}`, {
+      method: isNew ? 'POST' : 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(tramo),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (isNew) {
+          linkTramo(data.id, true);
+        }
+      });
   };
 
   const handleRowEditStop = (params, event) => {
-    console.log('handleRowEditStop');
-    console.log(params);
-    console.log(event);
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
     }
@@ -130,14 +168,16 @@ const SchedulePage = () => {
   };
 
   const handleSaveClick = (id) => () => {
-    console.log('save edit');
-    console.log(id);
-    console.log({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
   const handleDeleteClick = (id) => () => {
     setRows(rows.filter((row) => row.id !== id));
+    fetch(`/api/tramos/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    linkTramo(id, false);
   };
 
   const handleCancelClick = (id) => () => {
@@ -153,24 +193,21 @@ const SchedulePage = () => {
   };
 
   const processRowUpdate = (newRow) => {
-    console.log('processRowUpdate');
-    console.log(newRow);
     const updatedRow = { ...newRow, isNew: false };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    updateTramo(newRow);
+    saveTramo(newRow);
+
     return updatedRow;
   };
 
   const handleRowModesModelChange = (newRowModesModel) => {
-    console.log('handleRowModesModelChange');
-    console.log(newRowModesModel);
     setRowModesModel(newRowModesModel);
   };
 
   const columns = [
     { field: 'name', headerName: 'Nombre', width: 180, editable: true },
     { field: 'minTime', headerName: 'Tiempo de llegada', width: 180, editable: true },
-    { field: 'delay', headerName: 'Tiempo de holgura', width: 180, editable: true },
+    // { field: 'delay', headerName: 'Tiempo de holgura', width: 180, editable: true },
     { field: 'punishment', headerName: 'Castigo', width: 180, editable: true },
     {
       field: 'geofenceId',
@@ -178,7 +215,7 @@ const SchedulePage = () => {
       width: 220,
       editable: true,
       type: 'singleSelect',
-      valueOptions: ['a', 'b', 'c'],
+      valueOptions: [...geofences.map((geofence) => geofence.name)],
     },
     {
       field: 'actions',
@@ -262,8 +299,18 @@ const SchedulePage = () => {
     fetch('/api/horasalidas').then((response) => response.json()).then((data) => setHours(data.filter((item, index, self) => self.findIndex((t) => t.name === item.name) === index)));
 
     if (item?.id) {
-      fetch('/api/tramos?scheduleId=9').then((response) => response.json()).then((data) => { setRows(data); });
+      fetch(`/api/tramos?scheduleId=${item?.id}`).then((response) => response.json()).then((data) => { setRows(data); });
     }
+
+    setHoras(item?.attributes?.hours || {
+      1: { desde: [], hasta: [] },
+      2: { desde: [], hasta: [] },
+      4: { desde: [], hasta: [] },
+      8: { desde: [], hasta: [] },
+      16: { desde: [], hasta: [] },
+      32: { desde: [], hasta: [] },
+      64: { desde: [], hasta: [] },
+    });
   }, [item?.id]);
 
   useEffect(() => {
@@ -275,6 +322,10 @@ const SchedulePage = () => {
       days: newDays,
     });
   }, [days]);
+
+  useEffect(() => {
+    setItem({ ...{ ...item, attributes: { ...item?.attributes, hours: horas } } });
+  }, [horas]);
 
   const updateSubruta = (evt) => {
     setSubruta(evt.target.value);
@@ -292,6 +343,14 @@ const SchedulePage = () => {
     });
   };
 
+  const updateHora = (evt) => {
+    setHour(evt.target.value);
+    setItem({
+      ...item,
+      horasId: evt.target.value,
+    });
+  };
+
   const onItemSaved = useCatch(async () => {
     const response = await fetch('/api/itinerarios');
     if (response.ok) {
@@ -302,10 +361,6 @@ const SchedulePage = () => {
   });
 
   const validate = () => item && item.name && item.days && item.subrouteId;
-
-  // const linkTramo = (link = true) => {
-  //   fetch('http://localhost:3090/api/permissions', { method: link ? 'POST' : 'DELETE', body: JSON.stringify({ itinerarioId: item.id, tramoId: 5 }) });
-  // };
 
   return (
     <EditItemView
@@ -340,42 +395,217 @@ const SchedulePage = () => {
                     }
                     label="Lunes"
                   />
+                  {lunes && (
+
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={['TimePicker', 'TimePicker']}>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[1].desde[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[1].desde[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 1: { ...horas[1], desde: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[1].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[1].hasta[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 1: { ...horas[1], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  )}
                   <FormControlLabel
                     control={
                       <Checkbox checked={martes} onChange={handleChange} name="martes" />
                     }
                     label="Martes"
                   />
+                  {martes && (
+
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={['TimePicker', 'TimePicker']}>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[2].desde[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[2].desde[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 2: { ...horas[2], desde: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[2].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[2].hasta[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 2: { ...horas[2], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  )}
                   <FormControlLabel
                     control={
                       <Checkbox checked={miercoles} onChange={handleChange} name="miercoles" />
                     }
                     label="Miercoles"
                   />
+                  {miercoles && (
+
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={['TimePicker', 'TimePicker']}>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[4].desde[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[4].desde[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 4: { ...horas[4], desde: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[4].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[4].hasta[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 4: { ...horas[4], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  )}
                   <FormControlLabel
                     control={
                       <Checkbox checked={jueves} onChange={handleChange} name="jueves" />
                     }
                     label="Jueves"
                   />
+                  {jueves && (
+
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={['TimePicker', 'TimePicker']}>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[8].desde[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[8].desde[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 8: { ...horas[8], desde: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[8].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[8].hasta[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 8: { ...horas[8], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  )}
                   <FormControlLabel
                     control={
                       <Checkbox checked={viernes} onChange={handleChange} name="viernes" />
                     }
                     label="Viernes"
                   />
+                  {viernes && (
+
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={['TimePicker', 'TimePicker']}>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[16].desde[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[16].desde[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 16: { ...horas[16], desde: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[16].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[16].hasta[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 16: { ...horas[16], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  )}
                   <FormControlLabel
                     control={
                       <Checkbox checked={sabado} onChange={handleChange} name="sabado" />
                     }
                     label="Sabado"
                   />
+                  {sabado && (
+
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={['TimePicker', 'TimePicker']}>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[32].desde[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[32].desde[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 32: { ...horas[32], desde: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[32].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[32].hasta[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 32: { ...horas[32], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  )}
                   <FormControlLabel
                     control={
                       <Checkbox checked={domingo} onChange={handleChange} name="domingo" />
                     }
                     label="Domingo"
                   />
+                  {domingo && (
+
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={['TimePicker', 'TimePicker']}>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[64].desde[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[64].desde[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 64: { ...horas[64], desde: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportStartTime')}
+                            value={dayjs(new Date(new Date().setHours((horas[64].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[64].hasta[1] || 0)))}
+                            onChange={(newValue) => {
+                              setHoras({ ...{ ...horas, 64: { ...horas[64], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
+                            }}
+                          />
+                        </DemoItem>
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  )}
                 </FormGroup>
               </FormControl>
               <FormControl fullWidth>
@@ -393,12 +623,12 @@ const SchedulePage = () => {
                 </Select>
               </FormControl>
               <FormControl fullWidth>
-                <InputLabel id="geofence">Geocerca</InputLabel>
+                <InputLabel id="geofence">Geocerca de salida</InputLabel>
                 <Select
                   labelId="geofence"
                   id="geofenceid"
-                  value={geofence ?? 0}
-                  label="Geocerca"
+                  value={item.geofenceId || geofence}
+                  label="Geocerca de salida"
                   onChange={updateGeocerca}
                 >
                   {geofences && (
@@ -411,10 +641,10 @@ const SchedulePage = () => {
                 <InputLabel id="horas">Tabla de salidas</InputLabel>
                 <Select
                   labelId="horas"
-                  id="geofenceid"
-                  value={hour ?? 0}
+                  id="horasid"
+                  value={item.horasId || hour}
                   label="Tabla de salidas"
-                  onChange={(event) => setHour(event.target.value)}
+                  onChange={updateHora}
                 >
                   <MenuItem value={0}>--Sin horario--</MenuItem>
                   {hours && (
@@ -463,7 +693,6 @@ const SchedulePage = () => {
         </>
       )}
     </EditItemView>
-
   );
 };
 

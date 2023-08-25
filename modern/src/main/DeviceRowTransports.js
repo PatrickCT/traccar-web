@@ -94,7 +94,6 @@ const DeviceRowTransporte = ({ data, index }) => {
           setIsOpen(!isOpened);
           if (!desktop && user.attributes.hasOwnProperty('Transporte')) {
             window.showDevicesList(true);
-            console.log('openDevicesList');
           }
         }}
         disabled={!admin && item.disabled}

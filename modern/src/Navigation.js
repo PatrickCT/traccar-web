@@ -63,6 +63,7 @@ import HourPage from './settings/HourPage';
 import ScheduleConnectionsPage from './settings/ScheduleConnectionsPage';
 import DeviceConnectionGroupPage from './settings/DeviceConnectionGroupPage';
 import TicketReportPage from './reports/TicketReportPage';
+import HelpPage from './other/HelpPage';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -115,6 +116,7 @@ const Navigation = () => {
         <Route path="event/:id" element={<EventPage />} />
         <Route path="replay" element={<ReplayPage />} />
         <Route path="geofences" element={<GeofencesPage />} />
+        <Route path="help" element={<HelpPage />} />
 
         <Route path="settings">
           <Route path="accumulators/:deviceId" element={<AccumulatorsPage />} />

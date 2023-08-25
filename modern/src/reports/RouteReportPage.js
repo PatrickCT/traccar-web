@@ -1,12 +1,17 @@
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+/* eslint-disable import/no-extraneous-dependencies */
+
+import React, {
+  Fragment, useCallback, useEffect, useRef, useState,
+} from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Table, TableBody, TableCell, TableHead, TableRow,
+  Paper,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 } from '@mui/material';
+import { TableVirtuoso } from 'react-virtuoso';
+// import { GpsFixed, LocationSearching } from '@mui/icons-material';
 import { Popup } from 'maplibre-gl';
-// import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-// import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import ReportFilter from './components/ReportFilter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
@@ -21,7 +26,7 @@ import MapRoutePath from '../map/MapRoutePath';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapPositions from '../map/MapPositions';
 import useReportStyles from './common/useReportStyles';
-import TableShimmer from '../common/components/TableShimmer';
+// import TableShimmer from '../common/components/TableShimmer';
 import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
 import scheduleReport from './common/scheduleReport';
@@ -29,16 +34,29 @@ import {
   createPopUpReportRoute, generateRoute, streetView,
 } from '../common/util/mapPopup';
 
+const VirtuosoTableComponents = {
+  Scroller: React.forwardRef((props, ref) => (
+    <TableContainer component={Paper} {...props} ref={ref} />
+  )),
+  Table: (props) => (
+    <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />
+  ),
+  TableHead,
+  TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
+  TableBody: React.forwardRef((props, ref) => <TableBody {...props} ref={ref} />),
+};
+
 const RouteReportPage = () => {
   const navigate = useNavigate();
   const classes = useReportStyles();
   const t = useTranslation();
+  const virtuosoRef = useRef(null);
 
   const positionAttributes = usePositionAttributes(t);
 
   const devices = useSelector((state) => state.devices.items);
 
-  const [columns, setColumns] = usePersistedState('routeColumns', ['fixTime', 'latitude', 'longitude', 'speed', 'address']);
+  const [columns, setColumns] = usePersistedState('routeColumns', []);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -53,6 +71,13 @@ const RouteReportPage = () => {
       .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
       .addTo(map);
     window.position = items.find((it) => it.id === positionId);
+    if (virtuosoRef.current) {
+      virtuosoRef.current.scrollToIndex({
+        index: items.findIndex((item) => item.id === positionId),
+        align: 'start', // or 'center' or 'end'
+        behavior: 'smooth', // or 'auto'
+      });
+    }
   }, [items, setSelectedItem]);
 
   const handleSubmit = useCatch(async ({ deviceIds, from, to, type }) => {
@@ -111,6 +136,37 @@ const RouteReportPage = () => {
     };
   }, []);
 
+  const fixedHeaderContent = () => (
+    <TableRow style={{ backgroundColor: 'white' }}>
+      <TableCell>{t('sharedDevice')}</TableCell>
+      {columns.map((key) => (<TableCell key={key}>{positionAttributes[key]?.name || key}</TableCell>))}
+    </TableRow>
+  );
+  const showPU = (positionId) => {
+    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+    setSelectedItem(items.find((it) => it.id === positionId));
+    new Popup()
+      .setMaxWidth('400px')
+      .setHTML(createPopUpReportRoute(items.find((it) => it.id === positionId)))
+      .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
+      .addTo(map);
+    window.position = items.find((it) => it.id === positionId);
+  };
+  const rowContent = (_index, item) => (
+    <>
+      <TableCell onClick={() => showPU(item.id)} style={{ fontSize, lineHeight: '1', padding: '4px', backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }}>{devices[item.deviceId].name}</TableCell>
+      {columns.map((key) => (
+        <TableCell onClick={() => showPU(item.id)} style={{ fontSize, lineHeight: '1', padding: '4px', backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }} key={key}>
+          <PositionValue
+            position={item}
+            property={item.hasOwnProperty(key) ? key : null}
+            attribute={item.hasOwnProperty(key) ? null : key}
+          />
+        </TableCell>
+      ))}
+    </>
+  );
+
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportRoute']}>
       <div className={classes.container}>
@@ -142,38 +198,17 @@ const RouteReportPage = () => {
               />
             </ReportFilter>
           </div>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell className={classes.columnAction} />
-                <TableCell>{t('sharedDevice')}</TableCell>
-                {columns.map((key) => (<TableCell key={key}>{positionAttributes[key]?.name || key}</TableCell>))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {!loading ? items.slice(0, 4000).map((item) => (
-                <TableRow
-                  key={item.id}
-                  onClick={() => onMapPointClick(item.id)}
-                  style={{ backgroundColor: selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent' }}
-                >
-                  <TableCell className={classes.columnAction} padding="none" />
-                  <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }}>{devices[item.deviceId].name}</TableCell>
-                  {columns.map((key) => (
-                    <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }} key={key}>
-                      <PositionValue
-                        position={item}
-                        property={item.hasOwnProperty(key) ? key : null}
-                        attribute={item.hasOwnProperty(key) ? null : key}
-                      />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              )) : (
-                <TableShimmer columns={columns.length + 2} startAction />
-              )}
-            </TableBody>
-          </Table>
+          {!loading && (
+            <Paper style={{ height: 300, width: '100%' }}>
+              <TableVirtuoso
+                ref={virtuosoRef}
+                data={items}
+                components={VirtuosoTableComponents}
+                fixedHeaderContent={fixedHeaderContent}
+                itemContent={rowContent}
+              />
+            </Paper>
+          )}
         </div>
       </div>
     </PageLayout>

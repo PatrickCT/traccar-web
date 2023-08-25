@@ -6,6 +6,8 @@ import makeStyles from '@mui/styles/makeStyles';
 import {
   ListItemText, ListItemButton, useMediaQuery, Tooltip, IconButton,
 } from '@mui/material';
+import CrisisAlertIcon from '@mui/icons-material/CrisisAlert';
+import moment from 'moment';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
 import Battery60Icon from '@mui/icons-material/Battery60';
@@ -14,7 +16,7 @@ import Battery20Icon from '@mui/icons-material/Battery20';
 import BatteryCharging20Icon from '@mui/icons-material/BatteryCharging20';
 import ErrorIcon from '@mui/icons-material/Error';
 import { ReactComponent as EngineIcon } from '../resources/images/data/engine.svg';
-// import moment from 'moment';
+
 import { devicesActions } from '../store';
 // import {
 //   formatStatus, getStatusColor,
@@ -24,6 +26,7 @@ import { useAdministrator } from '../common/util/permissions';
 
 import { useAttributePreference } from '../common/util/preferences';
 import { formatAlarm, formatBoolean, formatPercentage } from '../common/util/formatter';
+import { hasPassedTime } from '../common/util/utils';
 // import { map } from '../map/core/MapView';
 // import { createPopUp } from '../common/util/mapPopup';
 
@@ -89,8 +92,8 @@ const DeviceRow = ({ data, index, style }) => {
         <span style={{ fontWeight: 'bold', fontSize: '14px' }}>{`${item[key]} `}</span>
         {' • '}
         <span style={{ color: item.status === 'online' ? 'green' : 'red', fontWeight: 'normal', fontSize: '14px' }}>{status}</span>
-        {/*
-        <span style={{ fontSize: '15px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span> */}
+        {' • '}
+        <span style={{ fontSize: '14px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
       </>
     );
   };
@@ -130,6 +133,11 @@ const DeviceRow = ({ data, index, style }) => {
         </Tooltip>
         {position && (
           <>
+            {hasPassedTime(new Date(position.fixTime), 30) && (
+              <Tooltip title={t('eventAlarm')}>
+                <CrisisAlertIcon fontSize="small" className={classes.negative} />
+              </Tooltip>
+            )}
             {position.attributes.hasOwnProperty('alarm') && (
               <Tooltip title={`${t('eventAlarm')}: ${formatAlarm(position.attributes.alarm, t)}`}>
                 <IconButton size="small">

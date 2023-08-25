@@ -1,9 +1,14 @@
 import {
   attsGetter,
+  hasPassedTime,
   isMobile,
   specialAtts,
   valueParser,
 } from './utils';
+
+window.extraDiv = 'none';
+
+window.showExtraDiv = () => { window.extraDiv = (window.extraDiv === 'none' ? 'block' : 'none'); document.getElementById('extra').style.display = window.extraDiv; };
 
 window.makeRequest = async (url, method = 'GET', payload = null) => {
   const options = {
@@ -133,38 +138,64 @@ export const generateRoute = () => {
   openInNewTab(url);
 };
 
-export const test = () => { generateRoute(); };
+export const test = () => `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  .collapsible {
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    background-color: #f1f1f1;
+    transition: background-color 0.3s;
+  }
 
-export const createPopUp = (position) => {
-  let html = '<div>';
-  html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
-  html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());" ><img src="./././images/botones-popup/connection.svg" width="14" height="14" /></a>`;
-  html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
-  html += window.localStorage.getItem(btoa('isAdmin')) === 'true' ? ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>` : '';
+  .content {
+    display: none;
+    padding: 10px;
+  }
 
-  html += `<h3><b>${attsGetter(position, 'name')}</b>`;
-  html += '</h3></div>';
-  html += valueParser(position, specialAtts(position, 'ignition'));
-  html += valueParser(position, specialAtts(position, 'motion'));
-  html += valueParser(position, specialAtts(position, 'dateTime'));
-  html += valueParser(position, specialAtts(position, 'status'));
-  html += valueParser(position, specialAtts(position, 'direccion'));
-  html += valueParser(position, specialAtts(position, 'fuel'));
-  html += valueParser(position, specialAtts(position, 'totalDistance'));
-  html += valueParser(position, specialAtts(position, 'speed'));
-  html += valueParser(position, specialAtts(position, 'hours'));
-  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
-  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
-  html += valueParser(position, 'bateria');
-  html += valueParser(position, specialAtts(position, 'lastAlarm'));
-  html += valueParser(position, specialAtts(position, 'protocol'));
-  html += '<br>';
+  .active {
+    background-color: #ddd;
+  }
 
+  .image {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+</head>
+<body>
+
+<button class="collapsible">Click to Expand</button>
+<div class="content">
+  <img class="image" src="https://picsum.photos/200/300" alt="Sample Image">
+</div>
+
+<script>
+  const collapsible = document.querySelector('.collapsible');
+  const content = document.querySelector('.content');
+
+  collapsible.addEventListener('click', function() {
+    this.classList.toggle('active');
+    content.style.display = content.style.display === 'block' ? 'none' : 'block';
+  });
+</script>
+
+</body>
+</html>
+
+`;
+
+const popupBtns = () => {
+  let html = '';
   html += "<div style='display: table; margin: auto'>";
-
-  // html += "<div style='float: left; padding: 2px;' >";
-  // html += `<a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());" ><img src="./././images/botones-popup/connection.svg" width="35" height="35" style="border-radius:6px;"/></a>`;
-  // html += '</div>';
 
   html += "<div style='float: left; padding: 2px;' >";
   html += '<a class="link-google-maps" onclick="(function(){engineLock();}());" ><img src="./././images/botones-popup/apagar.svg" width="35" height="35" style="border-radius:6px;"/></a>';
@@ -186,14 +217,89 @@ export const createPopUp = (position) => {
   html += "<a class='link-google-maps' onclick='(function(){navigate(`/reports/route`);}());'><img src='./././images/botones-popup/recorrido.svg' width='35' height='35' style='border-radius:6px;'/></a>";
   html += '</div>';
 
-  // html += "<div id='divclear' style='float: left; padding:2px;' >";
-  // html += "<a class='link-google-maps' onclick='(function(){clearMarkers();}());'><img src='./././images/botones-popup/limpiar_recorrido.svg' width='35' height='35' style='border-radius:6px;'/></a>";
-  // html += '</div>';
-
   html += "<div id='div_replay' style='float: left; padding:2px;' >";
   html += '<a class="link-google-maps" onClick="(function(){navigate(`/replay`);}());"><img src="./././images/botones-popup/replay.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
+
   html += '</div>';
+
+  return html;
+};
+
+export const createPopUp = (position) => {
+  let html = '';
+
+  if (hasPassedTime(new Date(position.fixTime), 30)) {
+    html += '<div style="width: 250px;">';
+    html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attsGetter(position, 'name')}, no esta reportando"  style="left: 42%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
+
+    html += '<br />';
+    html += '<br />';
+    html += popupBtns();
+    html += '</div>';
+    return html;
+  }
+  html += '<div>';
+  html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
+  html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());" ><img src="./././images/botones-popup/connection.svg" width="14" height="14" /></a>`;
+  html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
+  html += window.localStorage.getItem(btoa('isAdmin')) === 'true' ? ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>` : '';
+
+  html += `<h3><b>${attsGetter(position, 'name')}</b>`;
+  html += '</h3></div>';
+  html += '<div style="text-align: center;">';
+  html += `${valueParser(position, specialAtts(position, 'ignition'))}  -  `;
+  html += valueParser(position, specialAtts(position, 'motion'));
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'dateTime'));
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'lastUpdate'));
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'status'));
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'direccion'));
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'fuel'));
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'totalDistance'));
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'speed'));
+  html += valueParser(position, 'bateria');
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'odometer'));
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'hours'));
+  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
+  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
+
+  html += valueParser(position, specialAtts(position, 'lastAlarm'));
+  html += '<br />';
+
+  if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
+    html += valueParser(position, specialAtts(position, 'protocol'));
+    html += '<br />';
+    html += valueParser(position, specialAtts(position, 'phone'));
+    html += '<br />';
+    html += valueParser(position, specialAtts(position, 'imei'));
+  }
+
+  html += '<br />';
+
+  html += '<a onclick="(function(){showExtraDiv();}());" style="color: #ffffff" href="#" >+</a>';
+  html += '<br />';
+
+  html += `<div id="extra" style="display: ${window.extraDiv};">`;
+  html += `<img style="width: -webkit-fill-available; height: auto;" src="/api/media/${window.device.uniqueId}/${window.device.attributes?.deviceImage}" />`;
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'policy'));
+  html += valueParser(position, specialAtts(position, 'expiration'));
+  html += '</div>';
+  html += '</div>';
+
+  html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
+
+  html += '<br />';
+  html += popupBtns();
   html += '</div>';
   return html;
 };

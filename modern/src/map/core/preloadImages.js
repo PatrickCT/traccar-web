@@ -24,6 +24,7 @@ import tramSvg from '../../resources/images/icon/tram.svg';
 import trolleybusSvg from '../../resources/images/icon/trolleybus.svg';
 import truckSvg from '../../resources/images/icon/truck.svg';
 import vanSvg from '../../resources/images/icon/van.svg';
+import crossSvg from '../../resources/images/icon/cross.svg';
 
 export const mapIcons = {
   animal: animalSvg,
@@ -47,6 +48,7 @@ export const mapIcons = {
   trolleybus: trolleybusSvg,
   truck: truckSvg,
   van: vanSvg,
+  cross: crossSvg,
 };
 
 export const mapIconKey = (category) => (mapIcons.hasOwnProperty(category) ? category : 'default');

@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import dayjs from 'dayjs';
@@ -58,9 +59,9 @@ const HourPage = () => {
   const onItemSaved = useCatch(async () => {
     for (let il = 0; il < items.length; il += 1) {
       const i = items[il];
-      fetch(`/api/horasalidas/${i.gpsid ? i.gpsid : ''}`, { method: i.gpsid ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, hour: i.hour, id: i.id }) })
-        .then((response) => response.json())
-        .then((data) => console.log(data));
+      if (i.hasOwnProperty('id') && i?.name !== null) {
+        await fetch(`/api/horasalidas/${i.gpsid ? i.gpsid : ''}`, { method: i.gpsid ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, hour: i.hour, id: i.id }) });
+      }
     }
   });
 
@@ -95,43 +96,38 @@ const HourPage = () => {
   };
 
   const hoursGenerator = () => {
+    if (repeticion <= 0) return;
+
     const h = start.toDate();
     const i = items;
-    console.log(items);
     h.setSeconds(0);
     while (h < end.toDate()) {
-      console.log(h);
       i.push({ id: items.length + 1, hour: new Date(h), name });
       h.setMinutes(h.getMinutes() + repeticion);
-      console.log(i);
     }
     setItems(i);
     setItem(null);
   };
 
   const updateItem = (item) => {
-    console.log(item);
     setItem(item);
     setDate(dayjs(item.hour));
   };
 
   const saveItem = () => {
-    console.log(item);
     const i = items.map((i) => (i.id === item.id ? item : i));
-    console.log(i);
     setItems(i);
     setItem(null);
   };
 
   const removeItem = (item) => {
     const i = items.filter((i) => (i.id !== item.id));
-    console.log(i);
     setItems(i);
     setItem(null);
     if (item.gpsid) {
       fetch(`/api/horasalidas/${item.gpsid}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } })
         .then((response) => response.json())
-        .then((data) => console.log(data));
+        .then((data) => data);
     }
   };
 

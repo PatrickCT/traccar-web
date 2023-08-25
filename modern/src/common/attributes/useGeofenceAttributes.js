@@ -15,4 +15,8 @@ export default (t) => useMemo(() => ({
     type: 'number',
     subtype: 'distance',
   },
+  groupChange: {
+    name: t('attributeGroupChangeFlag'),
+    type: 'geofence',
+  },
 }), [t]);

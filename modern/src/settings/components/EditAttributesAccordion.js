@@ -26,6 +26,7 @@ import {
   distanceFromMeters, distanceToMeters, distanceUnitString, speedFromKnots, speedToKnots, speedUnitString, volumeFromLiters, volumeToLiters, volumeUnitString,
 } from '../../common/util/converter';
 import useFeatures from '../../common/util/useFeatures';
+import SelectField from '../../common/components/SelectField';
 
 const useStyles = makeStyles((theme) => ({
   removeButton: {
@@ -181,6 +182,22 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
                     />
                   )}
                   label={getAttributeName(key, subtype)}
+                />
+                <IconButton size="small" className={classes.removeButton} onClick={() => deleteAttribute(key)}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Grid>
+            );
+          }
+          if (key === 'groupChange') {
+            return (
+              <Grid container direction="row" justifyContent="space-between" key={key}>
+                <SelectField
+                  fullWidth
+                  endpoint="/api/groups"
+                  onChange={(e) => updateAttribute(key, e.target.value, 'number', 'number')}
+                  label={getAttributeName(key, subtype)}
+                  value={getDisplayValue(value, subtype)}
                 />
                 <IconButton size="small" className={classes.removeButton} onClick={() => deleteAttribute(key)}>
                   <CloseIcon fontSize="small" />

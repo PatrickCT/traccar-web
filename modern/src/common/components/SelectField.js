@@ -16,6 +16,7 @@ const SelectField = ({
   data,
   keyGetter = (item) => item.id,
   titleGetter = (item) => item.name,
+  dataGetter = (data) => data,
 }) => {
   const [items, setItems] = useState(data);
 
@@ -23,7 +24,8 @@ const SelectField = ({
     if (endpoint) {
       const response = await fetch(endpoint);
       if (response.ok) {
-        setItems(await response.json());
+        const d = dataGetter(await response.json());
+        setItems(d);
       } else {
         throw Error(await response.text());
       }

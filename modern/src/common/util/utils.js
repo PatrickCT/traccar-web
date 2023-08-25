@@ -334,7 +334,7 @@ export const attsGetter = (obj, attribute) => {
       return temperature;
     }
     case 'name':
-      return window.device?.name ?? '';
+      return `${window.device?.name || ''} ${window.device?.maker || ''} ${window.device?.model || ''} ${window.device?.year || ''}`;
     case 'ignition': {
       const motion = attsGetter(obj, 'motion');
       const value = (obj.ignition ? obj.ignition : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : (obj.attributes[`attribute.${attribute}`] ? obj.attributes[`attribute.${attribute}`] : null)));
@@ -352,22 +352,24 @@ export const attsGetter = (obj, attribute) => {
       const value = (obj.io173 ? obj.io173 : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : attsGetter(obj, 'motion')));
       return (value !== null && value === 1 && value !== undefined) ? 'Si' : 'No';
     }
-    case 'attribute.fuel': {
+    case 'fuel': {
       const value = (obj['attribute.fuel'] ? obj['attribute.fuel'] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
       return value;
     }
-    case 'attribute.hours': {
+    case 'hours': {
       const value = (obj['attribute.hours'] ? obj['attribute.hours'] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-      return value;
+      const hours = Math.floor(value / 3600000);
+      const minutes = Math.floor((value % 3600000) / 60000);
+      return value ? `${hours}H ${minutes}m` : null;
     }
-    case 'attribute.totalDistance': {
+    case 'totalDistance': {
       const value = (obj['attribute.totalDistance'] ? obj['attribute.totalDistance'] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
       return value;
     }
     case 'dateTime': {
       let value = attsGetter(obj, 'fixTime');
       const dt = new Date(value);
-      value = dt.toLocaleString();
+      value = dt.toLocaleString().replace(',', '');
       return value;
     }
     case 'fixTime': {
@@ -396,6 +398,21 @@ export const attsGetter = (obj, attribute) => {
       const event = getEvent();
       return alarmTranslator((event?.type || '').toUpperCase());
     }
+    case 'policy': {
+      return window.device?.policy || '';
+    }
+    case 'expiration': {
+      return formatDateToCustomString(new Date(window.device?.insuranceExpiration || ''));
+    }
+    case 'lastUpdate': {
+      return formatDate(new Date(window.device?.lastUpdate || ''), 'dd/mm/yyyy HH:mm:ss');
+    }
+    case 'phone': {
+      return window.device?.phone || '';
+    }
+    case 'imei': {
+      return window.device?.uniqueId || '';
+    }
     default: {
       return (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
     }
@@ -410,43 +427,57 @@ export const valueParser = (obj, value) => {
     case 'name':
       return `<h3><b>${attsGetter(obj, value)}</b></h3>`;
     case 'ignition':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Encendido:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Encendido:</b> ${attsGetter(obj, value)} `;
     case 'io409':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Encendido:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Encendido:</b> ${attsGetter(obj, value)} `;
     case 'motion':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Movimiento:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Movimiento:</b> ${attsGetter(obj, value)} `;
     case 'io173':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Movimiento:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Movimiento:</b> ${attsGetter(obj, value)} `;
     case 'dateTime':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Fecha:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Posición:</b> ${attsGetter(obj, value)} `;
     case 'fixTime':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Fecha:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Fecha:</b> ${attsGetter(obj, value)} `;
     case 'status':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Estado:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Estado:</b> ${attsGetter(obj, value)} `;
     case 'speed':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Velocidad:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">⏲:</b> ${attsGetter(obj, value)} `;
     case 'address':
       return `<div id='pop-up-address'><b style='font-weight: bold;text-transform: uppercase;'>Dirección:</b> ${attsGetter(obj, 'address')}</div>`;
     case 'fuel':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Combustible:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Combustible:</b> ${attsGetter(obj, value)} `;
     case 'hours':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Horas:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Horas:</b> ${attsGetter(obj, value)} `;
     case 'totalDistance':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Distancia total :</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Distancia total :</b> ${attsGetter(obj, value)} `;
     case 'temperaturaC':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ${attsGetter(obj, value)} `;
     case 'temperaturaF':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °F:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °F:</b> ${attsGetter(obj, value)} `;
     case 'temp2':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ${attsGetter(obj, value)} `;
     case 'bateria':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Nivel de bateria:</b> ${attsGetter(obj, specialAtts(obj, value))}%<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">🔋:</b> ${attsGetter(obj, specialAtts(obj, value))}% `;
     case 'lastAlarm':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Ultima alarma:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">❗:</b> ${attsGetter(obj, value)} `;
     case 'protocol':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Protocolo:</b> ${attsGetter(obj, value)}<br>`;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Protocolo:</b> ${attsGetter(obj, value)} `;
+    case 'policy':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Poliza:</b> ${attsGetter(obj, value)} `;
+    case 'expiration':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Expiración:</b> ${attsGetter(obj, value)} `;
+    case 'lastUpdate':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Conexión:</b> ${attsGetter(obj, value)} `;
+    case 'phone':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Telefono:</b> ${attsGetter(obj, value)} `;
+    case 'imei':
+      return `<b style="font-weight: bold;text-transform: uppercase;">IMEI:</b> ${attsGetter(obj, value)} `;
   }
   return '';
 };
 
 export const isMobile = () => /Mobi|Android/i.test(navigator.userAgent);
+
+export const hasPassedTime = (date, min) => Math.abs((date - new Date()) / 60000) > min;
+
+export const generateArray = (size, start = 1) => Array.from({ length: size }, (_, i) => start + i);

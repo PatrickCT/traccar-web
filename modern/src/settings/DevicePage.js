@@ -23,6 +23,7 @@ import { useAdministrator } from '../common/util/permissions';
 import SettingsMenu from './components/SettingsMenu';
 import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
 import { useCatch } from '../reactHelper';
+import { generateArray } from '../common/util/utils';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -60,7 +61,6 @@ const DevicePage = () => {
   });
 
   const validate = () => item && item.name && item.uniqueId;
-
   return (
     <EditItemView
       endpoint="devices"
@@ -116,11 +116,6 @@ const DevicePage = () => {
                     label={t('sharedPhone')}
                   />
                   <TextField
-                    value={item.model || ''}
-                    onChange={(event) => setItem({ ...item, model: event.target.value })}
-                    label={t('deviceModel')}
-                  />
-                  <TextField
                     value={item.contact || ''}
                     onChange={(event) => setItem({ ...item, contact: event.target.value })}
                     label={t('deviceContact')}
@@ -147,9 +142,67 @@ const DevicePage = () => {
                     label={t('sharedDisabled')}
                     disabled={!admin}
                   />
+
+                  <TextField
+                    value={item.carPlate || ''}
+                    onChange={(event) => setItem({ ...item, carPlate: event.target.value })}
+                    label={t('devicePlate')}
+                  />
+                  <TextField
+                    value={item.serie || ''}
+                    onChange={(event) => setItem({ ...item, serie: event.target.value })}
+                    label={t('deviceSerie')}
+                  />
+                  <SelectField
+                    data={generateArray(new Date().getFullYear() - 1990, 1991)}
+                    keyGetter={(item) => item}
+                    titleGetter={(item) => item}
+                    onChange={(event) => setItem({ ...item, year: event.target.value })}
+                    emptyTitle={t('deviceYear')}
+                    emptyValue={t('deviceYear')}
+                    value={item.year || '1991'}
+                  />
+                  <TextField
+                    value={item.maker || ''}
+                    onChange={(event) => setItem({ ...item, maker: event.target.value })}
+                    label={t('deviceMaker')}
+                  />
+                  <TextField
+                    value={item.model || ''}
+                    onChange={(event) => setItem({ ...item, model: event.target.value })}
+                    label={t('deviceModel')}
+                  />
+
+                  <SelectField
+                    data={[{ id: 1, name: 'Telcel Plan ' }, { id: 2, name: 'Telcel Recargas ' }, { id: 3, name: 'Oxio' }]}
+                    onChange={(event) => setItem({ ...item, simType: event.target.value })}
+                    value={item.simType || null}
+                  />
                 </AccordionDetails>
               </Accordion>
             )}
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle1">
+                {t('deviceInsurance')}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails className={classes.details}>
+
+              <TextField
+                value={item.policy || ''}
+                onChange={(event) => setItem({ ...item, policy: event.target.value })}
+                label={t('devicePolicy')}
+              />
+              <TextField
+                value={moment(item.insuranceExpiration).locale('en').format(moment.HTML5_FMT.DATE)}
+                onChange={(event) => setItem({ ...item, insuranceExpiration: event.target.value })}
+                label={t('userExpirationTime')}
+                type="date"
+              />
+            </AccordionDetails>
+          </Accordion>
+
           {!user.deviceReadonly && item.id && (
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>

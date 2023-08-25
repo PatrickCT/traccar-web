@@ -12,6 +12,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useDeviceReadonly } from '../common/util/permissions';
 import DeviceRow from './DeviceRow';
+import PulsingIconButton from './components/PulsingIconButton';
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -177,6 +178,11 @@ const MainToolbar = ({
           </IconButton>
         )}
 
+      <PulsingIconButton
+        onClick={() => navigate('help')}
+        disabled={deviceReadonly && Object.keys(devices).length === 0}
+        title={t('help')}
+      />
     </Toolbar>
   );
 };
