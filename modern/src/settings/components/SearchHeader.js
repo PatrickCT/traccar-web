@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, useTheme, useMediaQuery } from '@mui/material';
+import { TextField } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 
@@ -17,13 +17,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SearchHeader = ({ keyword, setKeyword }) => {
-  const theme = useTheme();
+  // const theme = useTheme();
   const classes = useStyles();
   const t = useTranslation();
 
-  const phone = useMediaQuery(theme.breakpoints.down('sm'));
-
-  return phone ? (
+  return (
     <div className={classes.header}>
       <TextField
         variant="outlined"
@@ -32,7 +30,7 @@ const SearchHeader = ({ keyword, setKeyword }) => {
         onChange={(e) => setKeyword(e.target.value)}
       />
     </div>
-  ) : '';
+  );
 };
 
 export default SearchHeader;

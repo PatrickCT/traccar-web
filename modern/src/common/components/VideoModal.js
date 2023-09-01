@@ -27,7 +27,7 @@ const customStyles = {
     cursor: 'pointer',
     fontSize: '16px',
     color: '#333',
-    top: 20,
+    top: 60,
     right: 20,
     position: 'absolute',
   },
@@ -43,11 +43,11 @@ const VideoModal = ({ videoUrl, onClose }) => (
     <div style={customStyles.modalheader} className="modal-header">
       <h2>Video</h2>
       <button style={customStyles.closebutton} type="button" onClick={onClose} className="close-button">
-        Cerrar
+        X
       </button>
     </div>
     <div className="video-container">
-      <VideoPlayer videoSrc={videoUrl} controls />
+      <VideoPlayer videoSrc={videoUrl} controls styled />
     </div>
   </Modal>
 );

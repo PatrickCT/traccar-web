@@ -99,9 +99,13 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
     }
   };
 
-  setInterval(async () => {
-    await loadInfoTable();
-  }, 5 * 60 * 1000);
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      await loadInfoTable();
+    }, 1 * 10 * 1000);
+
+    return () => clearInterval(intervalId); // Clear interval on component unmount
+  }, []);
 
   const calcDiffColor = (ticket) => {
     let border = '#163b61';

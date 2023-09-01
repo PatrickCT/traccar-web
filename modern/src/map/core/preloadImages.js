@@ -25,6 +25,7 @@ import trolleybusSvg from '../../resources/images/icon/trolleybus.svg';
 import truckSvg from '../../resources/images/icon/truck.svg';
 import vanSvg from '../../resources/images/icon/van.svg';
 import crossSvg from '../../resources/images/icon/cross.svg';
+import clusterSvg from '../../resources/images/backgroundCluster.svg';
 
 export const mapIcons = {
   animal: animalSvg,
@@ -49,6 +50,7 @@ export const mapIcons = {
   truck: truckSvg,
   van: vanSvg,
   cross: crossSvg,
+  cluster: clusterSvg,
 };
 
 export const mapIconKey = (category) => (mapIcons.hasOwnProperty(category) ? category : 'default');
@@ -58,6 +60,8 @@ export const mapImages = {};
 export default async () => {
   const background = await loadImage(backgroundSvg);
   mapImages.background = await prepareIcon(background);
+  const cluster = await loadImage(clusterSvg);
+  mapImages.cluster = await prepareIcon(cluster);
   mapImages.direction = await prepareIcon(await loadImage(directionSvg));
   await Promise.all(Object.keys(mapIcons).map(async (category) => {
     const results = [];

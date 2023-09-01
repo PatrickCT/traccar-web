@@ -167,21 +167,23 @@ const MainPage = () => {
     };
   }, []);
 
-  try {
-    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-    window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
-    window.position = selectedPosition;
+  useEffect(() => {
+    try {
+      Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+      window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
+      window.position = selectedPosition;
 
-    if (window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
-      new Popup()
-        .setMaxWidth('400px')
-        .setHTML(createPopUp(selectedPosition))
-        .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
-        .addTo(map);
+      if (window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
+        window.popup = new Popup()
+          .setMaxWidth('400px')
+          .setHTML(createPopUp(selectedPosition))
+          .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
+          .addTo(map);
+      }
+    } catch (error) {
+      Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     }
-  } catch (error) {
-    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-  }
+  }, [selectedPosition]);
 
   return (
     <div className={classes.root}>

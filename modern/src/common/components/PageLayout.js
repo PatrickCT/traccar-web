@@ -58,9 +58,9 @@ const PageTitle = ({ breadcrumbs }) => {
   return (
     <Breadcrumbs style={{ color: 'white' }}>
       {breadcrumbs.slice(0, -1).map((breadcrumb) => (
-        <Typography variant="h6" color="white" key={breadcrumb}>{t(breadcrumb)}</Typography>
+        <Typography variant="h6" color="white" key={breadcrumb}>{t(breadcrumb) || breadcrumb}</Typography>
       ))}
-      <Typography variant="h6" color="white">{t(breadcrumbs[breadcrumbs.length - 1])}</Typography>
+      <Typography variant="h6" color="white">{t(breadcrumbs[breadcrumbs.length - 1]) || breadcrumbs[breadcrumbs.length - 1]}</Typography>
     </Breadcrumbs>
   );
 };

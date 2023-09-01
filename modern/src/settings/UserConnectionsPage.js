@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Accordion,
@@ -6,6 +6,8 @@ import {
   AccordionDetails,
   Typography,
   Container,
+  AppBar,
+  Toolbar,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -33,12 +35,27 @@ const UserConnectionsPage = () => {
 
   const { id } = useParams();
 
+  const [item, setItem] = useState({});
+
+  useEffect(() => {
+    fetch(`/api/users/${id}`, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+      .then((response) => response.json())
+      .then((data) => setItem(data));
+  }, []);
+
   return (
     <PageLayout
       menu={<SettingsMenu />}
-      breadcrumbs={['settingsTitle', 'settingsUser', 'sharedConnections']}
+      breadcrumbs={['settingsTitle', 'settingsUser', 'sharedConnections', `Usuario: ${item?.name}`]}
     >
       <Container maxWidth="xs" className={classes.container}>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h6" style={{ flexGrow: 1 }}>
+              {`Usuario: ${item?.name}`}
+            </Typography>
+          </Toolbar>
+        </AppBar>
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="subtitle1">

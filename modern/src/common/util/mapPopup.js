@@ -231,7 +231,7 @@ export const createPopUp = (position) => {
 
   if (hasPassedTime(new Date(position.fixTime), 30)) {
     html += '<div style="width: 250px;">';
-    html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attsGetter(position, 'name')}, no esta reportando"  style="left: 42%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
+    html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attsGetter(position, 'name')}, no esta reportando" style="left: 40%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
 
     html += '<br />';
     html += '<br />';
@@ -289,7 +289,10 @@ export const createPopUp = (position) => {
   html += '<br />';
 
   html += `<div id="extra" style="display: ${window.extraDiv};">`;
-  html += `<img style="width: -webkit-fill-available; height: auto;" src="/api/media/${window.device.uniqueId}/${window.device.attributes?.deviceImage}" />`;
+  if (window.device.attributes?.deviceImage) {
+    html += `<img style="width: -webkit-fill-available; height: auto;" src="/api/media/${window.device.uniqueId}/${window.device.attributes?.deviceImage}" />`;
+  }
+
   html += '<br />';
   html += valueParser(position, specialAtts(position, 'policy'));
   html += valueParser(position, specialAtts(position, 'expiration'));

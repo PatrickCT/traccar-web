@@ -221,7 +221,7 @@ const HourPage = () => {
                 {items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{name}</TableCell>
-                    <TableCell>{item.hour.toLocaleString()}</TableCell>
+                    <TableCell>{new Date(item.hour).toLocaleString()}</TableCell>
                     <TableCell className={classes.columnAction} padding="none">
                       <Button onClick={(() => updateItem(item))}>Editar</Button>
                       <Button onClick={(() => removeItem(item))}>Eliminar</Button>

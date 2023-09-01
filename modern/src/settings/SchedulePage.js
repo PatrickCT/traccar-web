@@ -410,7 +410,7 @@ const SchedulePage = () => {
                         </DemoItem>
                         <DemoItem>
                           <TimePicker
-                            label={t('reportStartTime')}
+                            label={t('reportEndTime')}
                             value={dayjs(new Date(new Date().setHours((horas[1].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[1].hasta[1] || 0)))}
                             onChange={(newValue) => {
                               setHoras({ ...{ ...horas, 1: { ...horas[1], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
@@ -441,7 +441,7 @@ const SchedulePage = () => {
                         </DemoItem>
                         <DemoItem>
                           <TimePicker
-                            label={t('reportStartTime')}
+                            label={t('reportEndTime')}
                             value={dayjs(new Date(new Date().setHours((horas[2].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[2].hasta[1] || 0)))}
                             onChange={(newValue) => {
                               setHoras({ ...{ ...horas, 2: { ...horas[2], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
@@ -472,7 +472,7 @@ const SchedulePage = () => {
                         </DemoItem>
                         <DemoItem>
                           <TimePicker
-                            label={t('reportStartTime')}
+                            label={t('reportEndTime')}
                             value={dayjs(new Date(new Date().setHours((horas[4].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[4].hasta[1] || 0)))}
                             onChange={(newValue) => {
                               setHoras({ ...{ ...horas, 4: { ...horas[4], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
@@ -503,7 +503,7 @@ const SchedulePage = () => {
                         </DemoItem>
                         <DemoItem>
                           <TimePicker
-                            label={t('reportStartTime')}
+                            label={t('reportEndTime')}
                             value={dayjs(new Date(new Date().setHours((horas[8].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[8].hasta[1] || 0)))}
                             onChange={(newValue) => {
                               setHoras({ ...{ ...horas, 8: { ...horas[8], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
@@ -534,7 +534,7 @@ const SchedulePage = () => {
                         </DemoItem>
                         <DemoItem>
                           <TimePicker
-                            label={t('reportStartTime')}
+                            label={t('reportEndTime')}
                             value={dayjs(new Date(new Date().setHours((horas[16].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[16].hasta[1] || 0)))}
                             onChange={(newValue) => {
                               setHoras({ ...{ ...horas, 16: { ...horas[16], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
@@ -565,7 +565,7 @@ const SchedulePage = () => {
                         </DemoItem>
                         <DemoItem>
                           <TimePicker
-                            label={t('reportStartTime')}
+                            label={t('reportEndTime')}
                             value={dayjs(new Date(new Date().setHours((horas[32].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[32].hasta[1] || 0)))}
                             onChange={(newValue) => {
                               setHoras({ ...{ ...horas, 32: { ...horas[32], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });
@@ -596,7 +596,7 @@ const SchedulePage = () => {
                         </DemoItem>
                         <DemoItem>
                           <TimePicker
-                            label={t('reportStartTime')}
+                            label={t('reportEndTime')}
                             value={dayjs(new Date(new Date().setHours((horas[64].hasta[0] - Math.floor((new Date().getTimezoneOffset()) / 60)) || 0, horas[64].hasta[1] || 0)))}
                             onChange={(newValue) => {
                               setHoras({ ...{ ...horas, 64: { ...horas[64], hasta: [moment.utc(newValue.toDate()).get('hours'), moment.utc(newValue.toDate()).get('minutes')] } } });

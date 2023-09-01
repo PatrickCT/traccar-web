@@ -93,7 +93,9 @@ const DeviceRow = ({ data, index, style }) => {
         {' • '}
         <span style={{ color: item.status === 'online' ? 'green' : 'red', fontWeight: 'normal', fontSize: '14px' }}>{status}</span>
         {' • '}
-        <span style={{ fontSize: '14px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
+        <span style={{ fontSize: '14px' }}>{`Conexión: ${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
+        {' • '}
+        <span style={{ fontSize: '14px' }}>{`Posición: ${moment(position?.fixTime).format('YYYY-MM-D HH:mm:ss')}`}</span>
       </>
     );
   };
