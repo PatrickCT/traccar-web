@@ -112,6 +112,17 @@ const SettingsMenu = () => {
                   selected={location.pathname.startsWith('/settings/schedule')}
                 />
               )}
+            {user.attributes.hasOwnProperty('Transporte') &&
+              user.attributes.Transporte && user.attributes.hasOwnProperty('Salidas') &&
+              user.attributes.Salidas &&
+              (
+                <MenuItem
+                  title={t('settingsExits')}
+                  link="/settings/exits"
+                  icon={<ScheduleOutlined />}
+                  selected={location.pathname.startsWith('/settings/exits')}
+                />
+              )}
             <MenuItem
               title={t('sharedDrivers')}
               link="/settings/drivers"

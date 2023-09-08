@@ -2,10 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Popup } from 'maplibre-gl';
 import {
-  Box,
-  Modal,
   Paper,
-  Typography,
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useTheme } from '@mui/material/styles';
@@ -29,18 +26,6 @@ import {
 } from '../common/util/mapPopup';
 import { map } from '../map/core/MapView';
 import './MainPage.css';
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -95,7 +80,6 @@ const useStyles = makeStyles((theme) => ({
 
 const MainPage = () => {
   const classes = useStyles();
-  // const dispatch = useDispatch();
   const theme = useTheme();
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
@@ -122,12 +106,10 @@ const MainPage = () => {
 
   const [devicesOpen, setDevicesOpen] = useState(desktop);
   const [eventsOpen, setEventsOpen] = useState(false);
-  const [open, setOpen] = React.useState(false);
-  // const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!desktop && mapOnSelect && selectedDeviceId) {
       setDevicesOpen(false);
@@ -156,6 +138,7 @@ const MainPage = () => {
 
     // Clean up the function when the component unmounts
     return () => {
+      console.log('cleanin up');
       delete window.navigate;
       delete window.streetView;
       delete window.position;
@@ -236,29 +219,7 @@ const MainPage = () => {
         )}
       </div>
       <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
-      {/* {selectedDeviceId && (
-        <StatusCard
-          deviceId={selectedDeviceId}
-          position={selectedPosition}
-          onClose={() => dispatch(devicesActions.selectId(null))}
-          desktopPadding={theme.dimensions.drawerWidthDesktop}
-        />
-      )} */}
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
-        </Box>
-      </Modal>
+
     </div>
   );
 };

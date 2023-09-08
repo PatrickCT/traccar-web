@@ -23,7 +23,7 @@ const MapSelectedDevice = () => {
         offset: [0, -dimensions.popupMapOffset / 2],
       });
     }
-  });
+  }, []);
 
   return null;
 };

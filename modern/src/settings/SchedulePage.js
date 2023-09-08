@@ -631,6 +631,7 @@ const SchedulePage = () => {
                   label="Geocerca de salida"
                   onChange={updateGeocerca}
                 >
+                  <MenuItem key={null} value={null}>Manual</MenuItem>
                   {geofences && (
                     geofences.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
                   )}

@@ -174,7 +174,7 @@ const DevicePage = () => {
                   />
 
                   <SelectField
-                    data={[{ id: 1, name: 'Telcel Plan ' }, { id: 2, name: 'Telcel Recargas ' }, { id: 3, name: 'Oxio' }]}
+                    data={[{ id: 1, name: 'PT ' }, { id: 2, name: 'RT ' }, { id: 3, name: 'Ox' }]}
                     onChange={(event) => setItem({ ...item, simType: event.target.value })}
                     value={item.simType || null}
                   />
@@ -188,7 +188,6 @@ const DevicePage = () => {
               </Typography>
             </AccordionSummary>
             <AccordionDetails className={classes.details}>
-
               <TextField
                 value={item.policy || ''}
                 onChange={(event) => setItem({ ...item, policy: event.target.value })}

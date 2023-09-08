@@ -354,6 +354,11 @@ const UserPage = () => {
                   />
                 )}
                 <FormControlLabel
+                  control={<Checkbox checked={item.billing} onChange={(e) => setItem({ ...item, billing: e.target.checked })} />}
+                  label={t('sharedBilling')}
+                  disabled={!admin}
+                />
+                <FormControlLabel
                   control={<Checkbox checked={item.disabled} onChange={(e) => setItem({ ...item, disabled: e.target.checked })} />}
                   label={t('sharedDisabled')}
                   disabled={!manager}

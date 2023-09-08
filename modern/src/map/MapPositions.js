@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { useId, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
@@ -181,9 +182,20 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
   }, [mapCluster, clusters, direction, onMarkerClick, onClusterClick]);
 
   useEffect(() => {
+    const visiblePositions = positions.filter((position) => {
+      const coordinates = [position.longitude, position.latitude];
+      const bounds = map.getBounds();
+
+      return (
+        coordinates[0] >= bounds._sw.lng &&
+        coordinates[0] <= bounds._ne.lng &&
+        coordinates[1] >= bounds._sw.lat &&
+        coordinates[1] <= bounds._ne.lat
+      );
+    });
     map.getSource(id)?.setData({
       type: 'FeatureCollection',
-      features: positions.filter((it) => devices.hasOwnProperty(it.deviceId)).map((position) => ({
+      features: visiblePositions.filter((it) => devices.hasOwnProperty(it.deviceId)).map((position) => ({
         type: 'Feature',
         geometry: {
           type: 'Point',

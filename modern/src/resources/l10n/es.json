@@ -609,5 +609,8 @@
     "expectedTime": "Esp.",
     "password_wrong": "Contraseña incorrecta",
     "no-imei": "Sin IMEI",
-    "help": "Ayuda"
+    "help": "Ayuda",
+    "settingsExits": "Salidas manuales",
+    "sharedExits": "Salidas",
+    "sharedBilling": "Factura"
 }

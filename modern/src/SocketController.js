@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector, connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -75,7 +76,18 @@ const SocketController = () => {
         dispatch(devicesActions.update(data.devices));
       }
       if (data.positions) {
-        dispatch(sessionActions.updatePositions(data.positions));
+        const visiblePositions = data.positions.filter((position) => {
+          const coordinates = [position.longitude, position.latitude];
+          const bounds = window.map.getBounds();
+
+          return (
+            coordinates[0] >= bounds._sw.lng &&
+            coordinates[0] <= bounds._ne.lng &&
+            coordinates[1] >= bounds._sw.lat &&
+            coordinates[1] <= bounds._ne.lat
+          );
+        });
+        dispatch(sessionActions.updatePositions(visiblePositions));
       }
       if (data.events) {
         if (!features.disableEvents) {

@@ -64,6 +64,7 @@ import ScheduleConnectionsPage from './settings/ScheduleConnectionsPage';
 import DeviceConnectionGroupPage from './settings/DeviceConnectionGroupPage';
 import TicketReportPage from './reports/TicketReportPage';
 import HelpPage from './other/HelpPage';
+import ExitsPage from './settings/ExitsPage';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -167,6 +168,7 @@ const Navigation = () => {
           <Route path="hours" element={<HoursPage />} />
           <Route path="hour" element={<HourPage />} />
           <Route path="hour/:horas" element={<HourPage />} />
+          <Route path="exits" element={<ExitsPage />} />
         </Route>
 
         <Route path="reports">

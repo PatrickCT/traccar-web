@@ -42,7 +42,7 @@
     "react-virtualized": "^9.22.5",
     "react-virtualized-auto-sizer": "^1.0.14",
     "react-virtuoso": "^4.5.0",
-    "react-window": "^1.8.8",
+    "react-window": "^1.8.9",
     "recharts": "^2.5.0",
     "redux": "^4.2.1",
     "typeface-roboto": "^1.1.13",

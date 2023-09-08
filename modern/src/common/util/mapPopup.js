@@ -234,6 +234,13 @@ export const createPopUp = (position) => {
     html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attsGetter(position, 'name')}, no esta reportando" style="left: 40%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
 
     html += '<br />';
+    if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
+      html += valueParser(position, specialAtts(position, 'protocol'));
+      html += '<br />';
+      html += valueParser(position, specialAtts(position, 'phone'));
+      html += '<br />';
+      html += valueParser(position, specialAtts(position, 'imei'));
+    }
     html += '<br />';
     html += popupBtns();
     html += '</div>';
