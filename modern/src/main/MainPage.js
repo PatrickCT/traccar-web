@@ -26,6 +26,7 @@ import {
 } from '../common/util/mapPopup';
 import { map } from '../map/core/MapView';
 import './MainPage.css';
+import Counter from '../common/components/Counter';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -138,7 +139,6 @@ const MainPage = () => {
 
     // Clean up the function when the component unmounts
     return () => {
-      console.log('cleanin up');
       delete window.navigate;
       delete window.streetView;
       delete window.position;
@@ -170,6 +170,9 @@ const MainPage = () => {
 
   return (
     <div className={classes.root}>
+      {user && user.attributes.hasOwnProperty('FPS') && user.attributes.FPS && (
+        <Counter />
+      )}
       {desktop && (
         <MainMap
           filteredPositions={filteredPositions}

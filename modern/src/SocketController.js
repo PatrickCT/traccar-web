@@ -76,18 +76,18 @@ const SocketController = () => {
         dispatch(devicesActions.update(data.devices));
       }
       if (data.positions) {
-        const visiblePositions = data.positions.filter((position) => {
-          const coordinates = [position.longitude, position.latitude];
-          const bounds = window.map.getBounds();
+        // const visiblePositions = data.positions.filter((position) => {
+        //   const coordinates = [position.longitude, position.latitude];
+        //   const bounds = window.map.getBounds();
 
-          return (
-            coordinates[0] >= bounds._sw.lng &&
-            coordinates[0] <= bounds._ne.lng &&
-            coordinates[1] >= bounds._sw.lat &&
-            coordinates[1] <= bounds._ne.lat
-          );
-        });
-        dispatch(sessionActions.updatePositions(visiblePositions));
+        //   return (
+        //     coordinates[0] >= bounds._sw.lng &&
+        //     coordinates[0] <= bounds._ne.lng &&
+        //     coordinates[1] >= bounds._sw.lat &&
+        //     coordinates[1] <= bounds._ne.lat
+        //   ) || true;
+        // });
+        dispatch(sessionActions.updatePositions(data.positions));
       }
       if (data.events) {
         if (!features.disableEvents) {

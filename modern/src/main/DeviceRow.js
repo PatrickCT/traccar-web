@@ -1,5 +1,4 @@
 import React from 'react';
-// import { Popup } from 'maplibre-gl';
 import { useTheme } from '@emotion/react';
 import { useDispatch, useSelector } from 'react-redux';
 import makeStyles from '@mui/styles/makeStyles';
@@ -16,19 +15,13 @@ import Battery20Icon from '@mui/icons-material/Battery20';
 import BatteryCharging20Icon from '@mui/icons-material/BatteryCharging20';
 import ErrorIcon from '@mui/icons-material/Error';
 import { ReactComponent as EngineIcon } from '../resources/images/data/engine.svg';
-
 import { devicesActions } from '../store';
-// import {
-//   formatStatus, getStatusColor,
-// } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useAdministrator } from '../common/util/permissions';
-
 import { useAttributePreference } from '../common/util/preferences';
 import { formatAlarm, formatBoolean, formatPercentage } from '../common/util/formatter';
 import { hasPassedTime } from '../common/util/utils';
-// import { map } from '../map/core/MapView';
-// import { createPopUp } from '../common/util/mapPopup';
+import { map } from '../map/core/MapView';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -123,6 +116,9 @@ const DeviceRow = ({ data, index, style }) => {
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
           if (!desktop) { window.showDevicesList(false); }
+          if (position) {
+            map.flyTo({ center: [position.longitude, position.latitude], zoom: 18, duration: 1000 });
+          }
         }}
         disabled={!admin && item.disabled}
       >

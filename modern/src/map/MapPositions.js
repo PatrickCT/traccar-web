@@ -1,5 +1,7 @@
 /* eslint-disable no-underscore-dangle */
-import { useId, useCallback, useEffect } from 'react';
+import {
+  useId, useCallback, useEffect, useState,
+} from 'react';
 import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/styles';
@@ -23,6 +25,7 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
   const mapCluster = useAttributePreference('mapCluster', true);
   const hours12 = usePreference('twelveHourFormat');
   const directionType = useAttributePreference('mapDirection', 'selected');
+  const [recalculate, setRecalculate] = useState();
 
   const createFeature = (devices, position, selectedPositionId) => {
     const device = devices[position.deviceId];
@@ -156,6 +159,8 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
     map.on('click', id, onMarkerClick);
     map.on('click', clusters, onClusterClick);
     map.on('click', onMapClick);
+    map.on('moveend', () => setRecalculate(new Date()));
+    map.on('zoom', () => setRecalculate(new Date()));
 
     return () => {
       map.off('mouseenter', id, onMouseEnter);
@@ -204,7 +209,7 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
         properties: createFeature(devices, position, selectedPosition && selectedPosition.id),
       })),
     });
-  }, [mapCluster, clusters, direction, onMarkerClick, onClusterClick, devices, positions, selectedPosition]);
+  }, [mapCluster, clusters, direction, onMarkerClick, onClusterClick, devices, positions, selectedPosition, recalculate]);
 
   return null;
 };

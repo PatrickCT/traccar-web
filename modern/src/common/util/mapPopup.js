@@ -229,7 +229,7 @@ const popupBtns = () => {
 export const createPopUp = (position) => {
   let html = '';
 
-  if (hasPassedTime(new Date(position.fixTime), 30)) {
+  if (hasPassedTime(new Date(position.fixTime), 40)) {
     html += '<div style="width: 250px;">';
     html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attsGetter(position, 'name')}, no esta reportando" style="left: 40%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
 
@@ -320,17 +320,29 @@ export const createPopUpReport = (position) => {
 
   html += `<h3><b>${attsGetter(position, 'name')}</b></h3></div>`;
   html += valueParser(position, specialAtts(position, 'ignition'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'motion'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'dateTime'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'status'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'direccion'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'fuel'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'totalDistance'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'speed'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'hours'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
+  html += '<br />';
   html += valueParser(position, 'bateria');
+  html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
 
   html += '</div>';
   html += '</div>';
@@ -342,19 +354,31 @@ export const createPopUpReportRoute = (position) => {
   html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
 
   html += `<h3><b>${attsGetter(position, 'name')}</b></h3></div>`;
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'ignition'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'motion'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'dateTime'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'status'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'direccion'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'fuel'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'totalDistance'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'speed'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'hours'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
+  html += '<br />';
   html += valueParser(position, 'bateria');
-
+  html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
   html += '<br>';
   html += "<div style='display: table; margin: auto'>";
 
