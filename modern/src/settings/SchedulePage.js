@@ -129,7 +129,7 @@ const SchedulePage = () => {
   const [rowModesModel, setRowModesModel] = React.useState({});
 
   const linkTramo = (tramo, link = true) => {
-    fetch('http://localhost:3090/api/permissions', { method: link ? 'POST' : 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ itinerarioId: item.id, tramoId: tramo }) });
+    fetch('/api/permissions', { method: link ? 'POST' : 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ itinerarioId: item.id, tramoId: tramo }) });
   };
 
   const saveTramo = (tramo) => {

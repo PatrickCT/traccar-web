@@ -151,6 +151,16 @@ const MainPage = () => {
   }, []);
 
   useEffect(() => {
+    const handleVisibilityChange = () => { };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  useEffect(() => {
     try {
       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
       window.device = filteredDevices.find((item) => item.id === selectedDeviceId);

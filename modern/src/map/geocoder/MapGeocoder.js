@@ -40,8 +40,34 @@ const MapGeocoder = () => {
         }
         return { features };
       },
+      // forwardGeocode: async (config) => {
+      //   const features = [];
+      //   try {
+      //     const request = `https://maps.googleapis.com/maps/api/geocode/json?address=${config.query}&key=AIzaSyBftvBEm7TiicXXdedM7xmGK0Tmcotnscw`;
+      //     const response = await fetch(request);
+      //     const geojson = await response.json();
+      //     geojson.results.forEach((feature) => {
+      //       const center = [
+      //         feature.geometry.location.lat,
+      //         feature.geometry.location.lng,
+      //       ];
+      //       features.push({
+      //         type: 'Feature',
+      //         geometry: {
+      //           type: 'Point',
+      //           coordinates: center,
+      //         },
+      //         place_name: feature.formatted_address,
+      //         place_type: ['place'],
+      //         center,
+      //       });
+      //     });
+      //   } catch (e) {
+      //     dispatch(errorsActions.push(e.message));
+      //   }
+      //   return { features };
+      // },
     };
-
     const control = new MaplibreGeocoder(geocoder, {
       maplibregl,
       collapsed: true,

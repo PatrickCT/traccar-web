@@ -9,4 +9,8 @@ export default (t) => useMemo(() => ({
     name: t('sharedTimezone'),
     type: 'string',
   },
+  // turbanRoute: {
+  //   name: t('turbanRoute'),
+  //   type: 'ruta',
+  // },
 }), [t]);

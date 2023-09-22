@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Divider, List, ListItemButton, ListItemIcon, ListItemText,
 } from '@mui/material';
+import { useSelector } from 'react-redux';
 import StarIcon from '@mui/icons-material/Star';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
@@ -32,6 +33,7 @@ const ReportsMenu = () => {
 
   const admin = useAdministrator();
   const readonly = useRestriction('readonly');
+  const user = useSelector((state) => state.session.user);
 
   return (
     <>
@@ -83,12 +85,15 @@ const ReportsMenu = () => {
           link="/replay"
           icon={<RouteIcon />}
         />
-
-        <MenuItem
-          title={t('reportTicket')}
-          link="/reports/tickets"
-          icon={<AirplaneTicketOutlined />}
-        />
+        {user.attributes.hasOwnProperty('Transporte') &&
+          user.attributes.Transporte &&
+          (
+            <MenuItem
+              title={t('reportTicket')}
+              link="/reports/tickets"
+              icon={<AirplaneTicketOutlined />}
+            />
+          )}
       </List>
       {(admin || !readonly) && (
         <>

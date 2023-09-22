@@ -231,6 +231,15 @@ export const createPopUp = (position) => {
 
   if (hasPassedTime(new Date(position.fixTime), 40)) {
     html += '<div style="width: 250px;">';
+    if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
+      html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
+      html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
+      html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>`;
+
+      html += `<h3><b>${attsGetter(position, 'name')}</b>`;
+      html += '</h3></div>';
+    }
+
     html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attsGetter(position, 'name')}, no esta reportando" style="left: 40%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
 
     html += '<br />';
@@ -244,6 +253,7 @@ export const createPopUp = (position) => {
     html += '<br />';
     html += popupBtns();
     html += '</div>';
+    html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
     return html;
   }
   html += '<div>';

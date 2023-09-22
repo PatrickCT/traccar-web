@@ -609,5 +609,6 @@
     "help": "Help",
     "settingsExits": "Manual Schedule",
     "sharedExits": "Assign exit",
-    "sharedBilling": "Billing"
+    "sharedBilling": "Billing",
+    "turbanRoute": "T-Urban Route"
 }

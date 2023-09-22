@@ -205,6 +205,22 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
               </Grid>
             );
           }
+          if (key === 'turbanRoute') {
+            return (
+              <Grid container direction="row" justifyContent="space-between" key={key}>
+                <SelectField
+                  fullWidth
+                  endpoint="http://localhost:4050/api/t-urban/traccar/rutas"
+                  onChange={(e) => updateAttribute(key, e.target.value, 'number', 'number')}
+                  label={getAttributeName(key, subtype)}
+                  value={getDisplayValue(value, subtype)}
+                />
+                <IconButton size="small" className={classes.removeButton} onClick={() => deleteAttribute(key)}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Grid>
+            );
+          }
           return (
             <FormControl key={key}>
               <InputLabel>{getAttributeName(key, subtype)}</InputLabel>

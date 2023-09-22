@@ -71,6 +71,7 @@ const SocketController = () => {
     };
 
     socket.onmessage = (event) => {
+      if (document.hidden) return;
       const data = JSON.parse(event.data);
       if (data.devices) {
         dispatch(devicesActions.update(data.devices));
