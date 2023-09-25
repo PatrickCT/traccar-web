@@ -107,6 +107,7 @@ const MainPage = () => {
 
   const [devicesOpen, setDevicesOpen] = useState(desktop);
   const [eventsOpen, setEventsOpen] = useState(false);
+  const groups = useSelector((state) => state.groups.items);
 
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
   const navigate = useNavigate();
@@ -136,6 +137,7 @@ const MainPage = () => {
     window.map = map;
     window.showDevicesList = setDevicesOpen;
     window.localStorage.setItem('showMapPopup', true);
+    window.groupsNames = groups;
 
     // Clean up the function when the component unmounts
     return () => {
@@ -146,6 +148,7 @@ const MainPage = () => {
       delete window.device;
       delete window.map;
       delete window.showDevicesList;
+      delete window.groupsNames;
       window.localStorage.removeItem('showMapPopup');
     };
   }, []);

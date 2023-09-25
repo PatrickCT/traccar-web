@@ -285,9 +285,11 @@ export const createPopUp = (position) => {
   html += '<br />';
   html += valueParser(position, specialAtts(position, 'odometer'));
   html += '<br />';
+  html += valueParser(position, specialAtts(position, 'group'));
+  html += '<br />';
   html += valueParser(position, specialAtts(position, 'hours'));
   html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
-  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
+  html += valueParser(position, specialAtts(position, 'temperaturaF')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
 
   html += valueParser(position, specialAtts(position, 'lastAlarm'));
   html += '<br />';

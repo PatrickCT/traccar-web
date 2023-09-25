@@ -413,6 +413,9 @@ export const attsGetter = (obj, attribute) => {
     case 'imei': {
       return window.device?.uniqueId || '';
     }
+    case 'group': {
+      return window.groupsNames?.[window.device?.groupId]?.name || 'Sin grupo';
+    }
     default: {
       return (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
     }
@@ -472,6 +475,8 @@ export const valueParser = (obj, value) => {
       return `<b style="font-weight: bold;text-transform: uppercase;">Telefono:</b> ${attsGetter(obj, value)} `;
     case 'imei':
       return `<b style="font-weight: bold;text-transform: uppercase;">IMEI:</b> ${attsGetter(obj, value)} `;
+    case 'group':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Grupo:</b> ${attsGetter(obj, value)} `;
   }
   return '';
 };

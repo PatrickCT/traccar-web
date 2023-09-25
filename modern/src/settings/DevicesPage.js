@@ -6,6 +6,7 @@ import {
 import LinkIcon from '@mui/icons-material/Link';
 import LinearScaleIcon from '@mui/icons-material/LinearScale';
 import makeStyles from '@mui/styles/makeStyles';
+import { useSelector } from 'react-redux';
 import { useEffectAsync } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
@@ -38,6 +39,7 @@ const DevicesPage = () => {
   const [items, setItems] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
+  const groups = useSelector((state) => state.groups.items);
 
   useEffectAsync(async () => {
     setLoading(true);
@@ -75,6 +77,7 @@ const DevicesPage = () => {
           <TableRow>
             <TableCell>{t('sharedName')}</TableCell>
             <TableCell>{t('deviceIdentifier')}</TableCell>
+            <TableCell>{t('groupParent')}</TableCell>
             <TableCell>{t('sharedPhone')}</TableCell>
             <TableCell>{t('deviceModel')}</TableCell>
             <TableCell>{t('deviceContact')}</TableCell>
@@ -91,6 +94,7 @@ const DevicesPage = () => {
             <TableRow key={item.id}>
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.uniqueId}</TableCell>
+              <TableCell>{groups[item.groupId]?.name || t('groupNoGroup')}</TableCell>
               <TableCell>{item.phone}</TableCell>
               <TableCell>{item.model}</TableCell>
               <TableCell>{item.contact}</TableCell>

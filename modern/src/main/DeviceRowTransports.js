@@ -62,6 +62,7 @@ const DeviceRowTransporte = ({ data, index }) => {
   const item = data[index];
   const position = useSelector((state) => state.session.positions[item.id]);
   const geofences = useSelector((state) => state.geofences.items);
+  const groups = useSelector((state) => state.groups.items);
   const [isOpened, setIsOpen] = useState(false);
   const [info, setInfo] = useState({});
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
@@ -77,7 +78,10 @@ const DeviceRowTransporte = ({ data, index }) => {
     return (
       <>
         <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{`${item[key]} `}</span>
-        <span style={{ fontSize: '11px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
+        {' • '}
+        <span style={{ fontSize: '12px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
+        {' • '}
+        <span style={{ fontSize: '12px' }}>{`${groups[item.groupId]?.name || t('groupNoGroup')}`}</span>
       </>
     );
   };
