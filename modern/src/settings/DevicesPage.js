@@ -39,6 +39,7 @@ const DevicesPage = () => {
   const [items, setItems] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
   const groups = useSelector((state) => state.groups.items);
 
   useEffectAsync(async () => {
@@ -90,8 +91,16 @@ const DevicesPage = () => {
             if (a.id < b.id) return -1;
             if (a.id > b.id) return 1;
             return 0;
-          }).map((item) => (
-            <TableRow key={item.id}>
+          }).map((item, index) => (
+            <TableRow
+              key={item.id}
+              onMouseEnter={() => setHoveredRowIndex(index)}
+              onMouseLeave={() => setHoveredRowIndex(null)}
+              style={{
+                backgroundColor: hoveredRowIndex === index ? '#1F6EDE22' : 'transparent', // Change background color on hover
+                /* Add any other styles you want for the hover effect */
+              }}
+            >
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.uniqueId}</TableCell>
               <TableCell>{groups[item.groupId]?.name || t('groupNoGroup')}</TableCell>

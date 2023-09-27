@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import makeStyles from '@mui/styles/makeStyles';
-import { FixedSizeList } from 'react-window';
+// import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { devicesActions } from '../store';
 import { useEffectAsync } from '../reactHelper';
@@ -47,20 +47,24 @@ const DeviceListTransport = ({ devices }) => {
   return (
     <AutoSizer className={classes.list}>
       {({ height, width }) => (
-        <FixedSizeList
-          width={width}
-          height={height}
-          itemCount={devices.length}
-          itemData={devices}
-          itemSize={72}
-          overscanCount={10}
-          innerRef={listInnerEl}
-          position="relative"
-        >
-          {DeviceRowTransporte}
-        </FixedSizeList>
+        // <FixedSizeList
+        //   width={width}
+        //   height={height}
+        //   itemCount={devices.length}
+        //   itemData={devices}
+        //   itemSize={72}
+        //   overscanCount={10}
+        //   innerRef={listInnerEl}
+        //   position="relative"
+        // >
+        //   {DeviceRowTransporte}
+        // </FixedSizeList>
+        <div style={{ width, height, overflow: 'auto' }}>
+          {devices.map((device) => <DeviceRowTransporte data={devices} index={devices.indexOf(device)} />)}
+        </div>
       )}
     </AutoSizer>
+
   );
 };
 

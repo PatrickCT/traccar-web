@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { useSelector } from 'react-redux';
 import SelectField from '../common/components/SelectField';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
@@ -8,6 +9,7 @@ import SettingsMenu from './components/SettingsMenu';
 const DeviceConnectionGroupPage = () => {
   const [group, setGroup] = useState(-1);
   const [devices, setDevices] = useState([]);
+  const groups = useSelector((state) => state.groups.items);
   const t = useTranslation();
 
   useEffect(() => {
@@ -47,6 +49,7 @@ const DeviceConnectionGroupPage = () => {
       <FormGroup>
         {devices && devices.map((device) => (
           <FormControlLabel
+            label={`${device.name} - ${groups[device.groupId]?.name || t('groupNoGroup')}`}
             control={
               (
                 <Checkbox
@@ -56,7 +59,6 @@ const DeviceConnectionGroupPage = () => {
                 />
               )
             }
-            label={device.name}
           />
         ))}
       </FormGroup>

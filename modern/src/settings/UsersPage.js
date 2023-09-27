@@ -38,6 +38,7 @@ const UsersPage = () => {
   const [items, setItems] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
 
   const handleLogin = useCatch(async (userId) => {
     const response = await fetch(`/api/session/${userId}`);
@@ -100,8 +101,16 @@ const UsersPage = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {!loading ? filteredAndSortedItems.map((item) => (
-            <TableRow key={item.id}>
+          {!loading ? filteredAndSortedItems.map((item, index) => (
+            <TableRow
+              key={item.id}
+              onMouseEnter={() => setHoveredRowIndex(index)}
+              onMouseLeave={() => setHoveredRowIndex(null)}
+              style={{
+                backgroundColor: hoveredRowIndex === index ? '#1F6EDE22' : 'transparent', // Change background color on hover
+                /* Add any other styles you want for the hover effect */
+              }}
+            >
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.email}</TableCell>
               <TableCell>{formatBoolean(item.administrator, t)}</TableCell>

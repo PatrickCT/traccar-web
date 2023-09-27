@@ -50,9 +50,10 @@ const TicketReportPage = () => {
     window.position = items.find((it) => it.id === positionId);
   }, [items, setSelectedItem]);
 
-  const handleSubmit = useCatch(async ({ deviceIds, from, to, type }) => {
+  const handleSubmit = useCatch(async ({ deviceIds, groupIds, from, to, type }) => {
     const query = new URLSearchParams({ from, to });
     deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
+    groupIds.forEach((groupId) => query.append('groupId', groupId));
     if (type === 'export') {
       window.location.assign(`/api/reports/tickets/xlsx?${query.toString()}`);
     } else if (type === 'mail') {
@@ -143,7 +144,7 @@ const TicketReportPage = () => {
       <div className={classes.container}>
         <div className={classes.containerMain}>
           <div className={classes.header}>
-            <ReportFilter handleSubmit={handleSubmit} handleSchedule={handleSchedule} multiDevice />
+            <ReportFilter handleSubmit={handleSubmit} handleSchedule={handleSchedule} multiDevice includeGroups />
           </div>
           <Table>
             <TableHead>
@@ -152,11 +153,12 @@ const TicketReportPage = () => {
                 <TableCell>{t('sharedDevice')}</TableCell>
                 <TableCell>{t('sharedExits')}</TableCell>
                 <TableCell>{t('sharedGeofence')}</TableCell>
+                <TableCell>{t('groupParent')}</TableCell>
                 <TableCell>Hora programada</TableCell>
                 <TableCell>Hora de ingreso</TableCell>
                 <TableCell>Diferencia</TableCell>
                 <TableCell>Castigo</TableCell>
-                {columns.map((key) => (<TableCell key={key}>{key}</TableCell>))}
+
               </TableRow>
             </TableHead>
 
@@ -179,6 +181,9 @@ const TicketReportPage = () => {
                       </TableCell>
                       <TableCell>
                         {item.geofence}
+                      </TableCell>
+                      <TableCell>
+                        {item.group}
                       </TableCell>
                       <TableCell>
                         {item.expectedTime ? formatDate(new Date(item.expectedTime), 'yyyy-MM-dd HH:mm:ss') : 'Sin registro'}
