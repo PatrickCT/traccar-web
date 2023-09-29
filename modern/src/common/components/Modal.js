@@ -1,7 +1,6 @@
 import React from 'react';
 
 const Modal = ({ url, onClose }) => {
-  console.log(url);
   return (
 
     <div className="modal">

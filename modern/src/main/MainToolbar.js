@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  Toolbar, IconButton, OutlinedInput, InputAdornment, Popover, FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel, Checkbox, Badge, ListItemButton, ListItemText, Tooltip,
+  Toolbar, IconButton, OutlinedInput, InputAdornment, Popover, FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel, Checkbox, Badge, ListItemButton, ListItemText, Tooltip, Button,
 } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import MapIcon from '@mui/icons-material/Map';
@@ -166,6 +166,16 @@ const MainToolbar = ({
               control={<Checkbox checked={filterMap} onChange={(e) => setFilterMap(e.target.checked)} />}
               label={t('sharedFilterMap')}
             />
+          </FormGroup>
+          <FormGroup>
+            <Button
+              onClick={() => {
+                localStorage.removeItem('filter');
+                window.location.reload();
+              }}
+            >
+              {t('clearFilters')}
+            </Button>
           </FormGroup>
         </div>
       </Popover>

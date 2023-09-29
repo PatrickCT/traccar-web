@@ -60,7 +60,7 @@ const DeviceListTransport = ({ devices }) => {
         //   {DeviceRowTransporte}
         // </FixedSizeList>
         <div style={{ width, height, overflow: 'auto' }}>
-          {devices.map((device) => <DeviceRowTransporte data={devices} index={devices.indexOf(device)} />)}
+          {devices.map((device) => <DeviceRowTransporte key={device.id} data={devices} index={devices.indexOf(device)} />)}
         </div>
       )}
     </AutoSizer>

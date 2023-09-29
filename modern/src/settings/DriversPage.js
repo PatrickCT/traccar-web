@@ -32,8 +32,6 @@ const DriversPage = () => {
     setLoading(true);
     try {
       const response = await fetch('/api/drivers');
-      // eslint-disable-next-line no-console
-      console.log(response);
       if (response.ok) {
         setItems(await response.json());
       } else {

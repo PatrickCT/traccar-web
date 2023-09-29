@@ -613,5 +613,6 @@
     "settingsExits": "Salidas manuales",
     "sharedExits": "Salidas",
     "sharedBilling": "Factura",
-    "turbanRoute": "Ruta T-Urban"
+    "turbanRoute": "Ruta T-Urban",
+    "clearFilters": "Limpiar Filtros"
 }

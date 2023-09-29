@@ -610,5 +610,6 @@
     "settingsExits": "Manual Schedule",
     "sharedExits": "Assign exit",
     "sharedBilling": "Billing",
-    "turbanRoute": "T-Urban Route"
+    "turbanRoute": "T-Urban Route",
+    "clearFilters": "Clear Filters"
 }
