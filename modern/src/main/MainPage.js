@@ -1,9 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import { Popup } from 'maplibre-gl';
 import {
+  FormControlLabel,
+  FormGroup,
   Paper,
 } from '@mui/material';
+import Checkbox from '@mui/material/Checkbox';
 import { makeStyles } from '@mui/styles';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -27,6 +31,7 @@ import {
 import { map } from '../map/core/MapView';
 import './MainPage.css';
 import Counter from '../common/components/Counter';
+import Modal from './components/BasicModal';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -109,6 +114,18 @@ const MainPage = () => {
   const [eventsOpen, setEventsOpen] = useState(false);
   const groups = useSelector((state) => state.groups.items);
 
+  const [showModalRevision, setShowModalRevision] = useState(false);
+
+  // Function to open the modal
+  const openModal = () => {
+    setShowModalRevision(true);
+  };
+
+  // Function to close the modal
+  const closeModal = () => {
+    setShowModalRevision(false);
+  };
+
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
   const navigate = useNavigate();
 
@@ -138,6 +155,8 @@ const MainPage = () => {
     window.showDevicesList = setDevicesOpen;
     window.localStorage.setItem('showMapPopup', true);
     window.groupsNames = groups;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
 
     // Clean up the function when the component unmounts
     return () => {
@@ -150,6 +169,8 @@ const MainPage = () => {
       delete window.showDevicesList;
       delete window.groupsNames;
       window.localStorage.removeItem('showMapPopup');
+      delete window.openModal;
+      delete window.closeModal;
     };
   }, []);
 
@@ -235,7 +256,19 @@ const MainPage = () => {
         )}
       </div>
       <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
-
+      <Modal isOpen={showModalRevision} onClose={closeModal}>
+        <h1>Revisión</h1>
+        <h3>
+          Ultima revisión:
+          {moment().format(' dddd, MMMM Do YYYY, h:mm:ss a')}
+        </h3>
+        <FormGroup>
+          <FormControlLabel control={<Checkbox />} label="Llantas" />
+          <FormControlLabel control={<Checkbox />} label="AC" />
+          <FormControlLabel control={<Checkbox />} label="Aceite" />
+          <FormControlLabel control={<Checkbox />} label="Refacciones" />
+        </FormGroup>
+      </Modal>
     </div>
   );
 };

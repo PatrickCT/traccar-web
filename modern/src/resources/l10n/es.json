@@ -515,6 +515,7 @@
     "notificatorTelegram": "Telegram",
     "notificatorPushover": "Pushover",
     "reportTicket": "Reporte de tickets",
+    "reportSalidas": "Reporte de salidas",
     "reportReplay": "Repetición Ruta",
     "reportCombined": "Combinado",
     "reportRoute": "Ruta",

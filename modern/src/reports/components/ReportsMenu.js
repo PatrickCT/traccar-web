@@ -9,7 +9,7 @@ import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import { AirplaneTicketOutlined } from '@mui/icons-material';
+import { AirplaneTicketOutlined, TripOriginOutlined } from '@mui/icons-material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import RouteIcon from '@mui/icons-material/Route';
@@ -88,11 +88,18 @@ const ReportsMenu = () => {
         {user.attributes.hasOwnProperty('Transporte') &&
           user.attributes.Transporte &&
           (
-            <MenuItem
-              title={t('reportTicket')}
-              link="/reports/tickets"
-              icon={<AirplaneTicketOutlined />}
-            />
+            <>
+              <MenuItem
+                title={t('reportTicket')}
+                link="/reports/tickets"
+                icon={<AirplaneTicketOutlined />}
+              />
+              <MenuItem
+                title={t('reportSalidas')}
+                link="/reports/salidas"
+                icon={<TripOriginOutlined />}
+              />
+            </>
           )}
       </List>
       {(admin || !readonly) && (

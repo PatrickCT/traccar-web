@@ -65,6 +65,7 @@ import DeviceConnectionGroupPage from './settings/DeviceConnectionGroupPage';
 import TicketReportPage from './reports/TicketReportPage';
 import HelpPage from './other/HelpPage';
 import ExitsPage from './settings/ExitsPage';
+import VueltaReportPage from './reports/VueltaReportPage';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -182,6 +183,7 @@ const Navigation = () => {
           <Route path="scheduled" element={<ScheduledPage />} />
           <Route path="statistics" element={<StatisticsPage />} />
           <Route path="tickets" element={<TicketReportPage />} />
+          <Route path="salidas" element={<VueltaReportPage />} />
         </Route>
       </Route>
     </Routes>

@@ -1,5 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
+
 import { React } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import { Dropdown } from 'primereact/dropdown';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';

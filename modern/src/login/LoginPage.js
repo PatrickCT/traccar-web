@@ -119,6 +119,7 @@ const LoginPage = () => {
         localStorage.setItem('UGFzc3dvcmRVc2Vy', encode(password));
         const user = await response.json();
         localStorage.setItem('aXNBZG1pbg==', user.administrator);
+        localStorage.setItem('aXNSZXZpc29y', (user.attributes.hasOwnProperty('Revisor') && user.attributes.Revisor));
         generateLoginToken();
         dispatch(sessionActions.updateUser(user));
         navigate('/');
@@ -157,6 +158,7 @@ const LoginPage = () => {
   useEffect(() => {
     localStorage.removeItem('UGFzc3dvcmRVc2Vy');
     localStorage.removeItem('aXNBZG1pbg==');
+    localStorage.removeItem('aXNSZXZpc29y');
     const listener = (token) => handleTokenLogin(token);
     handleLoginTokenListeners.add(listener);
     return () => handleLoginTokenListeners.delete(listener);

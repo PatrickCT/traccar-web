@@ -226,6 +226,22 @@ const popupBtns = () => {
   return html;
 };
 
+const popupRevision = () => {
+  let html = '';
+  if (window.localStorage.getItem(btoa('isRevisor')) === 'true') {
+    html += `
+    <button
+      type="button"
+      onClick="openModal()"
+      style="background-color: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); transition: background-color 0.3s;"
+    >
+      Revision
+    </button>
+    `;
+  }
+  return html;
+};
+
 export const createPopUp = (position) => {
   let html = '';
 
@@ -254,6 +270,7 @@ export const createPopUp = (position) => {
     html += popupBtns();
     html += '</div>';
     html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
+    html += popupRevision();
     return html;
   }
   html += '<div>';
@@ -322,6 +339,7 @@ export const createPopUp = (position) => {
 
   html += '<br />';
   html += popupBtns();
+  html += popupRevision();
   html += '</div>';
   return html;
 };
