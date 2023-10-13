@@ -1,28 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
 import moment from 'moment';
-import { Popup } from 'maplibre-gl';
-// import GpsFixedIcon from '@mui/icons-material/GpsFixed';
-// import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
 import ReportFilter from './components/ReportFilter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
 import ReportsMenu from './components/ReportsMenu';
-import usePersistedState from '../common/util/usePersistedState';
-
 import { useCatch } from '../reactHelper';
 import { map } from '../map/core/MapView';
-
 import useReportStyles from './common/useReportStyles';
 import TableShimmer from '../common/components/TableShimmer';
-
 import scheduleReport from './common/scheduleReport';
 import {
-  createPopUpReportRoute, generateRoute, streetView,
+  generateRoute, streetView,
 } from '../common/util/mapPopup';
 import { formatDate } from '../common/util/utils';
 
@@ -33,29 +26,66 @@ const TicketReportPage = () => {
 
   const devices = useSelector((state) => state.devices.items);
 
-  const [columns] = usePersistedState('routeColumns', ['fixTime', 'latitude', 'longitude', 'speed', 'address']);
-  const [items, setItems] = useState([]);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
 
-  const onMapPointClick = useCallback((positionId) => {
-    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-    setSelectedItem(items.find((it) => it.id === positionId));
-    new Popup()
-      .setMaxWidth('400px')
-      .setHTML(createPopUpReportRoute(items.find((it) => it.id === positionId)))
-      .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
-      .addTo(map);
-    window.position = items.find((it) => it.id === positionId);
-  }, [items, setSelectedItem]);
+  const handleDownload = (url) => {
+    // Disable the button and set loading state to true
+    setLoading(true);
 
-  const handleSubmit = useCatch(async ({ deviceIds, groupIds, from, to, type }) => {
+    // URL of the file to download
+    const downloadUrl = url;
+
+    // Create a new XMLHttpRequest
+    const xhr = new XMLHttpRequest();
+
+    // Handle completion of the download
+    xhr.addEventListener('load', () => {
+      // Once the download is complete, enable the button and reset loading state
+      setLoading(false);
+
+      // Handle the downloaded data
+      const blob = new Blob([xhr.response], { type: xhr.getResponseHeader('Content-Type') });
+
+      // Create a blob URL for the downloaded file
+      const url = window.URL.createObjectURL(blob);
+
+      // Create an anchor element for the download link
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'report.xlsx'; // Specify the desired file name
+      document.body.appendChild(a);
+
+      // Trigger a click event to start the download
+      a.click();
+
+      // Clean up by revoking the blob URL
+      window.URL.revokeObjectURL(url);
+    });
+
+    // Handle any errors during the download
+    xhr.addEventListener('error', () => {
+      // Handle download error
+
+      // Enable the button and reset loading state
+      setLoading(false);
+    });
+
+    // Open the request and start the download
+    xhr.open('GET', downloadUrl);
+    xhr.responseType = 'blob'; // Set the response type to 'blob'
+    xhr.send();
+  };
+
+  const handleSubmit = useCatch(async ({ deviceIds, groupIds, from, to, type, unify }) => {
     const query = new URLSearchParams({ from, to });
     deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
     groupIds.forEach((groupId) => query.append('groupId', groupId));
+    query.append('unify', unify);
     if (type === 'export') {
-      window.location.assign(`/api/reports/tickets/xlsx?${query.toString()}`);
+      handleDownload(`/api/reports/tickets/xlsx?${query.toString()}`);
+      // window.location.assign(`/api/reports/tickets/xlsx?${query.toString()}`);
     } else if (type === 'mail') {
       const response = await fetch(`/api/reports/tickets/mail?${query.toString()}`);
       if (!response.ok) {
@@ -69,7 +99,6 @@ const TicketReportPage = () => {
         });
         if (response.ok) {
           const itemst = await response.json();
-          setItems(itemst);
           const groupedData = itemst.reduce((grouped, item) => {
             const { salida } = item;
             if (!grouped[salida]) {
@@ -103,14 +132,12 @@ const TicketReportPage = () => {
     window.navigate = navigate;
     window.streetView = streetView;
     window.generateRoute = generateRoute;
-    window.position = selectedItem;
     window.map = map;
 
     // Clean up the function when the component unmounts
     return () => {
       delete window.navigate;
       delete window.streetView;
-      delete window.position;
       delete window.map;
     };
   }, []);
@@ -144,7 +171,7 @@ const TicketReportPage = () => {
       <div className={classes.container}>
         <div className={classes.containerMain}>
           <div className={classes.header}>
-            <ReportFilter handleSubmit={handleSubmit} handleSchedule={handleSchedule} multiDevice includeGroups />
+            <ReportFilter handleSubmit={handleSubmit} handleSchedule={handleSchedule} multiDevice includeGroups unified />
           </div>
           <Table>
             <TableHead>
@@ -171,7 +198,7 @@ const TicketReportPage = () => {
                   </TableRow>
                   {groups[salida].map((item) => (
                     // Create rows for items within the group
-                    <TableRow style={calcDiffColor(item)} onClick={() => onMapPointClick(item.id)} key={item.id}>
+                    <TableRow style={calcDiffColor(item)} key={item.id}>
                       <TableCell className={classes.columnAction} padding="none" />
                       <TableCell>
                         {devices[item.device].name}
@@ -206,7 +233,7 @@ const TicketReportPage = () => {
                   </TableRow>
                 </React.Fragment>
               )) : (
-                <TableShimmer columns={columns.length + 2} startAction />
+                <TableShimmer columns={9} startAction />
               )}
             </TableBody>
           </Table>

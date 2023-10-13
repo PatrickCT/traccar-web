@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  FormControl, InputLabel, Select, MenuItem, Button, TextField, Typography,
+  FormControl, InputLabel, Select, MenuItem, Button, TextField, Typography, FormGroup, FormControlLabel, Checkbox,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
@@ -11,7 +11,16 @@ import SplitButton from '../../common/components/SplitButton';
 import SelectField from '../../common/components/SelectField';
 import { useRestriction } from '../../common/util/permissions';
 
-const ReportFilter = ({ children, handleSubmit, handleSchedule, showOnly, ignoreDevice, multiDevice, includeGroups }) => {
+const ReportFilter = ({
+  children,
+  handleSubmit,
+  handleSchedule,
+  showOnly,
+  ignoreDevice,
+  multiDevice,
+  includeGroups,
+  unified,
+}) => {
   const classes = useReportStyles();
   const dispatch = useDispatch();
   const t = useTranslation();
@@ -27,6 +36,7 @@ const ReportFilter = ({ children, handleSubmit, handleSchedule, showOnly, ignore
   const period = useSelector((state) => state.reports.period);
   const from = useSelector((state) => state.reports.from);
   const to = useSelector((state) => state.reports.to);
+  const [unify, setUnify] = useState(false);
   const [button, setButton] = useState('json');
 
   const [description, setDescription] = useState();
@@ -84,6 +94,7 @@ const ReportFilter = ({ children, handleSubmit, handleSchedule, showOnly, ignore
         to: selectedTo.toISOString(),
         calendarId,
         type,
+        unify,
       });
     }
   };
@@ -125,6 +136,7 @@ const ReportFilter = ({ children, handleSubmit, handleSchedule, showOnly, ignore
           </FormControl>
         </div>
       )}
+
       {button !== 'schedule' ? (
         <>
           <div className={classes.filterItem}>
@@ -186,6 +198,25 @@ const ReportFilter = ({ children, handleSubmit, handleSchedule, showOnly, ignore
         </>
       )}
       {children}
+      {unified && (
+        <div className={classes.filterItem}>
+          <FormControl fullWidth>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  (
+                    <Checkbox
+                      checked={unify}
+                      onChange={(event) => setUnify(event.target.checked)}
+                    />
+                  )
+                }
+                label="Unificar"
+              />
+            </FormGroup>
+          </FormControl>
+        </div>
+      )}
       <div className={classes.filterItem}>
         {showOnly ? (
           <Button
