@@ -82,9 +82,11 @@ const EventReportPage = () => {
     }
   }, []);
 
-  const handleSubmit = useCatch(async ({ deviceId, from, to, type }) => {
-    const query = new URLSearchParams({ deviceId, from, to });
+  const handleSubmit = useCatch(async ({ deviceId, groupIds, from, to, type }) => {
+    const query = new URLSearchParams(deviceId !== null ? { deviceId, from, to } : { from, to });
+
     eventTypes.forEach((it) => query.append('type', it));
+    groupIds.forEach((groupId) => query.append('groupId', groupId));
     if (type === 'export') {
       window.location.assign(`/api/reports/events/xlsx?${query.toString()}`);
     } else if (type === 'mail') {
@@ -177,7 +179,7 @@ const EventReportPage = () => {
         )}
         <div className={classes.containerMain}>
           <div className={classes.header}>
-            <ReportFilter handleSubmit={handleSubmit} handleSchedule={handleSchedule}>
+            <ReportFilter handleSubmit={handleSubmit} handleSchedule={handleSchedule} includeGroups>
               <div className={classes.filterItem}>
                 <FormControl fullWidth>
                   <InputLabel>{t('reportEventTypes')}</InputLabel>
@@ -207,6 +209,7 @@ const EventReportPage = () => {
             <TableHead>
               <TableRow>
                 <TableCell className={classes.columnAction} />
+                <TableCell>{t('sharedDevice')}</TableCell>
                 {columns.map((key) => (<TableCell key={key}>{t(columnsMap.get(key))}</TableCell>))}
               </TableRow>
             </TableHead>
@@ -223,6 +226,9 @@ const EventReportPage = () => {
                         <LocationSearchingIcon fontSize="small" />
                       </IconButton>
                     ) : ''}
+                  </TableCell>
+                  <TableCell>
+                    {devices[item.deviceId]?.name}
                   </TableCell>
 
                   {columns.map((key) => (

@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  AppBar, Button, IconButton, Toolbar,
+  AppBar, Button, IconButton, Snackbar, Toolbar,
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import VideoModal from '../common/components/VideoModal';
 import { useTranslation } from '../common/components/LocalizationProvider';
+import { snackBarDurationLongMs } from '../common/util/duration';
 
-const videoData = [
-  {
-    id: 1,
-    title: 'Video login',
-    videoUrl: './videos/file.mp4',
-    thumbnailUrl: './videos/output.png',
-  },
-  // Add more videos...
-];
+// const videoData = [
+//   {
+//     id: 1,
+//     title: 'Video login',
+//     videoUrl: './videos/file.mp4',
+//     thumbnailUrl: './videos/output.png',
+//   },
+//   // Add more videos...
+// ];
 
 const HelpPage = () => {
   const t = useTranslation();
   const navigate = useNavigate();
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [videoData, setVideoData] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
   const openVideoModal = (video) => {
     setSelectedVideo(video);
@@ -29,6 +32,18 @@ const HelpPage = () => {
   const closeVideoModal = () => {
     setSelectedVideo(null);
   };
+
+  useEffect(() => {
+    // Fetch the data from the JSON file
+    fetch('/help/videos.json')
+      .then((response) => response.json())
+      .then((data) => setVideoData(data))
+      .catch((error) => setNotifications([{
+        id: 1,
+        show: true,
+        message: error,
+      }]));
+  }, []);
 
   return (
     <>
@@ -70,6 +85,16 @@ const HelpPage = () => {
             onClose={closeVideoModal}
           />
         )}
+
+        {notifications.map((notification) => (
+          <Snackbar
+            key={notification.id}
+            open={notification.show}
+            message={notification.message}
+            autoHideDuration={snackBarDurationLongMs}
+            onClose={() => setNotifications([])}
+          />
+        ))}
       </div>
     </>
   );

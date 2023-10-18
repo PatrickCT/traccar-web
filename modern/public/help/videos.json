@@ -1,0 +1,8 @@
+[
+    {
+        "id": 1,
+        "title": "Video login",
+        "videoUrl": "../videos/file.mp4",
+        "thumbnailUrl": "../videos/output.png"
+    }
+]
