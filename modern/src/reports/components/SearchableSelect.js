@@ -8,22 +8,15 @@ import { InputAdornment, ListSubheader } from '@mui/material';
 import { SearchOutlined } from '@mui/icons-material';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 
-function SearchSelect({ options, label, value, onChange, multiple }) {
+const SearchSelect = ({ options, label, value, onChange, multiple }) => {
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const filteredOptions = options.filter((option) => option.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <FormControl fullWidth>
-
       <InputLabel>{label}</InputLabel>
-      <Select
-        label={label}
-        value={value}
-        onChange={onChange}
-        multiple={multiple}
-      >
-        {searchQuery}
+      <Select label={label} value={value} onChange={onChange} multiple={multiple}>
         <ListSubheader>
           <TextField
             size="small"
@@ -56,6 +49,6 @@ function SearchSelect({ options, label, value, onChange, multiple }) {
       </Select>
     </FormControl>
   );
-}
+};
 
 export default SearchSelect;

@@ -106,7 +106,6 @@ const ReportFilter = ({
       {!ignoreDevice && (
         <div className={classes.filterItem}>
           <FormControl fullWidth>
-            <InputLabel>{t(multiDevice ? 'deviceTitle' : 'reportDevice')}</InputLabel>
             <SearchSelect
               options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
               label={t(multiDevice ? 'deviceTitle' : 'reportDevice')}
@@ -114,41 +113,6 @@ const ReportFilter = ({
               onChange={(e) => dispatch(multiDevice ? devicesActions.selectIds(e.target.value) : devicesActions.selectId(e.target.value))}
               multiple={multiDevice}
             />
-            {/* <Select
-              id="cmb-report-devices"
-              label={t(multiDevice ? 'deviceTitle' : 'reportDevice')}
-              value={multiDevice ? deviceIds : deviceId || ''}
-              onChange={(e) => dispatch(multiDevice ? devicesActions.selectIds(e.target.value) : devicesActions.selectId(e.target.value))}
-              multiple={multiDevice}
-            >
-              <ListSubheader>
-                <TextField
-                  size="small"
-                  // Autofocus on textfield
-                  autoFocus
-                  placeholder={t('sharedSearch')}
-                  fullWidth
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchOutlined />
-                      </InputAdornment>
-                    ),
-                  }}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key !== 'Escape') {
-                      // Prevents autoselecting item while typing (default Select behaviour)
-                      e.stopPropagation();
-                    }
-                  }}
-                  value={searchQuery}
-                />
-              </ListSubheader>
-              {Object.values(devices).sort((a, b) => a.name.localeCompare(b.name)).filter((device) => device.name.toLowerCase().includes(searchQuery)).map((device) => (
-                <MenuItem key={device.id} value={device.id}>{device.name}</MenuItem>
-              ))}
-            </Select> */}
           </FormControl>
         </div>
       )}
