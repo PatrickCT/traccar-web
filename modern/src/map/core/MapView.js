@@ -100,7 +100,7 @@ const MapView = ({ children }) => {
     const filteredStyles = mapStyles.filter((s) => s.available && activeMapStyles.includes(s.id));
     const styles = filteredStyles.length ? filteredStyles : mapStyles.filter((s) => s.id === 'osm');
     switcher.updateStyles(styles, defaultMapStyle);
-  }, [mapStyles, defaultMapStyle]);
+  }, [defaultMapStyle]);
 
   useEffect(() => {
     const listener = (ready) => setMapReady(ready);

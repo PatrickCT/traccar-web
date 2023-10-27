@@ -33,23 +33,20 @@ class PopUpControl {
 }
 
 const MapPopup = () => {
-  const [enabled, setEnabled] = useState((window.localStorage.getItem('showMapPopup') === 'true'));
+  const [enabled, setEnabled] = useState(() => window.localStorage.getItem('showMapPopup') === 'true');
 
   const onClick = () => {
-    window.localStorage.setItem('showMapPopup', !enabled);
-    setEnabled(!enabled);
+    const newEnabled = !enabled;
+    window.localStorage.setItem('showMapPopup', newEnabled);
+    setEnabled(newEnabled);
   };
 
-  const control = useMemo(() => new PopUpControl(enabled, onClick));
+  const control = useMemo(() => new PopUpControl(enabled, onClick), [enabled]);
 
   useEffect(() => {
     map.addControl(control);
     return () => map.removeControl(control);
-  }, [onClick]);
-
-  useEffect(() => {
-    control.setEnabled(enabled);
-  }, [enabled]);
+  }, [control]);
 
   return null;
 };
