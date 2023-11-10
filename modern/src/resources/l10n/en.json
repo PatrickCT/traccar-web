@@ -215,6 +215,7 @@
     "deviceIdentifierHelp": "IMEI, serial number or other id. It has to match the identifier device reports to the server.",
     "devicePlate": "Car plate",
     "deviceSerie": "Serie",
+    "deviceKey": "Clave",
     "deviceMaker": "Brand",
     "deviceYear": "Year",
     "deviceInsurance": "Insurance",

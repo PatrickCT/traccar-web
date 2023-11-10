@@ -60,7 +60,7 @@ const HourPage = () => {
     for (let il = 0; il < items.length; il += 1) {
       const i = items[il];
       if (i.hasOwnProperty('id') && i?.name !== null) {
-        await fetch(`/api/horasalidas/${i.gpsid ? i.gpsid : ''}`, { method: i.gpsid ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, hour: i.hour, id: i.id }) });
+        await fetch(`/api/horasalidas/${i.gpsid ? i.gpsid : ''}`, { method: i.gpsid ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, hour: i.hour, id: i.gpsid }) });
       }
     }
   });

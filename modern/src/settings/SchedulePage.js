@@ -6,7 +6,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import {
-  Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, FormLabel, MenuItem, InputLabel, Select,
+  Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, FormLabel, MenuItem, InputLabel, Select, Snackbar,
 } from '@mui/material';
 import moment from 'moment';
 import Box from '@mui/material/Box';
@@ -71,6 +71,8 @@ const SchedulePage = () => {
   const dispatch = useDispatch();
   const t = useTranslation();
 
+  const [notifications, setNotifications] = useState([]);
+
   const daysValues = {
     lunes: 1,
     martes: 2,
@@ -122,6 +124,7 @@ const SchedulePage = () => {
   const [geofence, setGeofence] = useState(0);
   const [hours, setHours] = useState([]);
   const [hour, setHour] = useState(0);
+  const [reload, setReload] = useState(false);
 
   /// Alta de tramos
 
@@ -134,7 +137,7 @@ const SchedulePage = () => {
 
   const saveTramo = (tramo) => {
     const { isNew } = tramo;
-    tramo.geofenceId = (geofences.find((geofence) => geofence.name === tramo.geofenceId))?.id || (item?.geofenceId || null);
+    tramo.geofenceId = (geofences.find((geofence) => geofence.id === tramo.geofenceId))?.id || (item?.geofenceId || null);
     tramo.minTime = Number(tramo.minTime);
     tramo.delay = Number(tramo.delay);
     tramo.punishment = Number(tramo.punishment);
@@ -153,6 +156,7 @@ const SchedulePage = () => {
       .then((data) => {
         if (isNew) {
           linkTramo(data.id, true);
+          setReload(true);
         }
       });
   };
@@ -215,7 +219,11 @@ const SchedulePage = () => {
       width: 220,
       editable: true,
       type: 'singleSelect',
-      valueOptions: [...geofences.map((geofence) => geofence.name)],
+      valueOptions: geofences.map((geofence) => ({ value: geofence.id, label: geofence?.name })),
+      value: (params) => {
+        const geofence = geofences.find((g) => g.id === params.value);
+        return geofence ? geofence?.name : ''; // Return the name of the geofence based on the provided value
+      },
     },
     {
       field: 'actions',
@@ -296,7 +304,7 @@ const SchedulePage = () => {
       .then((data) => setGeofences(data));
     setGeofence(item?.geofenceId ?? 0);
 
-    fetch('/api/horasalidas').then((response) => response.json()).then((data) => setHours(data.filter((item, index, self) => self.findIndex((t) => t.name === item.name) === index)));
+    fetch('/api/horasalidas').then((response) => response.json()).then((data) => setHours(data.filter((item, index, self) => self.findIndex((t) => t?.name === item?.name) === index)));
 
     if (item?.id) {
       fetch(`/api/tramos?scheduleId=${item?.id}`).then((response) => response.json()).then((data) => { setRows(data); });
@@ -311,16 +319,21 @@ const SchedulePage = () => {
       32: { desde: [], hasta: [] },
       64: { desde: [], hasta: [] },
     });
-  }, [item?.id]);
+    setReload(false);
+  }, [item?.id, reload]);
 
   useEffect(() => {
-    const newDays = Object.entries(days)
-      .filter((item) => item[1] === true)
-      .reduce((sum, [day]) => sum + daysValues[day], 0);
-    setItem({
-      ...item,
-      days: newDays,
-    });
+    try {
+      const newDays = Object.entries(days)
+        .filter((item) => item[1] === true)
+        .reduce((sum, [day]) => sum + daysValues[day], 0);
+      setItem({
+        ...item,
+        days: newDays,
+      });
+    } catch (e) {
+      setNotifications([{ id: 0, show: true, message: 'Error', snackBarDurationLongMs: 2000 }]);
+    }
   }, [days]);
 
   useEffect(() => {
@@ -649,7 +662,7 @@ const SchedulePage = () => {
                 >
                   <MenuItem value={0}>--Sin horario--</MenuItem>
                   {hours && (
-                    hours.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
+                    hours.map((s) => <MenuItem key={s?.id} value={s?.id}>{s?.name}</MenuItem>)
                   )}
                 </Select>
               </FormControl>
@@ -693,6 +706,15 @@ const SchedulePage = () => {
           }
         </>
       )}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={notification.show}
+          message={notification.message}
+          autoHideDuration={notification.snackBarDurationLongMs}
+          onClose={() => setNotifications(notifications.filter((e) => e.id !== notification.id))}
+        />
+      ))}
     </EditItemView>
   );
 };

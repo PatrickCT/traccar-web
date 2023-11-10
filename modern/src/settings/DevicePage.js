@@ -178,6 +178,16 @@ const DevicePage = () => {
                     onChange={(event) => setItem({ ...item, simType: event.target.value })}
                     value={item.simType || null}
                   />
+                  {
+                    item.simType && item.simType === 2 && (
+                      <TextField
+                        value={item.simKey || ''}
+                        onChange={(event) => setItem({ ...item, simKey: event.target.value })}
+                        label={t('deviceKey')}
+                      />
+                    )
+                  }
+
                 </AccordionDetails>
               </Accordion>
             )}

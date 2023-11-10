@@ -34,8 +34,8 @@ const CombinedReportPage = () => {
   const createMarkers = () => items.flatMap((item) => item.events.map((event) => {
     const position = item.positions.find((p) => event.positionId === p.id);
     return {
-      latitude: position.latitude,
-      longitude: position.longitude,
+      latitude: position?.latitude,
+      longitude: position?.longitude,
     };
   }));
 

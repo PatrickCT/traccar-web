@@ -33,7 +33,7 @@ const HoursPage = () => {
     try {
       const response = await fetch('/api/horasalidas');
       if (response.ok) {
-        setItems(await response.json());
+        setItems((await response.json()).filter((item) => item !== null));
       } else {
         throw Error(await response.text());
       }
@@ -65,7 +65,7 @@ const HoursPage = () => {
                   <CollectionActions
                     itemId={item.name}
                     editPath="/settings/hour"
-                    endpoint="tramos"
+                    endpoint="horasalidas/delete"
                     setTimestamp={setTimestamp}
                   />
                 </TableCell>

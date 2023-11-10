@@ -216,6 +216,7 @@
     "deviceIdentifierHelp": "El IMEI, numero de serie u otro id, tiene que ser igual que el identificador del dispositivo que reporta al servidor.",
     "devicePlate": "Placa",
     "deviceSerie": "Serie",
+    "deviceKey": "Clave",
     "deviceMaker": "Marca",
     "deviceYear": "Año",
     "deviceInsurance": "Seguro",
