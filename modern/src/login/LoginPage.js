@@ -118,6 +118,7 @@ const LoginPage = () => {
       if (response.ok) {
         localStorage.setItem('UGFzc3dvcmRVc2Vy', encode(password));
         const user = await response.json();
+        localStorage.setItem('dXNlcg==', encode(JSON.stringify(user)));
         localStorage.setItem('aXNBZG1pbg==', user.administrator);
         localStorage.setItem('aXNSZXZpc29y', (user.attributes.hasOwnProperty('Revisor') && user.attributes.Revisor));
         generateLoginToken();
@@ -156,6 +157,7 @@ const LoginPage = () => {
   useEffect(() => nativePostMessage('authentication'), []);
 
   useEffect(() => {
+    localStorage.removeItem('dXNlcg==');
     localStorage.removeItem('UGFzc3dvcmRVc2Vy');
     localStorage.removeItem('aXNBZG1pbg==');
     localStorage.removeItem('aXNSZXZpc29y');

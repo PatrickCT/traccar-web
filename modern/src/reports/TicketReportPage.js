@@ -201,7 +201,7 @@ const TicketReportPage = () => {
                     <TableRow style={calcDiffColor(item)} key={item.id}>
                       <TableCell className={classes.columnAction} padding="none" />
                       <TableCell>
-                        {devices[item.device].name}
+                        {devices[item.device]?.name}
                       </TableCell>
                       <TableCell>
                         {item.salida}

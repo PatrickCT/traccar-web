@@ -310,94 +310,104 @@ const UserPage = () => {
               </Button>
             </AccordionDetails>
           </Accordion>
-          {admin && (
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle1">
-                  {t('sharedPermissions')}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails className={classes.details}>
-                <TextField
-                  label={t('userExpirationTime')}
-                  type="date"
-                  value={(item.expirationTime && moment(item.expirationTime).locale('en').format(moment.HTML5_FMT.DATE)) || '2099-01-01'}
-                  onChange={(e) => setItem({ ...item, expirationTime: moment(e.target.value, moment.HTML5_FMT.DATE).locale('en').format() })}
-                  disabled={!manager}
-                />
-                <TextField
-                  type="number"
-                  value={item.deviceLimit || 0}
-                  onChange={(e) => setItem({ ...item, deviceLimit: Number(e.target.value) })}
-                  label={t('userDeviceLimit')}
-                  disabled={!admin}
-                />
-                <TextField
-                  type="number"
-                  value={item.userLimit || 0}
-                  onChange={(e) => setItem({ ...item, userLimit: Number(e.target.value) })}
-                  label={t('userUserLimit')}
-                  disabled={!admin}
-                />
-                <FormGroup>
+
+          <Accordion>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle1">
+                {t('sharedPermissions')}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails className={classes.details}>
+              <TextField
+                label={t('userExpirationTime')}
+                type="date"
+                value={(item.expirationTime && moment(item.expirationTime).locale('en').format(moment.HTML5_FMT.DATE)) || '2099-01-01'}
+                onChange={(e) => setItem({ ...item, expirationTime: moment(e.target.value, moment.HTML5_FMT.DATE).locale('en').format() })}
+                disabled={!manager}
+              />
+              <TextField
+                type="number"
+                value={item.deviceLimit || 0}
+                onChange={(e) => setItem({ ...item, deviceLimit: Number(e.target.value) })}
+                label={t('userDeviceLimit')}
+                disabled={!admin}
+              />
+              <TextField
+                type="number"
+                value={item.userLimit || 0}
+                onChange={(e) => setItem({ ...item, userLimit: Number(e.target.value) })}
+                label={t('userUserLimit')}
+                disabled={!admin}
+              />
+              <FormGroup>
+                {admin && (
                   <FormControlLabel
                     control={<Checkbox checked={item.main} onChange={(e) => setItem({ ...item, main: e.target.checked })} />}
                     label={t('sharedMain')}
                     disabled={!admin}
                   />
-                  {!item.main && admin && (
-                    <SelectField
-                      endpoint="/api/users/main"
-                      hidden={!item.main}
-                      value={item.principal}
-                      onChange={(e) => setItem({ ...item, principal: e.target.value })}
+                )}
+                {!item.main && admin && (
+                  <SelectField
+                    endpoint="/api/users/main"
+                    hidden={!item.main}
+                    value={item.principal}
+                    onChange={(e) => setItem({ ...item, principal: e.target.value })}
+                    disabled={!admin}
+                  />
+                )}
+                {admin && (
+                  <>
+                    <FormControlLabel
+                      control={<Checkbox checked={item.billing} onChange={(e) => setItem({ ...item, billing: e.target.checked })} />}
+                      label={t('sharedBilling')}
                       disabled={!admin}
                     />
-                  )}
-                  <FormControlLabel
-                    control={<Checkbox checked={item.billing} onChange={(e) => setItem({ ...item, billing: e.target.checked })} />}
-                    label={t('sharedBilling')}
-                    disabled={!admin}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={item.disabled} onChange={(e) => setItem({ ...item, disabled: e.target.checked })} />}
-                    label={t('sharedDisabled')}
-                    disabled={!manager}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={item.administrator} onChange={(e) => setItem({ ...item, administrator: e.target.checked })} />}
-                    label={t('userAdmin')}
-                    disabled={!admin}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={item.readonly} onChange={(e) => setItem({ ...item, readonly: e.target.checked })} />}
-                    label={t('serverReadonly')}
-                    disabled={!manager}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={item.deviceReadonly} onChange={(e) => setItem({ ...item, deviceReadonly: e.target.checked })} />}
-                    label={t('userDeviceReadonly')}
-                    disabled={!manager}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={item.limitCommands} onChange={(e) => setItem({ ...item, limitCommands: e.target.checked })} />}
-                    label={t('userLimitCommands')}
-                    disabled={!manager}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={item.disableReports} onChange={(e) => setItem({ ...item, disableReports: e.target.checked })} />}
-                    label={t('userDisableReports')}
-                    disabled={!manager}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={item.fixedEmail} onChange={(e) => setItem({ ...item, fixedEmail: e.target.checked })} />}
-                    label={t('userFixedEmail')}
-                    disabled={!manager}
-                  />
-                </FormGroup>
-              </AccordionDetails>
-            </Accordion>
-          )}
+                    <FormControlLabel
+                      control={<Checkbox checked={item.disabled} onChange={(e) => setItem({ ...item, disabled: e.target.checked })} />}
+                      label={t('sharedDisabled')}
+                      disabled={!manager}
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={item.administrator} onChange={(e) => setItem({ ...item, administrator: e.target.checked })} />}
+                      label={t('userAdmin')}
+                      disabled={!admin}
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={item.readonly} onChange={(e) => setItem({ ...item, readonly: e.target.checked })} />}
+                      label={t('serverReadonly')}
+                      disabled={!manager}
+                    />
+                  </>
+                )}
+                <FormControlLabel
+                  control={<Checkbox checked={item.deviceReadonly} onChange={(e) => setItem({ ...item, deviceReadonly: e.target.checked })} />}
+                  label={t('userDeviceReadonly')}
+                  disabled={!manager}
+                />
+                {admin && (
+                  <>
+                    <FormControlLabel
+                      control={<Checkbox checked={item.limitCommands} onChange={(e) => setItem({ ...item, limitCommands: e.target.checked })} />}
+                      label={t('userLimitCommands')}
+                      disabled={!manager}
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={item.disableReports} onChange={(e) => setItem({ ...item, disableReports: e.target.checked })} />}
+                      label={t('userDisableReports')}
+                      disabled={!manager}
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={item.fixedEmail} onChange={(e) => setItem({ ...item, fixedEmail: e.target.checked })} />}
+                      label={t('userFixedEmail')}
+                      disabled={!manager}
+                    />
+                  </>
+                )}
+              </FormGroup>
+            </AccordionDetails>
+          </Accordion>
+
           <EditAttributesAccordion
             attribute={attribute}
             attributes={item.attributes}

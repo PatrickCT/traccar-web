@@ -17,7 +17,7 @@ import TableShimmer from '../common/components/TableShimmer';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import { usePreference } from '../common/util/preferences';
 import { formatTime } from '../common/util/formatter';
-import { useDeviceReadonly } from '../common/util/permissions';
+import { useAdministrator, useDeviceReadonly } from '../common/util/permissions';
 
 const useStyles = makeStyles((theme) => ({
   columnAction: {
@@ -30,6 +30,7 @@ const DevicesPage = () => {
   const classes = useStyles();
   const navigate = useNavigate();
   const t = useTranslation();
+  const admin = useAdministrator();
 
   const hours12 = usePreference('twelveHourFormat');
 
@@ -70,6 +71,8 @@ const DevicesPage = () => {
     handler: (deviceId) => navigate(`/settings/device/${deviceId}/groups`),
   };
 
+  const simTypes = [{ id: 0, name: 'Tipo no asignado' }, { id: 1, name: 'Plan Telcel' }, { id: 2, name: 'Recarga Telcel' }, { id: 3, name: 'Oxio' }];
+
   return (
     <PageLayout menu={<SettingsMenu />} breadcrumbs={['settingsTitle', 'sharedDrivers']}>
       <SearchHeader keyword={searchKeyword} setKeyword={setSearchKeyword} />
@@ -83,6 +86,11 @@ const DevicesPage = () => {
             <TableCell>{t('deviceModel')}</TableCell>
             <TableCell>{t('deviceContact')}</TableCell>
             <TableCell>{t('userExpirationTime')}</TableCell>
+            {
+              admin && (
+                <TableCell>Tipo sim</TableCell>
+              )
+            }
             <TableCell className={classes.columnAction} />
           </TableRow>
         </TableHead>
@@ -108,6 +116,11 @@ const DevicesPage = () => {
               <TableCell>{item.model}</TableCell>
               <TableCell>{item.contact}</TableCell>
               <TableCell>{formatTime(item.expirationTime, 'date', hours12)}</TableCell>
+              {
+                admin && (
+                  <TableCell>{simTypes.find((type) => type.id === item.simType)?.name}</TableCell>
+                )
+              }
               <TableCell className={classes.columnAction} padding="none">
                 <CollectionActions
                   itemId={item.id}

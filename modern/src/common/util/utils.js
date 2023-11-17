@@ -226,6 +226,23 @@ const formatDateToCustomString = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+window.getUser = () => JSON.parse(atob(localStorage.getItem(btoa('user'))));
+
+window.findServerName = (ip) => ({
+  '173.255.203.21': 'Alba',
+  '198.58.114.237': 'AutoKapital',
+  '45.56.69.178': 'Cancun',
+  '45.33.23.6': 'Cemex',
+  '69.164.203.19': 'Merida',
+  '45.56.79.216': 'Order',
+  '23.239.29.228': 'Evolucion',
+  '45.56.126.173': 'Rastreo',
+  '45.79.45.108': 'Pruebas',
+  '23.239.25.71': 'Transporte',
+  '45.56.66.144': 'Comit',
+  '45.33.116.80': 'Combis',
+}[ip] || ip);
+
 export const formatDate = (date, template = 'dd-MM-yyyy HH:mm:ss') => {
   const replacements = {
     dd: String(date.getDate()).padStart(2, '0'),
@@ -405,7 +422,7 @@ export const attsGetter = (obj, attribute) => {
       return formatDateToCustomString(new Date(window.device?.insuranceExpiration || ''));
     }
     case 'lastUpdate': {
-      return formatDate(new Date(window.device?.lastUpdate || ''), 'dd/mm/yyyy HH:mm:ss');
+      return formatDate(new Date(window.device?.lastUpdate || ''), 'dd/MM/yyyy HH:mm:ss');
     }
     case 'phone': {
       return window.device?.phone || '';
