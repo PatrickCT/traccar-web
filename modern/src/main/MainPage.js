@@ -32,6 +32,7 @@ import { map } from '../map/core/MapView';
 import './MainPage.css';
 import Counter from '../common/components/Counter';
 import Modal from './components/BasicModal';
+import ConnectionStatus from '../common/components/ConnectionStatus';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -269,6 +270,7 @@ const MainPage = () => {
           <FormControlLabel control={<Checkbox />} label="Refacciones" />
         </FormGroup>
       </Modal>
+      <ConnectionStatus />
     </div>
   );
 };
