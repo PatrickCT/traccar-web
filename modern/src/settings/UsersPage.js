@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Table, TableRow, TableCell, TableHead, TableBody,
-} from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+
 import LoginIcon from '@mui/icons-material/Login';
 import LinkIcon from '@mui/icons-material/Link';
-import makeStyles from '@mui/styles/makeStyles';
 import { useCatch, useEffectAsync } from '../reactHelper';
 import { formatBoolean, formatTime } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -13,20 +11,12 @@ import PageLayout from '../common/components/PageLayout';
 import SettingsMenu from './components/SettingsMenu';
 import CollectionFab from './components/CollectionFab';
 import CollectionActions from './components/CollectionActions';
-import TableShimmer from '../common/components/TableShimmer';
 import { useManager } from '../common/util/permissions';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import { usePreference } from '../common/util/preferences';
-
-const useStyles = makeStyles((theme) => ({
-  columnAction: {
-    width: '1%',
-    paddingRight: theme.spacing(1),
-  },
-}));
+import LoadingComponent from './components/LoadingComponent';
 
 const UsersPage = () => {
-  const classes = useStyles();
   const navigate = useNavigate();
   const t = useTranslation();
 
@@ -38,7 +28,6 @@ const UsersPage = () => {
   const [items, setItems] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
 
   const handleLogin = useCatch(async (userId) => {
     const response = await fetch(`/api/session/${userId}`);
@@ -77,59 +66,81 @@ const UsersPage = () => {
     }
   }, [timestamp]);
 
-  const filteredAndSortedItems = items
-    .filter(filterByKeyword(searchKeyword))
-    .sort((a, b) => {
-      if (a.id < b.id) return -1;
-      if (a.id > b.id) return 1;
-      return 0;
-    });
+  const columns = [
+    { field: 'name', headerName: `${t('sharedName')}`, width: 200 },
+    { field: 'email', headerName: `${t('userEmail')}`, width: 300 },
+    {
+      field: 'admin',
+      headerName: `${t('userAdmin')}`,
+      valueGetter: (params) => params.row.administrator,
+      renderCell: (params) => (
+        <span>
+          {formatBoolean(params.row.administrator, t)}
+        </span>
+      ),
+      width: 200,
+      sortable: true,
+
+    },
+    {
+      field: 'main',
+      headerName: `${t('sharedMain')}`,
+      valueGetter: (params) => `${formatBoolean(params.row.main, t)}`,
+      width: 200,
+    },
+    {
+      field: 'disabled',
+      headerName: `${t('sharedDisabled')}`,
+      valueGetter: (params) => `${formatBoolean(params.row.disabled, t)}`,
+      width: 200,
+    },
+    {
+      field: 'expirationTime',
+      headerName: `${t('userExpirationTime')}`,
+      valueGetter: (params) => `${formatTime(params.row.expirationTime, 'date', hours12)}`,
+      width: 200,
+    },
+    {
+      field: 'total_devices',
+      headerName: 'Unidades',
+      valueGetter: (params) => `${params.row.attributes?.total_devices || 0}`,
+    },
+    {
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Opciones',
+      width: 100,
+      cellClassName: 'actions',
+      getActions: ({ id }) => [
+        <CollectionActions
+          itemId={id}
+          editPath="/settings/user"
+          endpoint="users"
+          setTimestamp={setTimestamp}
+          customActions={manager ? [actionLogin, actionConnections] : [actionConnections]}
+        />,
+      ],
+    },
+  ];
 
   return (
     <PageLayout menu={<SettingsMenu />} breadcrumbs={['settingsTitle', 'settingsUsers']}>
       <SearchHeader keyword={searchKeyword} setKeyword={setSearchKeyword} />
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>{t('sharedName')}</TableCell>
-            <TableCell>{t('userEmail')}</TableCell>
-            <TableCell>{t('userAdmin')}</TableCell>
-            <TableCell>{t('sharedMain')}</TableCell>
-            <TableCell>{t('sharedDisabled')}</TableCell>
-            <TableCell>{t('userExpirationTime')}</TableCell>
-            <TableCell className={classes.columnAction} />
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {!loading ? filteredAndSortedItems.map((item, index) => (
-            <TableRow
-              key={item.id}
-              onMouseEnter={() => setHoveredRowIndex(index)}
-              onMouseLeave={() => setHoveredRowIndex(null)}
-              style={{
-                backgroundColor: hoveredRowIndex === index ? '#1F6EDE22' : 'transparent', // Change background color on hover
-                /* Add any other styles you want for the hover effect */
-              }}
-            >
-              <TableCell>{item.name}</TableCell>
-              <TableCell>{item.email}</TableCell>
-              <TableCell>{formatBoolean(item.administrator, t)}</TableCell>
-              <TableCell>{formatBoolean(item.main, t)}</TableCell>
-              <TableCell>{formatBoolean(item.disabled, t)}</TableCell>
-              <TableCell>{formatTime(item.expirationTime, 'date', hours12)}</TableCell>
-              <TableCell className={classes.columnAction} padding="none">
-                <CollectionActions
-                  itemId={item.id}
-                  editPath="/settings/user"
-                  endpoint="users"
-                  setTimestamp={setTimestamp}
-                  customActions={manager ? [actionLogin, actionConnections] : [actionConnections]}
-                />
-              </TableCell>
-            </TableRow>
-          )) : (<TableShimmer columns={6} endAction />)}
-        </TableBody>
-      </Table>
+      <div style={{ height: '80%', width: '100%' }}>
+        <LoadingComponent isLoading={loading}>
+          <DataGrid
+            rows={items.filter(filterByKeyword(searchKeyword))}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 12 },
+              },
+            }}
+            pageSizeOptions={[15, 20, 50, 100]}
+          />
+        </LoadingComponent>
+      </div>
+
       <CollectionFab editPath="/settings/user" />
     </PageLayout>
   );

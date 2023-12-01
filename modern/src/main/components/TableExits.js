@@ -89,7 +89,7 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
         'Content-Type': 'application/json;charset=utf-8',
       },
       body: JSON.stringify({
-        time: moment(hourSelected.$d).format('HH:mm'),
+        time: moment(hourSelected.$d).utc().format('HH:mm'),
       }),
     });
     if (response.ok) {
