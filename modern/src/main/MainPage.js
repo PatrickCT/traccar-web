@@ -33,6 +33,7 @@ import './MainPage.css';
 import Counter from '../common/components/Counter';
 import Modal from './components/BasicModal';
 import ConnectionStatus from '../common/components/ConnectionStatus';
+import DebtModal from '../common/components/DebtModal';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -271,6 +272,11 @@ const MainPage = () => {
         </FormGroup>
       </Modal>
       <ConnectionStatus />
+      {
+        user.debt && (
+          <DebtModal />
+        )
+      }
     </div>
   );
 };

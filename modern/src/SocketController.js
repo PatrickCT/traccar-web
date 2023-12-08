@@ -39,6 +39,31 @@ const SocketController = () => {
 
   const features = useFeatures();
 
+  const allowedFunctions = {
+    refreshUser: async () => {
+      const response = await fetch('/api/session');
+      if (response.ok) {
+        setNotifications([{
+          id: 0,
+          message: 'Ya\' gotta reload da page, att. the system',
+          show: true,
+        }]);
+        dispatch(sessionActions.updateUser(await response.json()));
+      }
+    },
+    reload: async () => {
+      window.location.reload();
+    },
+    logout: () => {
+      setNotifications([{
+        id: 0,
+        message: 'Ya\'ve been logged out by the system',
+        show: true,
+      }]);
+      window.handleLogout();
+    },
+  };
+
   const connectSocket = () => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const socket = new WebSocket(`${protocol}//${window.location.host}/api/socket`);
@@ -95,6 +120,9 @@ const SocketController = () => {
           dispatch(eventsActions.add(data.events));
         }
         setEvents(data.events);
+      }
+      if (data.custom) {
+        (allowedFunctions[JSON.parse(data.custom).command] ?? (() => { }))();
       }
     };
   };

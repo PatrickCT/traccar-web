@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -97,6 +97,16 @@ const BottomMenu = () => {
         break;
     }
   };
+
+  useEffect(() => {
+    // Attach the function to the global window object
+    window.handleLogout = handleLogout;
+
+    // Clean up the function when the component unmounts
+    return () => {
+      delete window.handleLogout;
+    };
+  }, []);
 
   return (
     <Paper square elevation={3}>
