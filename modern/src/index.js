@@ -14,7 +14,7 @@ import NativeInterface from './common/components/NativeInterface';
 import ServerProvider from './ServerProvider';
 import ErrorBoundary from './ErrorBoundary';
 
-preloadImages();
+await preloadImages();
 
 const root = createRoot(document.getElementById('root'));
 root.render(
