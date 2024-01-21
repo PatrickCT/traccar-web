@@ -616,5 +616,6 @@
     "sharedExits": "Salidas",
     "sharedBilling": "Factura",
     "turbanRoute": "Ruta T-Urban",
-    "clearFilters": "Limpiar Filtros"
+    "clearFilters": "Limpiar Filtros",
+    "extraModulesTitle": "Modulos Extra"
 }

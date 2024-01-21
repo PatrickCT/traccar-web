@@ -114,6 +114,7 @@ const DevicesPage = () => {
       <div style={{ height: '80%', width: '100%' }}>
         <LoadingComponent isLoading={loading}>
           <DataGrid
+            autoHeight={false}
             rows={items.filter(filterByKeyword(searchKeyword))}
             columns={columns}
             initialState={{

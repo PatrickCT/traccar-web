@@ -10,6 +10,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     [theme.breakpoints.down('md')]: {
       bottom: `calc(${theme.dimensions.bottomBarHeight}px + ${theme.spacing(1)})`,
+      top: '50vh',
     },
   },
   button: {
@@ -37,6 +38,7 @@ const RemoveDialog = ({
 
   return (
     <Snackbar
+      style={{ top: '60vh' }}
       className={classes.root}
       open={open}
       autoHideDuration={snackBarDurationLongMs}

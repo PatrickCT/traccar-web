@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import {
   Accordion,
   AccordionSummary,
@@ -36,6 +37,8 @@ const UserConnectionsPage = () => {
   const { id } = useParams();
 
   const [item, setItem] = useState({});
+
+  const user = useSelector((state) => state.session.user);
 
   useEffect(() => {
     fetch(`/api/users/${id}`, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
@@ -146,6 +149,16 @@ const UserConnectionsPage = () => {
               keyLink="maintenanceId"
               label={t('sharedMaintenance')}
             />
+            {user.administrator && (
+              <LinkField
+                endpointAll="/api/extramodules?all=true"
+                endpointLinked={`/api/extramodules?userId=${id}`}
+                baseId={id}
+                keyBase="userId"
+                keyLink="extramoduleId"
+                label={t('extraModulesTitle')}
+              />
+            )}
           </AccordionDetails>
         </Accordion>
       </Container>

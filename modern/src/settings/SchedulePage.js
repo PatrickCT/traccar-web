@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import TextField from '@mui/material/TextField';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -70,6 +70,7 @@ const SchedulePage = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const t = useTranslation();
+  const user = useSelector((state) => state.session.user);
 
   const [notifications, setNotifications] = useState([]);
 
@@ -124,6 +125,7 @@ const SchedulePage = () => {
   const [geofence, setGeofence] = useState(0);
   const [hours, setHours] = useState([]);
   const [hour, setHour] = useState(0);
+  const [hourRel, setHourRel] = useState(0);
   const [reload, setReload] = useState(false);
 
   /// Alta de tramos
@@ -295,6 +297,7 @@ const SchedulePage = () => {
     };
     setDays(initialDaysState);
     // setStart(dayjs(newDateStart));
+
     fetch('/api/subroutes')
       .then((response) => response.json())
       .then((data) => setSubrutas(data));
@@ -361,6 +364,14 @@ const SchedulePage = () => {
     setItem({
       ...item,
       horasId: evt.target.value,
+    });
+  };
+
+  const updateHoraRel = (evt) => {
+    setHourRel(evt.target.value);
+    setItem({
+      ...item,
+      horasIdRel: evt.target.value,
     });
   };
 
@@ -666,6 +677,26 @@ const SchedulePage = () => {
                   )}
                 </Select>
               </FormControl>
+
+              {
+                user.administrator && (
+                  <FormControl fullWidth>
+                    <InputLabel id="horasRel">Tabla de salidas relacionada</InputLabel>
+                    <Select
+                      labelId="horasRel"
+                      id="horasidRel"
+                      value={item.horasIdRel || hourRel}
+                      label="Tabla de salidas relacionada"
+                      onChange={updateHoraRel}
+                    >
+                      <MenuItem value={0}>--Sin horario--</MenuItem>
+                      {hours && (
+                        hours.filter((h) => h.id !== item.horasId).map((s) => <MenuItem key={s?.id} value={s?.id}>{s?.name}</MenuItem>)
+                      )}
+                    </Select>
+                  </FormControl>
+                )
+              }
             </AccordionDetails>
           </Accordion>
           {
