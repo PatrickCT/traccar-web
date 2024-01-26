@@ -613,5 +613,6 @@
     "sharedExits": "Assign exit",
     "sharedBilling": "Billing",
     "turbanRoute": "T-Urban Route",
-    "clearFilters": "Clear Filters"
+    "clearFilters": "Clear Filters",
+    "extraModulesTitle": "Extra Modules"
 }
