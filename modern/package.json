@@ -23,6 +23,7 @@
     "intro.js-react": "^1.0.0",
     "mapbox-gl": "^1.13.3",
     "maplibre-gl": "^2.4.0",
+    "million": "^2.6.4",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "ola": "^1.2.1",
@@ -63,8 +64,8 @@
     "workbox-streams": "^6.5.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "craco start",
+    "build": "craco build",
     "lint": "eslint .",
     "lint:fix": "eslint --fix --ext .js ."
   },
@@ -80,6 +81,7 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "eslint": "^8.38.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.27.5",
