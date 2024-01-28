@@ -22,6 +22,7 @@ const ReportFilter = ({
   multiDevice,
   includeGroups,
   unified,
+  forceDisabled,
 }) => {
   const classes = useReportStyles();
   const dispatch = useDispatch();
@@ -45,7 +46,7 @@ const ReportFilter = ({
   const [calendarId, setCalendarId] = useState();
 
   const scheduleDisabled = button === 'schedule' && (!description || !calendarId);
-  const disabled = (!ignoreDevice && !deviceId && !deviceIds.length && !groupIds.length) || scheduleDisabled;
+  const disabled = (!ignoreDevice && !deviceId && !deviceIds.length && !groupIds.length) || scheduleDisabled || forceDisabled;
 
   const handleClick = (type) => {
     if (type === 'schedule') {

@@ -516,6 +516,7 @@
     "notificatorPushover": "Pushover",
     "reportTicket": "Tickets history",
     "reportSalidas": "Transport trips report",
+    "reportHojaSalidas": "Transport trips sheet",
     "reportReplay": "Replay",
     "reportCombined": "Combined",
     "reportRoute": "Route",
