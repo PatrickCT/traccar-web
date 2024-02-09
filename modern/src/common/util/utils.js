@@ -320,6 +320,13 @@ export const specialAtts = (obj, attribute) => {
         default:
           return attribute;
       }
+    case 'startek':
+      switch (attribute) {
+        case 'bateria':
+          return 'bateriapercentage';
+        default:
+          return attribute;
+      }
     default:
       return attribute;
   }
@@ -410,6 +417,10 @@ export const attsGetter = (obj, attribute) => {
     case 'bateria': {
       const bat = obj.attributes.batteryLevel ? obj.attributes.batteryLevel : obj.attributes.battery ? obj.attributes.battery : null;
       return bat !== null ? bat.toFixed(2) : null;
+    }
+    case 'bateriapercentage': {
+      const bat = obj.attributes.batteryLevel ? obj.attributes.batteryLevel : obj.attributes.battery ? obj.attributes.battery : null;
+      return bat !== null ? ((bat * 100) / 4.5).toFixed(2) : null;
     }
     case 'lastAlarm': {
       const event = getEvent();

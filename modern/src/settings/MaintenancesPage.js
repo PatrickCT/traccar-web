@@ -82,7 +82,7 @@ const MaintenacesPage = () => {
           {!loading ? items.filter(filterByKeyword(searchKeyword)).map((item) => (
             <TableRow key={item.id}>
               <TableCell>{item.name}</TableCell>
-              <TableCell>{item.type}</TableCell>
+              <TableCell>{positionAttributes[item.type].name}</TableCell>
               <TableCell>{convertAttribute(item.type, item.start)}</TableCell>
               <TableCell>{convertAttribute(item.type, item.period)}</TableCell>
               <TableCell className={classes.columnAction} padding="none">

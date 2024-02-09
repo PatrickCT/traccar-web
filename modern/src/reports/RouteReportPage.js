@@ -194,7 +194,10 @@ const RouteReportPage = () => {
               <ColumnSelect
                 columns={columns}
                 setColumns={setColumns}
-                columnsObject={positionAttributes}
+                columnsObject={Object.fromEntries(
+                  Object.entries(positionAttributes)
+                    .filter(([key]) => ['speed', 'altitude', 'deviceTime', 'odometer', 'hours', 'fuel', 'fuelConsumption'].includes(key)),
+                )}
               />
             </ReportFilter>
           </div>

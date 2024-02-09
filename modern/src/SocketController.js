@@ -45,7 +45,7 @@ const SocketController = () => {
       if (response.ok) {
         setNotifications([{
           id: 0,
-          message: 'Ya\' gotta reload da page, att. the system',
+          message: 'Recarga de pagina por sistema',
           show: true,
         }]);
         dispatch(sessionActions.updateUser(await response.json()));

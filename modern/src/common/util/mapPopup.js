@@ -251,6 +251,7 @@ export const createPopUp = (position) => {
       html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
       html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
       html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>`;
+      html += ` <a class="link-google-maps" onclick="(function(){navigate('/position/${position.id}');}());" ><img src="./././images/botones-popup/position.svg" width="14" height="14" /></a>`;
 
       html += `<h3><b>${attsGetter(position, 'name')}</b>`;
       html += '</h3></div>';
@@ -278,6 +279,8 @@ export const createPopUp = (position) => {
   html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());" ><img src="./././images/botones-popup/connection.svg" width="14" height="14" /></a>`;
   html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
   html += window.localStorage.getItem(btoa('isAdmin')) === 'true' ? ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>` : '';
+  html += ` <a class="link-google-maps" onclick="(function(){navigate('/position/${position.id}');}());" ><img src="./././images/botones-popup/position.svg" width="14" height="14" /></a>`;
+  html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/accumulators/${position.deviceId}');}());" ><img src="./././images/botones-popup/accumulator.svg" width="14" height="14" /></a>`;
 
   html += `<h3><b>${attsGetter(position, 'name')}</b>`;
   html += '</h3></div>';

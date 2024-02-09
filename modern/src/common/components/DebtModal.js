@@ -57,7 +57,7 @@ const DebtModal = () => {
   useEffect(() => {
     fetch(`http://45.79.45.108:4040/api/external/${userId}`)
       .then((response) => response.json())
-      .then((data) => setResult(data));
+      .then((data) => setResult(data.status ?? { data: { debt: 'Sin información', stp: 'Sin información' } }));
   }, []);
 
   return (
