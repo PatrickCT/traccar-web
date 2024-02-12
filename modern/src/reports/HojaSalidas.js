@@ -102,7 +102,7 @@ const HojaSalidaReportPage = () => {
       }
     } else {
       setLoading(true);
-      await sleep(10000);
+      await sleep(1);
       try {
         const response = await fetch(`/api/tickets/hoja?${query.toString()}`, {
           headers: { Accept: 'application/json' },
