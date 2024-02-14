@@ -13,6 +13,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import TodayIcon from '@mui/icons-material/Today';
 import PublishIcon from '@mui/icons-material/Publish';
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
+import TrafficIcon from '@mui/icons-material/Traffic';
 import { ScheduleOutlined, SegmentOutlined } from '@mui/icons-material';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -121,6 +122,17 @@ const SettingsMenu = () => {
                   link="/settings/exits"
                   icon={<ScheduleOutlined />}
                   selected={location.pathname.startsWith('/settings/exits')}
+                />
+              )}
+
+            {user.attributes.hasOwnProperty('vp') &&
+              user.attributes.vp &&
+              (
+                <MenuItem
+                  title={t('settingsExcuses')}
+                  link="/settings/excuses"
+                  icon={<TrafficIcon />}
+                  selected={location.pathname.startsWith('/settings/excuse')}
                 />
               )}
             <MenuItem

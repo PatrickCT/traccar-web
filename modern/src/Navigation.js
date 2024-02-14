@@ -67,6 +67,8 @@ import HelpPage from './other/HelpPage';
 import ExitsPage from './settings/ExitsPage';
 import VueltaReportPage from './reports/VueltaReportPage';
 import HojaSalidaReportPage from './reports/HojaSalidas';
+import ExcusesPage from './settings/ExcusesPage';
+import ExcusePage from './settings/ExcusePage';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -171,6 +173,9 @@ const Navigation = () => {
           <Route path="hour" element={<HourPage />} />
           <Route path="hour/:horas" element={<HourPage />} />
           <Route path="exits" element={<ExitsPage />} />
+          <Route path="excuses" element={<ExcusesPage />} />
+          <Route path="excuse/:id" element={<ExcusePage />} />
+          <Route path="excuse" element={<ExcusePage />} />
         </Route>
 
         <Route path="reports">

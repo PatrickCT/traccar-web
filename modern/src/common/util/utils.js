@@ -420,7 +420,8 @@ export const attsGetter = (obj, attribute) => {
     }
     case 'bateriapercentage': {
       const bat = obj.attributes.batteryLevel ? obj.attributes.batteryLevel : obj.attributes.battery ? obj.attributes.battery : null;
-      return bat !== null ? ((bat * 100) / 4.5).toFixed(2) : null;
+      const calculatedValue = bat !== null ? ((Math.min(bat, 3.96) * 100) / 3.96).toFixed(2) : null;
+      return calculatedValue;
     }
     case 'lastAlarm': {
       const event = getEvent();

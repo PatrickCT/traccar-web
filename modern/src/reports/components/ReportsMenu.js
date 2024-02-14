@@ -102,8 +102,8 @@ const ReportsMenu = () => {
             </>
           )}
         {user.attributes.hasOwnProperty('Transporte') &&
-          user.attributes.Transporte && user.attributes.hasOwnProperty('VP') &&
-          user.attributes.VP &&
+          user.attributes.Transporte && user.attributes.hasOwnProperty('vp') &&
+          user.attributes.vp &&
           (
 
             <MenuItem
