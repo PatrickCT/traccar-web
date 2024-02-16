@@ -679,7 +679,8 @@ const SchedulePage = () => {
               </FormControl>
 
               {
-                user.administrator && (
+                (user.administrator || (user.attributes.hasOwnProperty('vp') &&
+                  user.attributes.vp)) && (
                   <FormControl fullWidth>
                     <InputLabel id="horasRel">Tabla de salidas relacionada</InputLabel>
                     <Select
@@ -691,7 +692,7 @@ const SchedulePage = () => {
                     >
                       <MenuItem value={0}>--Sin horario--</MenuItem>
                       {hours && (
-                        hours.filter((h) => h.id !== item.horasId).map((s) => <MenuItem key={s?.id} value={s?.id}>{s?.name}</MenuItem>)
+                        hours.map((s) => <MenuItem key={s?.id} value={s?.id}>{s?.name}</MenuItem>)
                       )}
                     </Select>
                   </FormControl>
