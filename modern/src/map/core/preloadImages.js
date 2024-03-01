@@ -26,6 +26,7 @@ import trolleybusSvg from '../../resources/images/icon/trolleybus.svg';
 import truckSvg from '../../resources/images/icon/truck.svg';
 import vanSvg from '../../resources/images/icon/van.svg';
 import clusterSvg from '../../resources/images/backgroundCluster.svg';
+import stopSvg from '../../resources/images/icon/stop.svg';
 
 export const mapIcons = {
   animal: animalSvg,
@@ -43,6 +44,7 @@ export const mapIcons = {
   plane: planeSvg,
   scooter: scooterSvg,
   ship: shipSvg,
+  stop: stopSvg,
   tractor: tractorSvg,
   train: trainSvg,
   tram: tramSvg,

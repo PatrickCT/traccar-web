@@ -88,7 +88,7 @@ const MapView = ({ children }) => {
 
   useEffect(() => {
     if (maxZoom) {
-      map.setMaxZoom(maxZoom);
+      map.setMaxZoom(maxZoom < 23 ? maxZoom : 22);
     }
   }, [maxZoom]);
 
