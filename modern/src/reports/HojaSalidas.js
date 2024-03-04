@@ -8,6 +8,7 @@ import {
   Button,
   CircularProgress,
   Divider,
+  Modal,
   TextField,
 } from '@mui/material';
 import moment from 'moment';
@@ -35,34 +36,19 @@ function sleep(ms) {
   });
 }
 
-const DebouncedTextField = ({ value, onChange, label, disabled }) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  const classes = useStyles();
-
-  const debounce = (func, delay) => {
-    let timeoutId;
-    return (...args) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        func(...args);
-      }, delay);
-    };
-  };
-
-  const handleDebouncedChange = debounce((newValue) => {
-    setDebouncedValue(newValue);
-    onChange(newValue);
-  }, 0); // Adjust the delay as needed (e.g., 300 milliseconds)
-
-  return (
-    <TextField
-      style={{ flex: 2, color: 'black', fontSize: 12 }}
-      value={debouncedValue}
-      onChange={(event) => handleDebouncedChange(event.target.value)}
-      label={label}
-      disabled={disabled}
-    />
-  );
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 300,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+  alignItems: 'center',
+  justifyContent: 'center',
+  flex: 1,
 };
 
 const HojaSalidaReportPage = () => {
@@ -74,6 +60,9 @@ const HojaSalidaReportPage = () => {
   const [report, setReport] = useState([]);
   const [rows, setRows] = useState([]);
   const [geofences, setGeofences] = useState([]);
+  const [excuse, setExcuse] = useState('');
+  const [ticket, setTicket] = useState(0);
+  const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = useCatch(async ({ deviceIds, groupIds, from, to, unify }) => {
     const query = new URLSearchParams({ from, to });
@@ -91,11 +80,12 @@ const HojaSalidaReportPage = () => {
         const result = await response.json();
         const r = [];
         setReport(result);
-        result.forEach((item) => {
+        result.forEach((item, index) => {
           const maxItems = Math.max(item.going.length, item.return.length);
 
           for (let i = 0; i < maxItems; i += 1) {
             const vuelta = {
+              item: index,
               rows: [],
               device: item.device,
               day: item.day,
@@ -160,6 +150,8 @@ const HojaSalidaReportPage = () => {
           }
         });
         setRows(r);
+        console.log('report ', result);
+        console.log('rows', r);
       } else {
         throw Error(await response.text());
       }
@@ -180,6 +172,7 @@ const HojaSalidaReportPage = () => {
 
   const updateTicket = (ticket) => {
     console.log(ticket);
+
     // fetch(`/api/tickets/${ticket.id}`, {
     //   method: 'PUT',
     //   headers: { 'Content-Type': 'application/json' },
@@ -216,7 +209,7 @@ const HojaSalidaReportPage = () => {
             report && report.length > 0 ? (
               <div id="printable" style={{ fontSize: 12 }}>
                 <br />
-                {report.map((item) => (
+                {report.map((item, reportIndex) => (
                   <>
                     <Divider flexItem style={{ background: 'black' }} />
                     <Box
@@ -320,7 +313,7 @@ const HojaSalidaReportPage = () => {
                       <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
                         CASTIGO
                       </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 2, fontSize: 12 }}>
+                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
                         EXCUSA
                       </Button>
                       <Divider orientation="vertical" variant="middle" flexItem style={{ background: 'black' }} />
@@ -339,13 +332,13 @@ const HojaSalidaReportPage = () => {
                       <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
                         CASTIGO
                       </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 2, fontSize: 12 }}>
+                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
                         EXCUSA
                       </Button>
                     </Box>
                     {/* lista de horas */}
-                    {rows.map((item) => (
-                      item.rows.map((row) => (
+                    {rows.filter((item) => item.item === reportIndex).map((item) => (
+                      item.rows.map((row, rowIndex) => (
                         <>
                           <Box
                             sx={{
@@ -376,17 +369,25 @@ const HojaSalidaReportPage = () => {
                             <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
                               {row.punishment_going}
                             </Button>
-                            <DebouncedTextField
-                              key={Math.random()}
-                              value={row.excuse_going || ''}
-                              onChange={(event) => {
-                                if (!row.globalExcuse_going) {
-                                  updateTicket({ ...row, excuse: event });
-                                }
+                            <Button
+                              key={row.id_going}
+                              variant="text"
+                              style={{ color: 'black', flex: 1, fontSize: 12 }}
+                              onDoubleClick={() => {
+                                // checar limite de excusas
+                                //
+                                console.log(report);
+                                console.log(rows);
+                                setTicket(row.id_going);
+                                setShowModal(true);
                               }}
-                              label=""
-                              disabled={row.globalExcuse_going}
-                            />
+                              disabled={(row.globalExcuse_going || row.excuse_going !== '' || rows.filter((item) => item.item === reportIndex).reduce((acc, obj) => acc + (obj.globalExcuse_going ? 0 : 1) + (obj.globalExcuse_return ? 0 : 1), 0) >= 3)}
+                            >
+                              {row.excuse_going || 'Sin excusa'}
+                              {' '}
+                              {rows.filter((item) => item.item === reportIndex).map((item) => item.rows).reduce((acc, obj) => acc + ((obj.globalExcuse_going && obj.excuse_going !== '') ? 0 : 1) + ((obj.globalExcuse_return && obj.excuse_return !== '') ? 0 : 1), 0)}
+                            </Button>
+
                             <Divider orientation="vertical" variant="middle" flexItem style={{ background: 'black' }} />
                             <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
                               {geofences.find((geofence) => geofence.id === row.geofenceId_return)?.name || 'Sin nombre'}
@@ -403,17 +404,18 @@ const HojaSalidaReportPage = () => {
                             <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
                               {row.punishment_return}
                             </Button>
-                            <DebouncedTextField
-                              key={Math.random()}
-                              value={row.excuse_return || ''}
-                              onChange={(event) => {
-                                if (!row.globalExcuse_return) {
-                                  updateTicket({ ...row, excuse: event.target.value });
-                                }
+                            <Button
+                              key={row.id_return}
+                              variant="text"
+                              style={{ color: 'black', flex: 1, fontSize: 12 }}
+                              onDoubleClick={() => {
+                                setTicket(row.id_return);
+                                setShowModal(true);
                               }}
-                              label=""
-                              disabled={row.globalExcuse_return}
-                            />
+                              disabled={(row.globalExcuse_return || row.excuse_return !== '' || rows.filter((item) => item.item === reportIndex).reduce((acc, obj) => acc + (obj.globalExcuse_going ? 0 : 1) + (obj.globalExcuse_return ? 0 : 1), 0) >= 3)}
+                            >
+                              {row.excuse_return || 'Sin excusa'}
+                            </Button>
                           </Box>
                           <br />
                         </>
@@ -430,7 +432,31 @@ const HojaSalidaReportPage = () => {
           )}
         </div>
       </div>
+      <Modal
+        open={showModal}
+        onClose={(event) => {
+
+        }}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <TextField onChange={(event) => setExcuse(event.target.value)} />
+          <Divider orientation="vertical" />
+          <Button onClick={() => {
+            updateTicket({ id: ticket, excuse, globalExcuse: false });
+            setShowModal(false);
+            setTicket(0);
+            setExcuse('');
+          }}
+          >
+            Guardar
+          </Button>
+        </Box>
+      </Modal>
+
     </PageLayout>
+
   );
 };
 
