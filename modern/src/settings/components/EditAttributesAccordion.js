@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import {
   Button,
   Checkbox,
@@ -168,7 +167,9 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
         </Typography>
       </AccordionSummary>
       <AccordionDetails className={classes.details}>
-        {convertToList(attributes).map(({
+        {convertToList(attributes).filter(({
+          key,
+        }) => key !== 'total_devices').map(({
           key, value, type, subtype,
         }) => {
           if (type === 'boolean') {
