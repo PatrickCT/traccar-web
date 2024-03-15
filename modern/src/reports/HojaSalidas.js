@@ -48,13 +48,13 @@ const calculateSumOfPunishments = (arr) => {
         // Check if 'excuse_going' is an empty string
         if (row.excuse_going === '') {
           // Add 'punishment_going' to the sum
-          sumOfPunishments += row.punishment_going;
+          sumOfPunishments += parseFloat(row.punishment_going || '0');
         }
 
         // Check if 'excuse_return' is an empty string
         if (row.excuse_return === '') {
           // Add 'punishment_return' to the sum
-          sumOfPunishments += row.punishment_return;
+          sumOfPunishments += parseFloat(row.punishment_return || '0');
         }
       });
     }
@@ -485,13 +485,47 @@ const HojaSalidaReportPage = () => {
                       <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
                       <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
                       <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
                       <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        {`Subtotal: ${calculateSumOfPunishments(rows.filter((item) => item.item === reportIndex))}`}
+                        {'Subtotal: '}
+                      </Button>
+                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                        {`${calculateSumOfPunishments(rows.filter((item) => item.item === reportIndex))}`}
                       </Button>
                     </Box>
                   </>
                 ))}
+                <Box
+                  sx={{
+                    fontSize: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center', // Center the content horizontally
+                    border: '1px solid',
+                    borderColor: 'divider', // black
+                    borderRadius: 0,
+                    bgcolor: 'background.paper',
+                    color: 'text.secondary',
+                    flex: 1, // Make the Box take the full width
+                  }}
+                >
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                  <Button />
+
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                    {'Total: '}
+                  </Button>
+                  <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                    {`${calculateSumOfPunishments(rows)}`}
+                  </Button>
+                </Box>
               </div>
             ) : (
               // If sheet is empty, show nothing
