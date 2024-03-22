@@ -22,7 +22,7 @@ import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
 import MainToolbar from './MainToolbar';
 import MainMap from './MainMap';
-import { useAttributePreference } from '../common/util/preferences';
+// import { useAttributePreference } from '../common/util/preferences';
 import {
   createPopUp,
   streetView,
@@ -92,7 +92,7 @@ const MainPage = () => {
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
-  const mapOnSelect = useAttributePreference('mapOnSelect', true);
+  // const mapOnSelect = useAttributePreference('mapOnSelect', true);
 
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);
@@ -131,11 +131,11 @@ const MainPage = () => {
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!desktop && mapOnSelect && selectedDeviceId) {
-      setDevicesOpen(false);
-    }
-  }, [desktop, mapOnSelect, selectedDeviceId]);
+  // useEffect(() => {
+  //   if (!desktop && mapOnSelect && selectedDeviceId) {
+  //     setDevicesOpen(false);
+  //   }
+  // }, [desktop, mapOnSelect, selectedDeviceId]);
 
   useFilter(
     keyword,

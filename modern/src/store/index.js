@@ -10,6 +10,7 @@ import { driversReducer as drivers } from './drivers';
 import { maintenancesReducer as maintenances } from './maintenances';
 import { calendarsReducer as calendars } from './calendars';
 import { reportsReducer as reports } from './reports';
+import { subroutesReducer as subroutes } from './subroutes';
 import throttleMiddleware from './throttleMiddleware';
 
 const reducer = combineReducers({
@@ -23,6 +24,7 @@ const reducer = combineReducers({
   maintenances,
   calendars,
   reports,
+  subroutes,
 });
 
 export { errorsActions } from './errors';
@@ -35,6 +37,7 @@ export { driversActions } from './drivers';
 export { maintenancesActions } from './maintenances';
 export { calendarsActions } from './calendars';
 export { reportsActions } from './reports';
+export { subroutesActions } from './subroutes';
 
 export default configureStore({
   reducer,

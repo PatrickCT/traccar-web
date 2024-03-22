@@ -5,10 +5,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.7/dist/notiflix-aio-3.2.7.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/notiflix@3.2.7/src/notiflix.min.css" rel="stylesheet">
+
     <script src="https://code.jquery.com/jquery-3.6.3.slim.min.js"
         integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-aio-3.2.6.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/notiflix@3.2.6/dist/notiflix-3.2.6.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/notiflix-3.2.6.min.css">
+    <script src="./libs/notiflix-aio-3.2.6.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js"></script>
@@ -28,7 +31,9 @@
     <div id="map"></div>
     <script>
         let _markers = [];
+        let _popups = [];
         let prevArray = [];
+        let socket;
         window.onload = async () => {
 
             await init();
@@ -48,13 +53,11 @@
                     'Okay',
                 );
             } else {
-
                 await verifyCode(urlParams.get('code'));
             }
         };
 
         const verifyCode = async (_code) => {
-            verifyPass('', '');
             var r = await fetch('./api/links/verify', {
                 method: 'POST', // or 'PUT'
                 body: JSON.stringify({ code: _code }), // data can be `string` or {object}!
@@ -64,7 +67,9 @@
             })
             if (r.ok) {
                 var obj = await r.json();
+
                 verifyPass(obj.pass, obj.code);
+
             } else {
                 Notiflix.Report.failure(
                     'Notiflix Success',
@@ -84,10 +89,47 @@
                 'Cancelar',
                 async () => {
                     initMap();
-                    await getPositions(link);
+                    socket = new WebSocket(`ws${location.protocol.includes('https') ? 's' : ''}://${location.host}/api/socket/share`);
+                    socket.onmessage = function (event) {
+                        var data = Ext.decode(event.data);
+                        //console.log(data);
+
+                        // if (data.devices) {
+                        //     self.updateDevices(data.devices);
+                        // }
+                        if (data.positions) {
+                            for (var a of data.positions) {
+
+                                m = _markers.find((m) => m.id == a.deviceId);
+                                p = _popups.find((p) => p.id == a.deviceId);
+                                if (m == undefined) {
+                                    let popup = createPopup(createPopupContent(a), a.latitude, a.longitude);
+                                    let marker = createMarker(a.latitude, a.longitude, popup);
+                                    _markers.push({ marker: marker, id: a.deviceId });
+                                    _popups.push({ popup: popup, id: a.deviceId });
+                                } else {
+                                    p.popup.setContent(createPopupContent(a)).setLatLng([a.latitude, a.longitude]).openPopup();
+                                    updateMarker(m.marker, a.latitude, a.longitude, p.popup);
+                                }
+
+                            }
+                        }
+                        // if (data.events) {
+                        //     self.updateEvents(data.events);
+                        // }
+                        // if (data.custom) {
+                        //     const command = JSON.parse(data.custom.replace(/&#34;/g, '"') || '{}').command;
+                        //     if (allowedFunctions[command]) {
+                        //         (async () => {
+                        //             await allowedFunctions[command]();
+                        //         })();
+                        //     }
+                        // }
+                    };
+                    // await getPositions(link);
                     interval = setInterval(async () => {
-                        await getPositions(link);
-                    }, 1000);
+                        await validateLink(link);
+                    }, 3000);
                 },
                 function cancelCb() {
                     setTimeout(() => {
@@ -95,6 +137,9 @@
                     }, 500);
                 }
             );
+            setTimeout(() => {
+                $('#NXConfirmValidationInput').attr('type', 'number');
+            }, 500);
         };
 
         const initMap = () => {
@@ -123,58 +168,50 @@
         };
 
         const createMarker = (lat, lon, popup) => {
-            var m = L.marker([lat, lon]).addTo(map),
-                p = new L.Popup({ autoClose: false, closeOnClick: false })
-                    .setContent(popup)
-                    .setLatLng([lat, lon]);
-            m.bindPopup(p).openPopup();
-
+            var m = L.marker([lat, lon]).addTo(map);
+            m.bindPopup(popup);
             return m;
         }
 
-        const updateMarker = (marker, lat, lon) => {
+        const createPopup = (content, lat, lon) => {
+            p = new L.Popup({ autoClose: false, closeOnClick: false })
+                .setContent(content)
+                .setLatLng([lat, lon]);
+
+            return p;
+        }
+
+        const updateMarker = (marker, lat, lon, popup) => {
+            // p.setLatLng([lat, lon]);
+            // marker.bindPopup(p).openPopup();
             marker.setLatLng([lat, lon]);
         }
 
-        const getPositions = async (_code) => {
+        const validateLink = async (_code) => {
             var r = await fetch('./api/links/positions', {
                 method: 'POST', // or 'PUT'
                 body: JSON.stringify({ code: _code }), // data can be `string` or {object}!
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            })
-            if (r.ok) {
-                var obj = await r.json();
-                //console.log(detectChanges(obj))
-
-                // $(".leaflet-marker-icon").remove();
-                // $(".leaflet-popup").remove();
-                // $(".leaflet-pane.leaflet-shadow-pane").remove();
-                for (var a of obj) {
-                    console.log(a);
-                    m = _markers.find((m) => m.id == a.deviceId);
-                    if (m == undefined) {
-
-                        marker = createMarker(a.latitude, a.longitude, createPopup(a));
-                        _markers.push({ marker: marker, id: a.deviceId });
-                    } else {
-
-                        updateMarker(m.marker, a.latitude, a.longitude);
-                    }
-
-                }
-
-            } else {
-                Notiflix.Report.failure(
-                    'Notiflix Success',
-                    'Link expiro',
-                    'Okay',
+            });
+            if (!r.ok) {
+                Notiflix.Report.info(
+                    'Información',
+                    'El link expiro',
+                    'Ok',
                 );
-
+                socket.close();
+                stopTimers();
+                map.off();
+                map.remove();
             }
+        }
 
-
+        const stopTimers = () => {
+            var killId = setTimeout(function () {
+                for (var i = killId; i > 0; i--) clearInterval(i)
+            }, 3000);
         }
 
         function detectChanges(currentArray) {
@@ -200,8 +237,8 @@
             return { added, removed, changed };
         }
 
-        function createPopup(position) {
-            console.log(position);
+        function createPopupContent(position) {
+
             var html = '';
             html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>"
             html += "<h3><b>" + attsGetter(position, 'name') + "</b></h3></div>";

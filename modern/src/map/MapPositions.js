@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import {
-  useId, useCallback, useEffect, useState,
+  useId, useCallback, useEffect, useState, useRef,
 } from 'react';
 import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
@@ -12,8 +12,10 @@ import { findFonts } from './core/mapUtil';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { hasPassedTime } from '../common/util/utils';
 
-const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleField }) => {
+const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleField, indexS, speedS, playingS, setIndexS }) => {
   const id = useId();
+  const timerRef = useRef();
+
   const clusters = `${id}-clusters`;
   const direction = `${id}-direction`;
 
@@ -27,6 +29,12 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
   const hours12 = usePreference('twelveHourFormat');
   const directionType = useAttributePreference('mapDirection', 'selected');
   const [recalculate, setRecalculate] = useState();
+  const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(500);
+
+  window.mapReplay = map;
+  window.idReplay = id;
 
   const createFeature = (devices, position, selectedPositionId) => {
     const device = devices[position.deviceId];
@@ -57,12 +65,6 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
 
   const onMouseEnter = () => map.getCanvas().style.cursor = 'pointer';
   const onMouseLeave = () => map.getCanvas().style.cursor = '';
-
-  const onMapClick = useCallback((event) => {
-    if (!event.defaultPrevented && onClick) {
-      onClick();
-    }
-  }, [onClick]);
 
   const onMarkerClick = useCallback((event) => {
     event.preventDefault();
@@ -122,19 +124,19 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
       },
     });
 
-    map.addLayer({
-      id: clusters,
-      type: 'symbol',
-      source: id,
-      filter: ['has', 'point_count'],
-      layout: {
-        'icon-image': 'cluster',
-        'icon-size': iconScale,
-        'text-field': '{point_count_abbreviated}',
-        'text-font': findFonts(map),
-        'text-size': 14,
-      },
-    });
+    // map.addLayer({
+    //   id: clusters,
+    //   type: 'symbol',
+    //   source: id,
+    //   filter: ['has', 'point_count'],
+    //   layout: {
+    //     'icon-image': 'cluster',
+    //     'icon-size': iconScale,
+    //     'text-field': '{point_count_abbreviated}',
+    //     'text-font': findFonts(map),
+    //     'text-size': 14,
+    //   },
+    // });
 
     map.addLayer({
       id: direction,
@@ -158,9 +160,9 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
     map.on('mouseleave', id, onMouseLeave);
     map.on('mouseenter', clusters, onMouseEnter);
     map.on('mouseleave', clusters, onMouseLeave);
-    map.on('click', id, onMarkerClick);
-    map.on('click', clusters, onClusterClick);
-    map.on('click', onMapClick);
+    // map.on('click', id, onMarkerClick);
+    // map.on('click', clusters, onClusterClick);
+    // map.on('click', onMapClick);
     map.on('moveend', () => setRecalculate(new Date()));
     map.on('zoom', () => setRecalculate(new Date()));
 
@@ -169,9 +171,9 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
       map.off('mouseleave', id, onMouseLeave);
       map.off('mouseenter', clusters, onMouseEnter);
       map.off('mouseleave', clusters, onMouseLeave);
-      map.off('click', id, onMarkerClick);
-      map.off('click', clusters, onClusterClick);
-      map.off('click', onMapClick);
+      // map.off('click', id, onMarkerClick);
+      // map.off('click', clusters, onClusterClick);
+      // map.off('click', onMapClick);
 
       if (map.getLayer(id)) {
         map.removeLayer(id);
@@ -189,7 +191,8 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
   }, [mapCluster, clusters, direction, onMarkerClick, onClusterClick]);
 
   useEffect(() => {
-    const visiblePositions = positions.filter((position) => {
+    if (positions.length <= 0 || !index) return;
+    const visiblePositions = [positions[index]].filter((position) => {
       const coordinates = [position.longitude, position.latitude];
       const bounds = map.getBounds();
 
@@ -211,7 +214,34 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
         properties: createFeature(devices, position, selectedPosition && selectedPosition.id),
       })),
     });
-  }, [mapCluster, clusters, direction, onMarkerClick, onClusterClick, devices, positions, selectedPosition, recalculate]);
+  }, [positions, recalculate, index, speed, playing]);
+
+  useEffect(() => {
+    if (playing && positions.length > 0) {
+      timerRef.current = setInterval(() => {
+        setIndex((index) => index + 1);
+        setIndexS((index) => index + 1);
+        setSpeed((speed) => speed);
+      }, speed);
+    } else {
+      clearInterval(timerRef.current);
+    }
+
+    return () => clearInterval(timerRef.current);
+  }, [positions, recalculate, index, speed, playing]);
+
+  useEffect(() => {
+    if (index >= positions.length - 1) {
+      clearInterval(timerRef.current);
+      setPlaying(false);
+    }
+  }, [positions, recalculate, index, speed, playing]);
+
+  useEffect(() => {
+    setPlaying(playingS);
+    setIndex(indexS);
+    setSpeed(speedS);
+  }, [speedS, playingS]);
 
   return null;
 };

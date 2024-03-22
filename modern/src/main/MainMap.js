@@ -1,8 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Popup } from 'maplibre-gl';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
+import Modal from './components/BasicModal';
 import MapView, { map } from '../map/core/MapView';
 import MapSelectedDevice from '../map/main/MapSelectedDevice';
 import MapAccuracy from '../map/main/MapAccuracy';
@@ -21,6 +22,8 @@ import MapNotification from '../map/notification/MapNotification';
 import useFeatures from '../common/util/useFeatures';
 import { createPopUp } from '../common/util/mapPopup';
 import MapPopup from '../map/showpopup/MapPopup';
+import MapShare from '../map/share/MapShare';
+import LinksPage from '../settings/LinksPage';
 
 const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const theme = useTheme();
@@ -29,6 +32,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const eventsAvailable = useSelector((state) => !!state.events.items.length);
   const features = useFeatures();
+  const [showModalShareLocation, setShowModalShareLocation] = useState(false);
 
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
@@ -69,6 +73,14 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
         <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)} />
       )}
       <MapPopup />
+      <MapShare onClick={() => setShowModalShareLocation(true)} />
+      <Modal
+        isOpen={showModalShareLocation}
+        onClose={() => setShowModalShareLocation(false)} // Close modal when the overlay is clicked or Esc is pressed
+        contentLabel="Links"
+      >
+        <LinksPage />
+      </Modal>
     </>
   );
 };

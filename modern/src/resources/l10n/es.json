@@ -105,6 +105,7 @@
     "sharedMain": "Principal",
     "sharedOfflineTimeout": "Alerta fuera de linea (Min.)",
     "sharedStopTimeout": "Alerta de paradas (Min.)",
+    "sharedSubroute": "Subruta",
     "calendarSimple": "Simple",
     "calendarRecurrence": "Recurrente",
     "calendarOnce": "Una vez",
@@ -620,5 +621,6 @@
     "sharedBilling": "Factura",
     "turbanRoute": "Ruta T-Urban",
     "clearFilters": "Limpiar Filtros",
-    "extraModulesTitle": "Modulos Extra"
+    "extraModulesTitle": "Modulos Extra",
+    "emptyString": ""
 }

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="./styles/jsPanelTable.css">
+</head>
+
+<body>
+  <table class="slds-table slds-table--bordered">
+    <thead>
+      <tr class="slds-text-heading--label">
+        <th class="slds-cell-shrink">
+          <label class="slds-checkbox">
+            <input type="checkbox" name="options" />
+            <span class="slds-checkbox--faux"></span>
+            <span class="slds-assistive-text">Select All</span>
+          </label>
+        </th>
+        <th class="slds-is-sortable" scope="col">
+          <div class="slds-truncate">Dispositivo
+            <button class="slds-button slds-button--icon-bare">
+              <svg aria-hidden="true" class="slds-button__icon slds-button__icon--small">
+                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#arrowdown"></use>
+              </svg>
+              <span class="slds-assistive-text">Sort</span>
+            </button>
+          </div>
+        </th>
+
+        <th class="slds-cell-shrink"></th>
+      </tr>
+    </thead>
+    <tbody>
+
+
+    </tbody>
+  </table>
+
+
+  <script>
+    window.onload = () => {
+      init();
+    }
+
+    const init = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      console.log(urlParams);
+      console.log(urlParams.get('link'));
+      if (!urlParams.get('link')) {
+      } else {
+        await loadDevices(urlParams.get('link'));
+      }
+    };
+
+    const addRow = (device, checked, link) => {
+      tr = `<tr class="slds-hint-parent">
+        <td class="slds-cell-shrink" data-label="Select Row">
+          <label class="slds-checkbox">
+            <input type="checkbox" name="options" id="${device.id}" ${checked}/>
+            <span class="slds-checkbox--faux"></span>
+            <span class="slds-assistive-text">Select Row</span>
+          </label>
+        </td>
+
+        <td class="slds-truncate" data-label="">${device.name}</td>
+
+      </tr>`
+
+      $('table tbody').append($($.parseHTML(tr)));
+      $("tbody :checkbox").on("click", async function () {
+        if (this.checked) {
+          await fetch('./api/permissions', {
+            method: 'POST', // or 'PUT'
+            body: JSON.stringify({ linkId: link, deviceId: $(this).attr('id') }), // data can be `string` or {object}!
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+        } else {
+          await fetch('./api/permissions', {
+            method: 'DELETE', // or 'PUT'
+            body: JSON.stringify({ linkId: link, deviceId: $(this).attr('id') }), // data can be `string` or {object}!
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+        }
+        // toggle selected class to the checkbox in a row
+        $(this)
+          .closest("tr")
+          .toggleClass("selected", this.checked);
+      });
+    }
+    const loadDevices = async (link) => {
+
+      let devicesLink;
+      let devices;
+
+      var dl = await fetch(`./api/links/${link}/devices`, {
+        method: 'GET', // or 'PUT'
+        // data can be `string` or {object}!
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (dl.ok) {
+        devicesLink = await dl.json();
+
+      }
+
+      var d = await fetch('./api/devices', {
+        method: 'GET', // or 'PUT'
+        // data can be `string` or {object}!
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (d.ok) {
+        devices = await d.json();
+        for (device of devices) {
+
+          addRow(device, (devicesLink.find((d) => d.id == device.id) ? 'checked' : ''), link)
+        }
+      }
+    }
+
+  </script>
+</body>
+
+</html>

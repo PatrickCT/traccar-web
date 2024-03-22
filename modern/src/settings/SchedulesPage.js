@@ -5,6 +5,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import LinkIcon from '@mui/icons-material/Link';
 import makeStyles from '@mui/styles/makeStyles';
+import { useSelector } from 'react-redux';
 import { useEffectAsync } from '../reactHelper';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
@@ -30,6 +31,8 @@ const SchedulesPage = () => {
   const [items, setItems] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
+  const geofences = useSelector((state) => state.geofences.items);
+  const subroutes = useSelector((state) => state.subroutes.items);
 
   useEffectAsync(async () => {
     setLoading(true);
@@ -59,6 +62,8 @@ const SchedulesPage = () => {
         <TableHead>
           <TableRow>
             <TableCell>{t('sharedName')}</TableCell>
+            <TableCell>{t('sharedSubroute')}</TableCell>
+            <TableCell>{t('sharedGeofence')}</TableCell>
             <TableCell className={classes.columnAction} />
           </TableRow>
         </TableHead>
@@ -70,6 +75,8 @@ const SchedulesPage = () => {
           }).map((item) => (
             <TableRow key={item.id}>
               <TableCell>{item.name}</TableCell>
+              <TableCell>{subroutes[item.subrouteId].name}</TableCell>
+              <TableCell>{geofences[item.geofenceId].name}</TableCell>
               <TableCell className={classes.columnAction} padding="none">
                 <CollectionActions
                   itemId={item.id}

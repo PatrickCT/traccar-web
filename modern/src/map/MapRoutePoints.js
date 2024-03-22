@@ -41,7 +41,7 @@ const MapPositions = ({ positions, onClick }) => {
       layout: {
         'icon-image': 'arrow', // Assuming you have an arrow icon registered in your map resources
         'icon-rotate': ['get', 'course'], // Adjust the rotation to orient the arrow correctly
-        'icon-size': 0.9,
+        'icon-size': 0.6,
         'icon-allow-overlap': true,
       },
       paint: {

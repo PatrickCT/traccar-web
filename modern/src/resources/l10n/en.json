@@ -104,6 +104,7 @@
     "sharedMain": "Mian",
     "sharedOfflineTimeout": "Offline alert delay (Min.)",
     "sharedStopTimeout": "Stops alert delay (Min.)",
+    "sharedSubroute": "Subroute",
     "calendarSimple": "Simple",
     "calendarRecurrence": "Recurrence",
     "calendarOnce": "Once",
@@ -617,5 +618,6 @@
     "sharedBilling": "Billing",
     "turbanRoute": "T-Urban Route",
     "clearFilters": "Clear Filters",
-    "extraModulesTitle": "Extra Modules"
+    "extraModulesTitle": "Extra Modules",
+    "emptyString": ""
 }

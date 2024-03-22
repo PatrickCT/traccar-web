@@ -13,6 +13,8 @@ const Modal = ({ isOpen, onClose, children }) => {
     zIndex: 1000,
     borderRadius: '5px',
     boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
+    width: '60%',
+    height: '60%',
   };
 
   const overlayStyle = {
@@ -40,7 +42,7 @@ const Modal = ({ isOpen, onClose, children }) => {
       <div className="modal" style={modalStyle}>
         <div className="modal-content">
           {children}
-          <Button onClick={onClose}>Cerrar</Button>
+          <Button style={{ position: 'fixed', bottom: '0px', left: '0px' }} onClick={onClose}>Cerrar</Button>
         </div>
       </div>
     </div>

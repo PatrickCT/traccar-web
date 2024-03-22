@@ -1,11 +1,10 @@
 import React, {
-  useState, useEffect, useRef, useCallback,
+  useState, useCallback,
 } from 'react';
 import {
   IconButton, Paper, Slider, Toolbar, Typography,
 } from '@mui/material';
-
-// import { Popup } from 'maplibre-gl';
+// import * as turf from '@turf/turf';
 import makeStyles from '@mui/styles/makeStyles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -17,7 +16,7 @@ import FastRewindIcon from '@mui/icons-material/FastRewind';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import MapView from '../map/core/MapView';
-import MapRoutePath from '../map/MapRoutePath';
+import MapRoutePath from '../map/MapRoutePathReplay';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapPositions from '../map/MapPositions';
 import { formatTime } from '../common/util/formatter';
@@ -72,7 +71,9 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     padding: '1px',
     [theme.breakpoints.down('md')]: {
-      margin: theme.spacing(1),
+      margin: theme.spacing(2),
+      bottom: '25%',
+      position: 'fixed',
     },
     [theme.breakpoints.up('md')]: {
       marginTop: theme.spacing(1),
@@ -87,7 +88,6 @@ const ReplayPage = () => {
   const t = useTranslation();
   const classes = useStyles();
   const navigate = useNavigate();
-  const timerRef = useRef();
 
   const hours12 = usePreference('twelveHourFormat');
 
@@ -103,6 +103,12 @@ const ReplayPage = () => {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(500);
 
+  const [value, setValue] = React.useState([50, 100]);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
   const deviceName = useSelector((state) => {
     if (selectedDeviceId) {
       const device = state.devices.items[selectedDeviceId];
@@ -116,53 +122,21 @@ const ReplayPage = () => {
   // useEffect(() => {
   //   if (playing && positions.length > 0) {
   //     timerRef.current = setInterval(() => {
-  //       console.log(index, positions[index].latitude, positions[index].longitude);
-
-  //       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-  //       new Popup()
-  //         .setMaxWidth('400px')
-  //         .setHTML(createPopUpReport(positions[index + 1]))
-  //         .setLngLat([positions[index + 1].longitude, positions[index + 1].latitude])
-  //         .addTo(map);
-
   //       setIndex((index) => index + 1);
-  //     }, 500);
+  //     }, speed);
   //   } else {
   //     clearInterval(timerRef.current);
   //   }
 
   //   return () => clearInterval(timerRef.current);
-  // }, [playing, positions]);
+  // }, [playing, positions, speed]);
 
-  useEffect(() => {
-    if (playing && positions.length > 0) {
-      timerRef.current = setInterval(() => {
-        setIndex((index) => index + 1);
-        // Check if the next index is within the bounds of the positions array
-        // if (index + 1 < positions.length) {
-        //   Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-        //   new Popup()
-        //     .setMaxWidth('400px')
-        //     .setHTML(createPopUpReport(positions[index + 1]))
-        //     .setLngLat([positions[index + 1].longitude, positions[index + 1].latitude])
-        //     .addTo(map);
-        // }
-
-        // Return the next index value for the state update
-      }, speed);
-    } else {
-      clearInterval(timerRef.current);
-    }
-
-    return () => clearInterval(timerRef.current);
-  }, [playing, positions, speed]);
-
-  useEffect(() => {
-    if (index >= positions.length - 1) {
-      clearInterval(timerRef.current);
-      setPlaying(false);
-    }
-  }, [index, positions]);
+  // useEffect(() => {
+  //   if (index >= positions.length - 1) {
+  //     clearInterval(timerRef.current);
+  //     setPlaying(false);
+  //   }
+  // }, [index, positions]);
 
   const onPointClick = useCallback((_, index) => {
     setIndex(index);
@@ -181,6 +155,7 @@ const ReplayPage = () => {
     if (response.ok) {
       setIndex(0);
       const positions = await response.json();
+
       setPositions(positions);
       if (positions.length) {
         setExpanded(false);
@@ -201,10 +176,10 @@ const ReplayPage = () => {
     <div className={classes.root}>
       <MapView>
         <MapGeofence />
-        <MapRoutePath positions={positions} />
+        <MapRoutePath positions={positions} values={value} />
         <MapRoutePoints positions={positions} onClick={onPointClick} />
         {index < positions.length && (
-          <MapPositions positions={[positions[index]]} onClick={onMarkerClick} titleField="fixTime" />
+          <MapPositions positions={positions} indexS={index} playingS={playing} speedS={speed} setIndexS={setIndex} onClick={onMarkerClick} titleField="fixTime" />
         )}
         {playing && index < positions.length && (
           <div style={{ zIndex: 999999, position: 'absolute', bottom: isMobile() ? '60px' : '10px', left: '2px', backgroundColor: 'aliceblue', width: '99vw' }}>
@@ -262,6 +237,7 @@ const ReplayPage = () => {
                 marks={positions.map((_, index) => ({ value: index }))}
                 value={index}
                 onChange={(_, index) => setIndex(index)}
+
               />
               <div className={classes.controls}>
                 {`${index + 1}/${positions.length}`}
@@ -284,6 +260,15 @@ const ReplayPage = () => {
                 step={1}
                 valueLabelDisplay="auto"
                 marks={Array.from({ length: 1001 }, (_, index) => ({ value: 1000 - index }))}
+              />
+              <br />
+              <Slider
+                getAriaLabel={() => 'Limites de velocidad'}
+                value={value}
+                onChange={handleChange}
+                valueLabelDisplay="auto"
+                getAriaValueText={(value) => value}
+                max={200}
               />
             </>
           ) : (

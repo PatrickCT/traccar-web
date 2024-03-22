@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CollectionFab = ({ editPath, disabled }) => {
+const CollectionFab = ({ editPath, disabled, onClick }) => {
   const classes = useStyles();
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ const CollectionFab = ({ editPath, disabled }) => {
 
   if (!readonly && !disabled) {
     return (
-      <Fab size="medium" color="primary" className={classes.fab} onClick={() => navigate(editPath)}>
+      <Fab size="medium" color="primary" className={classes.fab} onClick={() => (onClick != null ? onClick() : navigate(editPath))}>
         <AddIcon style={{ color: 'white' }} />
       </Fab>
     );

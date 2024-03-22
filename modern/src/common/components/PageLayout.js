@@ -76,40 +76,48 @@ const PageLayout = ({ menu, breadcrumbs, children }) => {
 
   return desktop ? (
     <div className={classes.desktopRoot}>
-      <Drawer
-        variant="permanent"
-        className={classes.desktopDrawer}
-        classes={{ paper: classes.desktopDrawer }}
-      >
-        <Toolbar>
-          <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => navigate('/')}>
-            <ArrowBackIcon style={{ color: 'white' }} />
-          </IconButton>
-          <PageTitle breadcrumbs={breadcrumbs} />
-        </Toolbar>
-        <Divider />
-        {menu}
-      </Drawer>
+      {menu ? (
+        <Drawer
+          variant="permanent"
+          className={classes.desktopDrawer}
+          classes={{ paper: classes.desktopDrawer }}
+        >
+          <Toolbar>
+            <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => navigate('/')}>
+              <ArrowBackIcon style={{ color: 'white' }} />
+            </IconButton>
+            <PageTitle breadcrumbs={breadcrumbs} />
+          </Toolbar>
+          <Divider />
+          {menu}
+        </Drawer>
+      ) : (<div />)}
+
       <div className={classes.content}>{children}</div>
     </div>
   ) : (
     <div className={classes.mobileRoot}>
-      <Drawer
-        variant="temporary"
-        open={openDrawer}
-        onClose={() => setOpenDrawer(false)}
-        classes={{ paper: classes.mobileDrawer }}
-      >
-        {menu}
-      </Drawer>
-      <AppBar className={classes.mobileToolbar} position="static" color="inherit">
-        <Toolbar>
-          <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => setOpenDrawer(true)}>
-            <MenuIcon style={{ color: 'white' }} />
-          </IconButton>
-          <PageTitle breadcrumbs={breadcrumbs} />
-        </Toolbar>
-      </AppBar>
+      {menu ? (
+        <Drawer
+          variant="temporary"
+          open={openDrawer}
+          onClose={() => setOpenDrawer(false)}
+          classes={{ paper: classes.mobileDrawer }}
+        >
+          {menu}
+        </Drawer>
+      ) : (<div />)}
+      {menu ? (
+        <AppBar className={classes.mobileToolbar} position="static" color="inherit">
+          <Toolbar>
+            <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => setOpenDrawer(true)}>
+              <MenuIcon style={{ color: 'white' }} />
+            </IconButton>
+            <PageTitle breadcrumbs={breadcrumbs} />
+          </Toolbar>
+        </AppBar>
+      ) : (<div />)}
+
       <div className={classes.content}>{children}</div>
     </div>
   );
