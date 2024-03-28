@@ -1,33 +1,24 @@
+/* eslint-disable no-unused-vars */
 import React, {
-  useState, useCallback,
+  useState, useCallback, useRef, useEffect, useMemo, memo,
 } from 'react';
-import {
-  IconButton, Paper, Slider, Toolbar, Typography,
-} from '@mui/material';
-// import * as turf from '@turf/turf';
+import * as turf from '@turf/turf';
+import { Popup } from 'mapbox-gl';
 import makeStyles from '@mui/styles/makeStyles';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import TuneIcon from '@mui/icons-material/Tune';
-import DownloadIcon from '@mui/icons-material/Download';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
-import FastForwardIcon from '@mui/icons-material/FastForward';
-import FastRewindIcon from '@mui/icons-material/FastRewind';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import MapView from '../map/core/MapView';
+import MapView, { map } from '../map/core/MapView';
 import MapRoutePath from '../map/MapRoutePathReplay';
 import MapRoutePoints from '../map/MapRoutePoints';
 import MapPositions from '../map/MapPositions';
-import { formatTime } from '../common/util/formatter';
-import ReportFilter from '../reports/components/ReportFilter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useCatch } from '../reactHelper';
 import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
-import StatusCard from '../common/components/StatusCard';
-import { usePreference } from '../common/util/preferences';
-import { attsGetter, formatDate, isMobile } from '../common/util/utils';
+// import StatusCard from '../common/components/StatusCard';
+// import { usePreference } from '../common/util/preferences';
+import { createPopUp, createPopUpReport, createPopUpReportRoute, createPopUpSimple } from '../common/util/mapPopup';
+import ReplaySideBar from './ReplaySideBar';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,8 +31,10 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 3,
     left: 0,
     top: 0,
-    margin: theme.spacing(1.5),
-    width: theme.dimensions.drawerWidthDesktop,
+    // margin: theme.spacing(1.5),
+    // width: theme.dimensions.drawerWidthDesktop,
+    margin: 0,
+    width: '100%',
     [theme.breakpoints.down('md')]: {
       width: '100%',
       margin: 0,
@@ -70,33 +63,46 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     padding: '1px',
+    paddingLeft: '20px',
+    paddingRight: '20px',
+    width: '97.5%',
     [theme.breakpoints.down('md')]: {
       margin: theme.spacing(2),
-      bottom: '25%',
       position: 'fixed',
+      width: '90%',
+      bottom: '8%',
     },
     [theme.breakpoints.up('md')]: {
-      marginTop: theme.spacing(1),
+      // marginTop: theme.spacing(1),
     },
     lineHeight: '1px',
     backgroundColor: 'transparent',
+    pointerEvents: 'none',
+    '&:hover': {
+      backgroundColor: 'white',
+      pointerEvents: 'auto',
+    },
 
   },
 }));
 
 const ReplayPage = () => {
+  Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item?.remove());
+  // console.log('ReplayPage');
+  const timerRef = useRef();
   const t = useTranslation();
   const classes = useStyles();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const hours12 = usePreference('twelveHourFormat');
+  // const hours12 = usePreference('twelveHourFormat');
 
   const defaultDeviceId = useSelector((state) => state.devices.selectedId);
 
   const [positions, setPositions] = useState([]);
+  const [stops, setStops] = useState([]);
   const [index, setIndex] = useState(0);
   const [selectedDeviceId, setSelectedDeviceId] = useState(defaultDeviceId);
-  const [showCard, setShowCard] = useState(false);
+  // const [showCard, setShowCard] = useState(false);
   const [from, setFrom] = useState();
   const [to, setTo] = useState();
   const [expanded, setExpanded] = useState(true);
@@ -104,47 +110,90 @@ const ReplayPage = () => {
   const [speed, setSpeed] = useState(500);
 
   const [value, setValue] = React.useState([50, 100]);
+  // const [marker, setMarker] = useState(null);
+
+  const memoPositions = useMemo(() => positions, [positions]);
+  const memoStops = useMemo(() => stops, [stops]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const deviceName = useSelector((state) => {
-    if (selectedDeviceId) {
-      const device = state.devices.items[selectedDeviceId];
-      if (device) {
-        return device.name;
-      }
+  // const deviceName = useSelector((state) => {
+  //   if (selectedDeviceId) {
+  //     const device = state.devices.items[selectedDeviceId];
+  //     if (device) {
+  //       return device.name;
+  //     }
+  //   }
+  //   return null;
+  // });
+
+  const changeIndex = useCallback((_, index) => {
+    setIndex(index);
+  }, [setIndex]);
+
+  useEffect(() => {
+    if (playing && positions.length > 0) {
+      timerRef.current = setInterval(() => {
+        changeIndex(null, (index) => index + 1);
+      }, speed);
+    } else {
+      clearInterval(timerRef.current);
     }
-    return null;
-  });
 
-  // useEffect(() => {
-  //   if (playing && positions.length > 0) {
-  //     timerRef.current = setInterval(() => {
-  //       setIndex((index) => index + 1);
-  //     }, speed);
-  //   } else {
-  //     clearInterval(timerRef.current);
-  //   }
+    return () => clearInterval(timerRef.current);
+  }, [playing, positions, speed]);
 
-  //   return () => clearInterval(timerRef.current);
-  // }, [playing, positions, speed]);
+  useEffect(() => {
+    if (index >= positions.length - 1) {
+      clearInterval(timerRef.current);
+      setPlaying(false);
+    }
+  }, [index, positions]);
 
-  // useEffect(() => {
-  //   if (index >= positions.length - 1) {
-  //     clearInterval(timerRef.current);
-  //     setPlaying(false);
-  //   }
-  // }, [index, positions]);
+  useEffect(() => {
+    if (positions && positions.length > 0) {
+      Array.from(document.getElementsByClassName('mapboxgl-popup')).filter((popup) => popup.id !== '').map((item) => item.remove());
+      const p = new Popup()
+        .setMaxWidth('400px')
+        .setHTML(createPopUpReportRoute(positions[index]))
+        .setLngLat([positions[index]?.longitude, positions[index]?.latitude])
+        .addTo(map);
+      p.getElement().id = positions[index].deviceId;
+    }
+  }, [index]);
 
   const onPointClick = useCallback((_, index) => {
     setIndex(index);
   }, [setIndex]);
 
-  const onMarkerClick = useCallback((positionId) => {
-    setShowCard(!!positionId);
-  }, [setShowCard]);
+  const onMarkerClick = useCallback((_, deviceId, map, event) => {
+    // console.log('on marker click ', deviceId, positions, stops);
+    // const selectedPosition = (positions.find((p) => p.deviceId === (deviceId || 0) && p.original === true) || [null])[0];
+    // Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+    // if (window.localStorage.getItem('showMapPopup') === 'true' && selectedPosition != null) {
+    //   new Popup()
+    //     .setMaxWidth('400px')
+    //     .setHTML(createPopUpReport(selectedPosition))
+    //     .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
+    //     .addTo(map);
+    // }
+    if (event === undefined) return;
+    const stopsMarkers = map.queryRenderedFeatures(event.point, { layers: ['stops-layer'] });
+    console.log(event.point, stopsMarkers, memoStops, stops, positions);
+    stopsMarkers.forEach((stop) => {
+      console.log(stop.properties.index, memoStops[stop.properties.index]); return new Popup()
+        .setMaxWidth('400px')
+        .setHTML(createPopUpSimple(stops[stop.properties.index]))
+        .setLngLat([stops[stop.properties.index].longitude, stops[stop.properties.index].latitude])
+        .addTo(map);
+    });
+  }, [memoPositions, memoStops]);
+
+  const changeSpeed = useCallback((_, value) => {
+    setSpeed(value);
+  }, [speed]);
 
   const handleSubmit = useCatch(async ({ deviceId, from, to }) => {
     setSelectedDeviceId(deviceId);
@@ -152,11 +201,38 @@ const ReplayPage = () => {
     setTo(to);
     const query = new URLSearchParams({ deviceId, from, to });
     const response = await fetch(`/api/positions?${query.toString()}`);
+    const response2 = await fetch(`/api/reports/stops?${query.toString()}`, { headers: { accept: 'application/json' } });
     if (response.ok) {
       setIndex(0);
-      const positions = await response.json();
+      const p = await response.json();
+      const positions = [];
+      const stops = [];
+
+      p.forEach((position, index) => {
+        positions.push({ ...position, original: true });
+        if (index < p.length - 1) {
+          const distance = turf.distance(turf.point([p[index].longitude, p[index].latitude]), turf.point([p[index + 1].longitude, p[index + 1].latitude]), { units: 'meters' });
+          if (parseInt(distance, 10) > 0) {
+            const steps = parseInt(distance / 2, 10);
+            for (let i = 0; i < steps; i += 1) {
+              const point = turf.along(turf.lineString([[p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]]), ((i + 1) * 2), { units: 'meters' });
+              positions.push({ ...position, original: false, longitude: point.geometry.coordinates[0], latitude: point.geometry.coordinates[1] });
+            }
+          }
+        }
+      });
+
+      if (response2.ok) {
+        const p = await response2.json();
+        p.forEach((s) => stops.push(s));
+      } else {
+        throw Error(await response2.text());
+      }
 
       setPositions(positions);
+      setStops(stops);
+      // const m = new Marker();
+      // setMarker(m);
       if (positions.length) {
         setExpanded(false);
       } else {
@@ -165,6 +241,8 @@ const ReplayPage = () => {
     } else {
       throw Error(await response.text());
     }
+
+    // stops
   });
 
   const handleDownload = () => {
@@ -178,115 +256,36 @@ const ReplayPage = () => {
         <MapGeofence />
         <MapRoutePath positions={positions} values={value} />
         <MapRoutePoints positions={positions} onClick={onPointClick} />
-        {index < positions.length && (
-          <MapPositions positions={positions} indexS={index} playingS={playing} speedS={speed} setIndexS={setIndex} onClick={onMarkerClick} titleField="fixTime" />
-        )}
-        {playing && index < positions.length && (
-          <div style={{ zIndex: 999999, position: 'absolute', bottom: isMobile() ? '60px' : '10px', left: '2px', backgroundColor: 'aliceblue', width: '99vw' }}>
-            <p>
-              Nombre:
-              {deviceName}
-              ,
-              Encendido:
-              {attsGetter(positions[index], 'ignition')}
-              ,
-              Movimiento:
-              {attsGetter(positions[index], 'motion')}
-              ,
-              Fecha:
-              {formatDate(new Date(attsGetter(positions[index], 'fixTime')), 'yyyy-MM-dd mm:HH:ss')}
-              ,
-              Velocidad:
-              {attsGetter(positions[index], 'speed')}
-              ,
-              Bateria:
-              {attsGetter(positions[index], 'bateria')}
-              %
-            </p>
-          </div>
+        {index < memoPositions.length && (
+          <MapPositions positions={memoPositions} index={index} onClick={onMarkerClick} titleField="fixTime" replay showStatus stops={memoStops} />
         )}
       </MapView>
       <MapCamera positions={positions} />
-      <div className={classes.sidebar}>
-        <Paper elevation={3} square>
-          <Toolbar>
-            <IconButton edge="start" sx={{ mr: 2 }} onClick={() => navigate(-1)}>
-              <ArrowBackIcon style={{ color: 'white' }} />
-            </IconButton>
-            <Typography variant="h6" className={classes.title}>{t('reportReplay')}</Typography>
-            {!expanded && (
-              <>
-                <IconButton onClick={handleDownload}>
-                  <DownloadIcon style={{ color: 'white' }} />
-                </IconButton>
-                <IconButton edge="end" onClick={() => setExpanded(true)}>
-                  <TuneIcon style={{ color: 'white' }} />
-                </IconButton>
-              </>
-            )}
-          </Toolbar>
-        </Paper>
-
-        <Paper className={classes.content} square>
-          {!expanded ? (
-            <>
-              <Slider
-                className={classes.slider}
-                max={positions.length - 1}
-                step={null}
-                marks={positions.map((_, index) => ({ value: index }))}
-                value={index}
-                onChange={(_, index) => setIndex(index)}
-
-              />
-              <div className={classes.controls}>
-                {`${index + 1}/${positions.length}`}
-                <IconButton onClick={() => setIndex((index) => index - 1)} disabled={playing || index <= 0}>
-                  <FastRewindIcon />
-                </IconButton>
-                <IconButton onClick={() => setPlaying(!playing)} disabled={index >= positions.length - 1}>
-                  {playing ? <PauseIcon /> : <PlayArrowIcon />}
-                </IconButton>
-                <IconButton onClick={() => setIndex((index) => index + 1)} disabled={playing || index >= positions.length - 1}>
-                  <FastForwardIcon />
-                </IconButton>
-                {formatTime(positions[index].fixTime, 'seconds', hours12)}
-              </div>
-              <Slider
-                className={classes.slider}
-                value={1001 - speed}
-                onChange={(_, value) => setSpeed(1001 - value)}
-                max={1001}
-                step={1}
-                valueLabelDisplay="auto"
-                marks={Array.from({ length: 1001 }, (_, index) => ({ value: 1000 - index }))}
-              />
-              <br />
-              <Slider
-                getAriaLabel={() => 'Limites de velocidad'}
-                value={value}
-                onChange={handleChange}
-                valueLabelDisplay="auto"
-                getAriaValueText={(value) => value}
-                max={200}
-              />
-            </>
-          ) : (
-            <ReportFilter handleSubmit={handleSubmit} fullScreen showOnly />
-          )}
-        </Paper>
-
-      </div>
-      {showCard && index < positions.length && (
+      <ReplaySideBar
+        changeSpeed={changeSpeed}
+        setExpanded={setExpanded}
+        setIndex={changeIndex}
+        setPlaying={setPlaying}
+        handleChange={handleChange}
+        handleDownload={handleDownload}
+        handleSubmit={handleSubmit}
+        index={index}
+        playing={playing}
+        marks={memoPositions.map((_, index) => ({ value: index }))}
+        max={memoPositions.length}
+        expanded={expanded}
+        value={value}
+      />
+      {/* {showCard && index < positions.length && (
         <StatusCard
           deviceId={selectedDeviceId}
           position={positions[index]}
           onClose={() => setShowCard(false)}
           disableActions
         />
-      )}
+      )} */}
     </div>
   );
 };
 
-export default ReplayPage;
+export default memo(ReplayPage);

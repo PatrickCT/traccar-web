@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditItemView = ({
-  children, endpoint, item, setItem, defaultItem, validate, onItemSaved, menu, breadcrumbs,
+  children, endpoint, item, setItem, defaultItem, validate, onItemSaved, menu, breadcrumbs, preventBack = false,
 }) => {
   const navigate = useNavigate();
   const classes = useStyles();
@@ -67,7 +67,9 @@ const EditItemView = ({
       if (onItemSaved) {
         onItemSaved(await response.json());
       }
-      navigate(-1);
+      if (!preventBack) {
+        navigate(-1);
+      }
     } else {
       throw Error(await response.text());
     }

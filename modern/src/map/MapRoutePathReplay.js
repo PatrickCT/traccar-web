@@ -1,11 +1,12 @@
 import { useTheme } from '@mui/styles';
-import { useId, useEffect } from 'react';
+import { useId, useEffect, memo } from 'react';
 import { useSelector } from 'react-redux';
 import { map } from './core/MapView';
 import { findFonts } from './core/mapUtil';
 import { attsGetter } from '../common/util/utils';
 
 const MapRoutePath = ({ name, positions, coordinates, values }) => {
+  // console.log('Render MapRoutePath');
   const id = useId();
 
   const theme = useTheme();
@@ -47,7 +48,7 @@ const MapRoutePath = ({ name, positions, coordinates, values }) => {
       },
       paint: {
         'line-color': ['get', 'color'],
-        'line-width': 2,
+        'line-width': 5,
       },
     });
     if (name) {
@@ -151,4 +152,4 @@ const MapRoutePath = ({ name, positions, coordinates, values }) => {
   return null;
 };
 
-export default MapRoutePath;
+export default memo(MapRoutePath);

@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import maplibregl from 'maplibre-gl';
 import { map } from './core/MapView';
 
 const MapCamera = ({
   latitude, longitude, positions, coordinates,
 }) => {
+  // console.log('MapCamera');
   useEffect(() => {
     if (coordinates || positions) {
       if (!coordinates) {
@@ -29,4 +30,4 @@ const MapCamera = ({
   return null;
 };
 
-export default MapCamera;
+export default memo(MapCamera);

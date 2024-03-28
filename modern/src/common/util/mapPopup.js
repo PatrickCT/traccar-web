@@ -430,6 +430,19 @@ export const createPopUpReportRoute = (position) => {
   return html;
 };
 
+export const createPopUpSimple = (position) => {
+  let html = '<div>';
+
+  html += valueParser(position, specialAtts(position, 'startTime'));
+  html += '<br />';
+  html += valueParser(position, specialAtts(position, 'endTime'));
+  html += '<br />';
+  html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
+  html += '<br>';
+  html += '</div>';
+  return html;
+};
+
 export const streetView = () => {
   if (window.position.latitude != null && window.position.longitude != null) {
     window.jsPanel.create({

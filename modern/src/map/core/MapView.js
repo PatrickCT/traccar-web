@@ -52,6 +52,43 @@ const initMap = async () => {
     }
     map.addImage('arrow', image);
   });
+  map.loadImage('../images/replay-neutral.png', (err, image) => {
+    if (err) {
+      return;
+    }
+    map.addImage('replay-neutral', image);
+  });
+  map.loadImage('../images/replay-positive.png', (err, image) => {
+    if (err) {
+      return;
+    }
+    map.addImage('replay-positive', image);
+  });
+  map.loadImage('../images/replay-negative.png', (err, image) => {
+    if (err) {
+      return;
+    }
+    map.addImage('replay-negative', image);
+  });
+  // markadores playback fijos
+  map.loadImage('../images/p_start_en.png', (err, image) => {
+    if (err) {
+      return;
+    }
+    map.addImage('replay-start', image);
+  });
+  map.loadImage('../images/p_end_en.png', (err, image) => {
+    if (err) {
+      return;
+    }
+    map.addImage('replay-end', image);
+  });
+  map.loadImage('../images/stopicon.png', (err, image) => {
+    if (err) {
+      return;
+    }
+    map.addImage('replay-stop', image);
+  });
 };
 
 map.addControl(new maplibregl.NavigationControl());

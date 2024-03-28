@@ -445,6 +445,21 @@ export const attsGetter = (obj, attribute) => {
     case 'group': {
       return window.groupsNames?.[window.device?.groupId]?.name || 'Sin grupo';
     }
+    case 'startTime': {
+      let value = (obj.startTime ? obj.startTime : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
+      const dt = new Date(value);
+      value = dt.toLocaleString().replace(',', '');
+      return value;
+    }
+    case 'endTime': {
+      let value = (obj.endTime ? obj.endTime : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
+      const dt = new Date(value);
+      value = dt.toLocaleString().replace(',', '');
+      return value;
+    }
+    case 'deviceName': {
+      return (obj.deviceName || obj[attribute] || obj.attributes[attribute] || '');
+    }
     default: {
       return (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
     }
@@ -506,6 +521,12 @@ export const valueParser = (obj, value) => {
       return `<b style="font-weight: bold;text-transform: uppercase;">IMEI:</b> ${attsGetter(obj, value)} `;
     case 'group':
       return `<b style="font-weight: bold;text-transform: uppercase;">Grupo:</b> ${attsGetter(obj, value)} `;
+    case 'deviceName':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Nombre:</b> ${attsGetter(obj, value)} `;
+    case 'startTime':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Hora inicial:</b> ${attsGetter(obj, value)} `;
+    case 'endTime':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Hora final:</b> ${attsGetter(obj, value)} `;
   }
   return '';
 };

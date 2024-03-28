@@ -25,6 +25,26 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <title>GpsTracker</title>
+
+  <script>
+    // Function to check if the user is accessing from a mobile device
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // Function to add meta tag for viewport if the user is on a mobile device
+    function addViewportMetaTag() {
+      if (isMobileDevice()) {
+        var metaTag = document.createElement('meta');
+        metaTag.setAttribute('name', 'viewport');
+        metaTag.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        document.head.appendChild(metaTag);
+      }
+    }
+
+    // Call the function to add the meta tag
+    addViewportMetaTag();
+  </script>
 </head>
 
 <body>

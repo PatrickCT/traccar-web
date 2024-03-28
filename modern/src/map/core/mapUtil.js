@@ -36,7 +36,9 @@ export const prepareIcon = (background, icon, color) => {
   canvas.style.height = `${background.height}px`;
 
   const context = canvas.getContext('2d');
-  context.drawImage(background, 0, 0, canvas.width, canvas.height);
+  if (background) {
+    context.drawImage(background, 0, 0, canvas.width, canvas.height);
+  }
 
   if (icon) {
     const iconRatio = 0.5;

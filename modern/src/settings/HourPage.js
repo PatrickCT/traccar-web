@@ -7,7 +7,7 @@ import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import {
-  Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, Table, TableHead, TableRow, TableCell, TableBody, Button,
+  Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, Table, TableHead, TableRow, TableCell, TableBody, Button, Box, LinearProgress,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -56,13 +56,19 @@ const HourPage = () => {
   newDateEnd.setMinutes(minutes);
   const [date, setDate] = useState(dayjs(newDate));
 
+  const [progress, setProgress] = useState(0);
+  const [saving, setSaving] = useState(false);
+
   const onItemSaved = useCatch(async () => {
+    setSaving(true);
     for (let il = 0; il < items.length; il += 1) {
       const i = items[il];
       if (i.hasOwnProperty('id') && i?.name !== null) {
         await fetch(`/api/horasalidas/${i.gpsid ? i.gpsid : ''}`, { method: i.gpsid ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, hour: i.hour, id: i.gpsid }) });
       }
+      setProgress((il * 100) / items.length);
     }
+    setSaving(false);
   });
 
   useEffect(() => {
@@ -131,6 +137,18 @@ const HourPage = () => {
     }
   };
 
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+    };
+
+    if (saving) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    } else {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
+  }, [saving]);
+
   const validate = () => name && items.length > 0;
 
   return (
@@ -142,6 +160,7 @@ const HourPage = () => {
       onItemSaved={onItemSaved}
       menu={<SettingsMenu />}
       breadcrumbs={['settingsTitle', 'sectionDialog']}
+      preventBack
     >
       {item && (
         <Accordion defaultExpanded>
@@ -157,79 +176,90 @@ const HourPage = () => {
               label={t('sharedName')}
             />
 
-            <FormControl fullWidth>
-              <TextField onChange={(event) => setRepeticion(Number(event.target.value))} label="Repetición" />
-              <br />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={['TimePicker', 'TimePicker']}>
-                  <DemoItem>
-                    <TimePicker
-                      label={t('reportStartTime')}
-                      value={start}
-                      onChange={(newValue) => updateStart(newValue)}
-                    />
-                  </DemoItem>
+            {saving ? (
+              <Box sx={{ width: '100%' }}>
+                <LinearProgress variant="determinate" value={progress} />
+              </Box>
+            ) : (
+              <FormControl fullWidth>
+                <TextField onChange={(event) => setRepeticion(Number(event.target.value))} label="Repetición" />
+                <br />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={['TimePicker', 'TimePicker']}>
+                    <DemoItem>
+                      <TimePicker
+                        label={t('reportStartTime')}
+                        value={start}
+                        onChange={(newValue) => updateStart(newValue)}
+                      />
+                    </DemoItem>
 
-                </DemoContainer>
-              </LocalizationProvider>
-              <br />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer components={['TimePicker', 'TimePicker']}>
-                  <DemoItem>
-                    <TimePicker
-                      label={t('reportEndTime')}
-                      value={end}
-                      onChange={(newValue) => updateEnd(newValue)}
-                    />
-                  </DemoItem>
+                  </DemoContainer>
+                </LocalizationProvider>
+                <br />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={['TimePicker', 'TimePicker']}>
+                    <DemoItem>
+                      <TimePicker
+                        label={t('reportEndTime')}
+                        value={end}
+                        onChange={(newValue) => updateEnd(newValue)}
+                      />
+                    </DemoItem>
 
-                </DemoContainer>
-              </LocalizationProvider>
+                  </DemoContainer>
+                </LocalizationProvider>
 
-              <br />
-              <Button onClick={hoursGenerator}>Generar</Button>
+                <br />
+                <Button onClick={hoursGenerator}>Generar</Button>
 
-              {item.id && (
-                <>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['TimePicker', 'TimePicker']}>
-                      <DemoItem>
-                        <TimePicker
-                          label={t('reportEndTime')}
-                          value={date}
-                          onChange={(newValue) => { setItem({ ...item, hour: dayjs(newValue) }); setDate(dayjs(newValue)); }}
-                        />
-                      </DemoItem>
+                {item.id && (
+                  <>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={['TimePicker', 'TimePicker']}>
+                        <DemoItem>
+                          <TimePicker
+                            label={t('reportEndTime')}
+                            value={date}
+                            onChange={(newValue) => { setItem({ ...item, hour: dayjs(newValue) }); setDate(dayjs(newValue)); }}
+                          />
+                        </DemoItem>
 
-                    </DemoContainer>
-                  </LocalizationProvider>
-                  <Button onClick={(() => saveItem())}>Guardar</Button>
-                </>
+                      </DemoContainer>
+                    </LocalizationProvider>
+                    <Button onClick={(() => saveItem())}>Guardar</Button>
+                  </>
+                )}
+
+              </FormControl>
+            )}
+
+            {saving ? (
+              <Box sx={{ width: '100%' }} />
+            ) :
+              (
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{t('sharedName')}</TableCell>
+                      <TableCell>{t('sharedHour')}</TableCell>
+                      <TableCell className={classes.columnAction} />
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {items.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{name}</TableCell>
+                        <TableCell>{new Date(item.hour).toLocaleString()}</TableCell>
+                        <TableCell className={classes.columnAction} padding="none">
+                          <Button onClick={(() => updateItem(item))}>Editar</Button>
+                          <Button onClick={(() => removeItem(item))}>Eliminar</Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
-
-            </FormControl>
-
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('sharedName')}</TableCell>
-                  <TableCell>{t('sharedHour')}</TableCell>
-                  <TableCell className={classes.columnAction} />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{name}</TableCell>
-                    <TableCell>{new Date(item.hour).toLocaleString()}</TableCell>
-                    <TableCell className={classes.columnAction} padding="none">
-                      <Button onClick={(() => updateItem(item))}>Editar</Button>
-                      <Button onClick={(() => removeItem(item))}>Eliminar</Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
 
           </AccordionDetails>
         </Accordion>

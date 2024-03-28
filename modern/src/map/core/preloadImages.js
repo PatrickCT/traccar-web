@@ -4,6 +4,7 @@ import { loadImage, prepareIcon } from './mapUtil';
 import defaultSvg from '../../resources/images/icon/default.svg';
 import crossSvg from '../../resources/images/icon/cross.svg';
 import directionSvg from '../../resources/images/direction.svg';
+import cardirectionSvg from '../../resources/images/car_direction.svg';
 import backgroundSvg from '../../resources/images/background.svg';
 import animalSvg from '../../resources/images/icon/animal.svg';
 import bicycleSvg from '../../resources/images/icon/bicycle.svg';
@@ -53,6 +54,7 @@ export const mapIcons = {
   van: vanSvg,
   cross: crossSvg,
   cluster: clusterSvg,
+  carDirection: cardirectionSvg,
 };
 
 export const mapIconKey = (category) => (mapIcons.hasOwnProperty(category) ? category : 'default');
@@ -71,7 +73,12 @@ export default async () => {
       const imagePath = mapIcons[category];
       results.push(loadImage(imagePath).then((icon) => {
         // console.info(`Loading  ${category}-${color}`);
-        mapImages[`${category}-${color}`] = prepareIcon(background, icon, palette.colors[color]);
+        if (category === 'carDirection') {
+          mapImages[`${category}-${color}`] = prepareIcon(null, icon, palette.colors[color]);
+        } else {
+          mapImages[`${category}-${color}`] = prepareIcon(background, icon, palette.colors[color]);
+        }
+
         // eslint-disable-next-line no-unused-vars
       }).catch((error) => {
         // console.error(`Error loading image '${category}-${color}' from path '${imagePath}':`, error);
