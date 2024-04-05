@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Table, TableRow, TableCell, TableHead, TableBody, Switch, TextField, Button, IconButton,
 } from '@mui/material';
@@ -56,10 +56,6 @@ const LinksPage = () => {
     }
   }, [showModal, reload]);
 
-  useEffect(() => {
-    console.log(selectedItem);
-  }, [selectedItem]);
-
   const saveLink = async () => {
     const { isNew } = selectedItem;
     delete selectedItem.isNew;
@@ -69,8 +65,7 @@ const LinksPage = () => {
       body: JSON.stringify(selectedItem),
     })
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
+      .then(() => {
         setShowModal(false);
       });
   };
@@ -82,8 +77,7 @@ const LinksPage = () => {
       body: JSON.stringify(link),
     })
       .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
+      .then(() => {
         setReload(false);
       });
   };
@@ -271,7 +265,6 @@ const LinksPage = () => {
           style={{ position: 'fixed', bottom: '0px', right: '0px' }}
           onClick={() => {
             setphones(strPhone.split(','));
-            console.log(phones);
             setStrPhone('');
             shareLink();
             setShowShare(false);

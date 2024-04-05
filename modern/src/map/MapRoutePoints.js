@@ -1,21 +1,24 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import {
   useId, useCallback, useEffect, memo,
 } from 'react';
 import { useTheme } from '@mui/styles';
 import { useMediaQuery } from '@mui/material';
+import { Expression } from 'mapbox-expression';
+
 import { useAttributePreference } from '../common/util/preferences';
 import { map } from './core/MapView';
 
 const MapRoutePoints = ({
-  positions, onClick,
+  positions, onClick, replay = false,
 }) => {
-  // console.log('Render MapRoutePoints');
   const id = useId();
   const clusters = `${id}-clusters`;
 
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
+
   const onMouseEnter = () => map.getCanvas().style.cursor = 'pointer';
   const onMouseLeave = () => map.getCanvas().style.cursor = '';
 
@@ -67,6 +70,9 @@ const MapRoutePoints = ({
       cluster: mapCluster,
       clusterMaxZoom: 14,
       clusterRadius: 50,
+      clusterProperties: {
+        course: ['max', ['get', 'course']],
+      },
     });
 
     // map.addLayer({
@@ -79,28 +85,37 @@ const MapRoutePoints = ({
     //   },
     // });
 
-    map.addLayer({
-      id: clusters,
-      type: 'symbol',
-      source: id,
-      filter: ['has', 'point_count'],
-      layout: {
-        'icon-image': 'cluster',
-        'icon-size': iconScale,
-      },
-    });
+    // map.addLayer({
+    //   id: clusters,
+    //   type: 'symbol',
+    //   source: id,
+    //   filter: ['has', 'point_count'],
+    //   layout: {
+    //     'icon-image': 'cluster',
+    //     'icon-size': iconScale,
+    //     'icon-rotate': ['get', 'course'],
+    //     'icon-rotation-alignment': 'map',
+    //     'symbol-placement': 'point',
+    //     'icon-allow-overlap': true,
+    //   },
+    // });
 
     map.addLayer({
       id,
       type: 'symbol',
       source: id,
       layout: {
-        'icon-image': 'arrow', // Assuming you have an arrow icon registered in your map resources
-        'icon-rotate': ['get', 'course'], // Adjust the rotation to orient the arrow correctly
-        'icon-size': 0.4,
+        'icon-image': replay ? 'arrowW' : 'arrow',
+        'icon-size': replay ? iconScale : 0.4,
         'icon-allow-overlap': true,
+        'icon-rotate': ['get', 'course'],
+        'icon-rotation-alignment': 'map',
+        'symbol-placement': 'point',
       },
-      paint: {
+      paint: replay ? {
+        'icon-opacity': 1,
+        'icon-color': '#FFFFFF',
+      } : {
         'icon-opacity': 1,
       },
     });
@@ -129,40 +144,44 @@ const MapRoutePoints = ({
   }, [onMarkerClick]);
 
   useEffect(() => {
+    const features = positions.map((position, index) => {
+      if (position.hasOwnProperty('original')) {
+        if (position.original === true) {
+          return ({
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [position.longitude, position.latitude],
+            },
+            properties: {
+              index,
+              id: position.id,
+              course: position.course,
+            },
+          });
+        }
+        return false;
+      }
+      return ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [position.longitude, position.latitude],
+        },
+        properties: {
+          index,
+          id: position.id,
+          course: position.course,
+        },
+      });
+    });
     map.getSource(id)?.setData({
       type: 'FeatureCollection',
-      features: positions.map((position, index) => {
-        if (position.hasOwnProperty('original')) {
-          if (position.original === true) {
-            return ({
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: [position.longitude, position.latitude],
-              },
-              properties: {
-                index,
-                id: position.id,
-                course: position.course,
-              },
-            });
-          }
-          return false;
-        }
-        return ({
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [position.longitude, position.latitude],
-          },
-          properties: {
-            index,
-            id: position.id,
-            course: position.course,
-          },
-        });
-      }),
+      features,
     });
+
+    window.feature = features;
+    window.Expression = Expression;
   }, [onMarkerClick, positions]);
 
   return null;

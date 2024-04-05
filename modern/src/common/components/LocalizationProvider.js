@@ -146,7 +146,7 @@ const getDefaultLanguage = () => {
 const LocalizationContext = createContext({
   languages,
   language: 'en',
-  setLanguage: () => {},
+  setLanguage: () => { },
 });
 
 export const LocalizationProvider = ({ children }) => {
@@ -178,7 +178,7 @@ export const useLocalization = () => useContext(LocalizationContext);
 export const useTranslation = () => {
   const context = useContext(LocalizationContext);
   const { data } = context.languages[context.language];
-  return useMemo(() => (key) => data[key], [data]);
+  return useMemo(() => (key) => data[key] || key, [data]);
 };
 
 export const useTranslationKeys = (predicate) => {

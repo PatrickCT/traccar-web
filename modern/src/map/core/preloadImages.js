@@ -28,6 +28,7 @@ import truckSvg from '../../resources/images/icon/truck.svg';
 import vanSvg from '../../resources/images/icon/van.svg';
 import clusterSvg from '../../resources/images/backgroundCluster.svg';
 import stopSvg from '../../resources/images/icon/stop.svg';
+import directionWhite from '../../resources/images/direction-white.svg';
 
 export const mapIcons = {
   animal: animalSvg,
@@ -67,6 +68,7 @@ export default async () => {
   const cluster = await loadImage(clusterSvg);
   mapImages.cluster = await prepareIcon(cluster);
   mapImages.direction = await prepareIcon(await loadImage(directionSvg));
+  mapImages.directionWhite = await prepareIcon(await loadImage(directionWhite), null, palette.colors.white);
   await Promise.all(Object.keys(mapIcons).map(async (category) => {
     const results = [];
     ['primary', 'positive', 'negative', 'neutral'].forEach((color) => {

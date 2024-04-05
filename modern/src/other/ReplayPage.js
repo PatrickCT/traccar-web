@@ -17,7 +17,9 @@ import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
 // import StatusCard from '../common/components/StatusCard';
 // import { usePreference } from '../common/util/preferences';
-import { createPopUp, createPopUpReport, createPopUpReportRoute, createPopUpSimple } from '../common/util/mapPopup';
+import {
+  createPopUpReportRoute, createPopUpSimple,
+} from '../common/util/mapPopup';
 import ReplaySideBar from './ReplaySideBar';
 
 const useStyles = makeStyles((theme) => ({
@@ -87,7 +89,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ReplayPage = () => {
-  Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item?.remove());
+  // Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item?.remove());
   // console.log('ReplayPage');
   const timerRef = useRef();
   const t = useTranslation();
@@ -134,12 +136,12 @@ const ReplayPage = () => {
   }, [setIndex]);
 
   useEffect(() => {
+    clearInterval(timerRef.current);
     if (playing && positions.length > 0) {
       timerRef.current = setInterval(() => {
-        changeIndex(null, (index) => index + 1);
+        // changeIndex(null, (index) => index + 1);
+        setIndex((index) => index + 1);
       }, speed);
-    } else {
-      clearInterval(timerRef.current);
     }
 
     return () => clearInterval(timerRef.current);
@@ -149,18 +151,23 @@ const ReplayPage = () => {
     if (index >= positions.length - 1) {
       clearInterval(timerRef.current);
       setPlaying(false);
+      window.marker = null;
     }
   }, [index, positions]);
 
   useEffect(() => {
     if (positions && positions.length > 0) {
       Array.from(document.getElementsByClassName('mapboxgl-popup')).filter((popup) => popup.id !== '').map((item) => item.remove());
-      const p = new Popup()
-        .setMaxWidth('400px')
-        .setHTML(createPopUpReportRoute(positions[index]))
-        .setLngLat([positions[index]?.longitude, positions[index]?.latitude])
-        .addTo(map);
-      p.getElement().id = positions[index].deviceId;
+      requestAnimationFrame(() => {
+        const p = new Popup()
+          .setMaxWidth('400px')
+          .setHTML(createPopUpReportRoute(positions[index]))
+          .setLngLat([positions[index]?.longitude, positions[index]?.latitude])
+          .addTo(map);
+
+        p.getElement().id = positions[index].deviceId;
+        window.marker = p;
+      });
     }
   }, [index]);
 
@@ -181,14 +188,11 @@ const ReplayPage = () => {
     // }
     if (event === undefined) return;
     const stopsMarkers = map.queryRenderedFeatures(event.point, { layers: ['stops-layer'] });
-    console.log(event.point, stopsMarkers, memoStops, stops, positions);
-    stopsMarkers.forEach((stop) => {
-      console.log(stop.properties.index, memoStops[stop.properties.index]); return new Popup()
-        .setMaxWidth('400px')
-        .setHTML(createPopUpSimple(stops[stop.properties.index]))
-        .setLngLat([stops[stop.properties.index].longitude, stops[stop.properties.index].latitude])
-        .addTo(map);
-    });
+    stopsMarkers.forEach((stop) => (new Popup()
+      .setMaxWidth('400px')
+      .setHTML(createPopUpSimple(stops[stop.properties.index]))
+      .setLngLat([stops[stop.properties.index].longitude, stops[stop.properties.index].latitude])
+      .addTo(map)));
   }, [memoPositions, memoStops]);
 
   const changeSpeed = useCallback((_, value) => {
@@ -255,7 +259,7 @@ const ReplayPage = () => {
       <MapView>
         <MapGeofence />
         <MapRoutePath positions={positions} values={value} />
-        <MapRoutePoints positions={positions} onClick={onPointClick} />
+        <MapRoutePoints positions={positions} onClick={onPointClick} replay />
         {index < memoPositions.length && (
           <MapPositions positions={memoPositions} index={index} onClick={onMarkerClick} titleField="fixTime" replay showStatus stops={memoStops} />
         )}

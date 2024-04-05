@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 import { useNavigate } from 'react-router-dom';
 import {
-  Box, IconButton, Paper, Slider, Toolbar, Typography,
+  Box, Button, IconButton, MenuItem, Paper, Select, Slider, Toolbar, Typography, useMediaQuery, useTheme,
 } from '@mui/material';
 import React, {
   memo, useState,
@@ -15,6 +16,7 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import FastRewindIcon from '@mui/icons-material/FastRewind';
 import ReportFilter from '../reports/components/ReportFilter';
 import { useTranslation } from '../common/components/LocalizationProvider';
+import Modal from '../main/components/BasicModal';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,10 +29,9 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 3,
     left: 0,
     top: 0,
-    // margin: theme.spacing(1.5),
-    // width: theme.dimensions.drawerWidthDesktop,
-    margin: 0,
-    width: '97.5%',
+    margin: theme.spacing(1.5),
+    width: theme.dimensions.drawerWidthDesktop,
+
     [theme.breakpoints.down('md')]: {
       width: '88%',
       margin: 0,
@@ -46,6 +47,11 @@ const useStyles = makeStyles((theme) => ({
   controls: {
     display: 'flex',
     justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  row: {
+    display: 'flex',
+    justifyContent: 'start',
     alignItems: 'center',
   },
   formControlLabel: {
@@ -144,7 +150,7 @@ const DiscreteSlider = (props) => {
     <Box
       sx={{
         width: '100%',
-        margin: '16px',
+        margin: '0px',
       }}
     >
       <Typography
@@ -177,6 +183,9 @@ const DiscreteSlider = (props) => {
             },
           },
           '& .MuiSlider-mark': {
+            background: 'none',
+          },
+          '& .MuiSlider-markLabel': {
             background: 'none',
           },
           '& .MuiSlider-rail': {
@@ -215,10 +224,13 @@ const ReplaySideBar = ({
 
   const [speed, setSpeed] = useState(500);
   const [value, setValue] = React.useState([50, 100]);
+  const [showModalSpeed, setShowModalSpeed] = useState(false);
 
   const classes = useStyles({ values: value });
   const navigate = useNavigate();
   const t = useTranslation();
+  const theme = useTheme();
+  const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
   return (
     <div className={classes.sidebar}>
@@ -244,29 +256,47 @@ const ReplaySideBar = ({
       <Paper className={classes.content} square>
         {!expanded ? (
           <>
-            <Slider
-              className={classes.slider}
-              max={max - 1}
-              step={1}
-              marks={null}
-              value={index}
-              onChange={(_, index) => setIndex(_, index)}
-
-            />
             <div className={classes.controls}>
-              {/* {`${index + 1}/${positions.length}`} */}
-              <IconButton onClick={() => setIndex(null, (index) => index - 1)} disabled={playing || index <= 0}>
-                <FastRewindIcon />
-              </IconButton>
-              <IconButton onClick={() => setPlaying(!playing)} disabled={index >= max - 1}>
-                {playing ? <PauseIcon /> : <PlayArrowIcon />}
-              </IconButton>
-              <IconButton onClick={() => setIndex(null, (index) => index + 1)} disabled={playing || index >= max - 1}>
-                <FastForwardIcon />
-              </IconButton>
-              {/* {formatTime(positions[index].fixTime, 'seconds', hours12)} */}
+              <div style={{ width: '95%' }}>
+                <Slider
+                  className={classes.slider}
+                  max={max - 1}
+                  step={1}
+                  marks={null}
+                  value={index}
+                  onChange={(_, index) => setIndex(_, index)}
+
+                />
+                <div className={classes.controls}>
+                  {/* {`${index + 1}/${positions.length}`} */}
+                  <IconButton onClick={() => setIndex(null, (index) => index - 1)} disabled={playing || index <= 0}>
+                    <FastRewindIcon />
+                  </IconButton>
+                  <IconButton onClick={() => setPlaying(!playing)} disabled={index >= max - 1}>
+                    {playing ? <PauseIcon /> : <PlayArrowIcon />}
+                  </IconButton>
+                  <IconButton onClick={() => setIndex(null, (index) => index + 1)} disabled={playing || index >= max - 1}>
+                    <FastForwardIcon />
+                  </IconButton>
+                  {/* {formatTime(positions[index].fixTime, 'seconds', hours12)} */}
+                </div>
+              </div>
+              <Select
+                defaultValue={1000 - speed}
+                onChange={
+                  (e) => {
+                    setSpeed(1000 - e.target.value);
+                    changeSpeed(null, 1000 - e.target.value);
+                  }
+                }
+              >
+                <MenuItem value={500}>1X</MenuItem>
+                <MenuItem value={650}>2X</MenuItem>
+                <MenuItem value={800}>4X</MenuItem>
+                <MenuItem value={1000}>8X</MenuItem>
+              </Select>
             </div>
-            <Slider
+            {/* <Slider
               className={classes.slider}
               value={1001 - speed}
               onChange={(_, value) => setSpeed(1001 - value)}
@@ -276,7 +306,7 @@ const ReplaySideBar = ({
               valueLabelDisplay="auto"
               // marks={Array.from({ length: 1001 }, (_, index) => ({ value: 1000 - index }))}
               marks={null}
-            />
+            /> */}
             {/* <Slider
               className={classes.slider}
               classes={{ track: classes.track }}
@@ -286,23 +316,64 @@ const ReplaySideBar = ({
               max={200}
               step={1}
             /> */}
-            <DiscreteSlider
-              reverse={false}
-              step={1}
-              values={value}
-              min={1}
-              max={200}
-              thresholdMarks={[value[0] / 2, value[1] / 2, 200 / 2]}
-              thresholdMarksTitles={['Normal', 'Rapido', 'Exceso']}
-              setValues={setValue}
-              onChangeCommitted={handleChange}
-            />
+
+            {!desktop && (
+              <DiscreteSlider
+                reverse={false}
+                step={1}
+                values={value}
+                min={1}
+                max={200}
+                thresholdMarks={[value[0] / 2, value[1] / 2, 200 / 2]}
+                thresholdMarksTitles={['Normal', 'Rapido', 'Exceso']}
+                setValues={setValue}
+                onChangeCommitted={handleChange}
+                valueLabelDisplay={desktop ? 'on' : 'auto'}
+              />
+            )}
           </>
         ) : (
           <ReportFilter handleSubmit={handleSubmit} fullScreen showOnly />
         )}
       </Paper>
 
+      {!expanded && desktop && (
+        <Paper className={classes.content} square>
+          <Box>
+            <div style={{ marginTop: '20px' }} className={classes.row}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: 'green', marginRight: '20px' }} />
+              {`0 - ${value[0]} Km/h`}
+            </div>
+            <div style={{ marginTop: '20px' }} className={classes.row}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: 'orange', marginRight: '20px' }} />
+              {`${value[0]} - ${value[1]} Km/h`}
+            </div>
+            <div style={{ marginTop: '20px' }} className={classes.row}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: 'red', marginRight: '20px' }} />
+              {`${value[1]} - 200 Km/h`}
+            </div>
+            <div style={{ marginTop: '20px' }} className={classes.row}>
+              <div style={{ width: '20px', height: '20px', backgroundColor: 'transparent', marginRight: '80%' }} />
+              <Button onClick={() => setShowModalSpeed(true)}>Cambiar</Button>
+            </div>
+          </Box>
+        </Paper>
+      )}
+
+      <Modal style={{ height: 'auto' }} isOpen={showModalSpeed} onClose={() => setShowModalSpeed(false)}>
+        <DiscreteSlider
+          reverse={false}
+          step={1}
+          values={value}
+          min={1}
+          max={200}
+          thresholdMarks={[value[0] / 2, value[1] / 2, 200 / 2]}
+          thresholdMarksTitles={['Normal', 'Rapido', 'Exceso']}
+          setValues={setValue}
+          onChangeCommitted={handleChange}
+          valueLabelDisplay={desktop ? 'on' : 'auto'}
+        />
+      </Modal>
     </div>
   );
 };

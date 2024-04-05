@@ -332,10 +332,6 @@ export const specialAtts = (obj, attribute) => {
   }
 };
 export const attsGetter = (obj, attribute) => {
-  // obj has the form {att, att2, att..., data{data_att, data_att2, data_att..., attributes:{atribute...}}}
-  // access att like obj.get('att'), data_att like obj.get('data').get('data_att')
-  // const att  = specialAtts(obj, attribute);
-  // console.log('switch '+att)
   switch (attribute) {
     case 'status': {
       const status = (obj.status ? obj.status : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : ''));

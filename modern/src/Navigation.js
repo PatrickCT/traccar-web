@@ -69,6 +69,7 @@ import VueltaReportPage from './reports/VueltaReportPage';
 import HojaSalidaReportPage from './reports/HojaSalidas';
 import ExcusesPage from './settings/ExcusesPage';
 import ExcusePage from './settings/ExcusePage';
+import SalidasActivas from './reports/SalidasActivas';
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -191,6 +192,7 @@ const Navigation = () => {
           <Route path="tickets" element={<TicketReportPage />} />
           <Route path="salidas" element={<VueltaReportPage />} />
           <Route path="hojasalidas" element={<HojaSalidaReportPage />} />
+          <Route path="salidas_activas" element={<SalidasActivas />} />
         </Route>
       </Route>
     </Routes>

@@ -18,8 +18,6 @@ import { hasPassedTime } from '../common/util/utils';
 const MapPositions = ({
   positions, onClick, titleField, selectedPosition, stops, showStatus, index, replay = false,
 }) => {
-  // const positions = [positions[index]];
-  // console.log('Render MapPositions', positions);
   const id = useId();
   window.id = id;
   window.map = map;
@@ -71,7 +69,6 @@ const MapPositions = ({
   const onMarkerClick = useCallback((event) => {
     event.preventDefault();
     const feature = event.features[0];
-    console.log(feature);
     if (onClick) {
       onClick(feature.properties.id, feature.properties.deviceId, map, event);
     }
@@ -372,6 +369,8 @@ const MapPositions = ({
       if (map.getSource('end')) {
         map.removeSource('end');
       }
+
+      // window.marker = null;
     };
   }, []);
 

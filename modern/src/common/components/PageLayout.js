@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PageTitle = ({ breadcrumbs }) => {
+export const PageTitle = ({ breadcrumbs }) => {
   const theme = useTheme();
   const t = useTranslation();
 

@@ -48,7 +48,7 @@ const MapRoutePath = ({ name, positions, coordinates, values }) => {
       },
       paint: {
         'line-color': ['get', 'color'],
-        'line-width': 5,
+        'line-width': 8,
       },
     });
     if (name) {

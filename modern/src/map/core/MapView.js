@@ -52,6 +52,12 @@ const initMap = async () => {
     }
     map.addImage('arrow', image);
   });
+  map.loadImage('../images/arrowW.png', (err, image) => {
+    if (err) {
+      return;
+    }
+    map.addImage('arrowW', image);
+  });
   map.loadImage('../images/replay-neutral.png', (err, image) => {
     if (err) {
       return;

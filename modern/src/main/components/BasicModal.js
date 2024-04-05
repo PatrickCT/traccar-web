@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@mui/material';
 
-const Modal = ({ isOpen, onClose, children }) => {
+const Modal = ({ isOpen, onClose, children, style = {} }) => {
   const modalStyle = {
     display: isOpen ? 'block' : 'none',
     position: 'fixed',
@@ -15,6 +15,7 @@ const Modal = ({ isOpen, onClose, children }) => {
     boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
     width: '60%',
     height: '60%',
+    ...style,
   };
 
   const overlayStyle = {

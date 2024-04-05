@@ -1,6 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import { React, useEffect, useState } from 'react';
+import {
+  React, memo, useEffect, useMemo, useState,
+} from 'react';
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -19,8 +21,39 @@ import DropdownComponents from '../../common/components/DropdownComponent';
 import { useEffectAsync } from '../../reactHelper';
 import '../../common/tickets.css';
 import { useTranslation } from '../../common/components/LocalizationProvider';
+import store from '../../store';
 
-const TableExist = ({ deviceId, handleLoadInfo }) => {
+const isEqual = require('react-fast-compare');
+
+window.isEqual = isEqual;
+
+const propPrint = (prop) => {
+  switch (typeof prop) {
+    case 'object': return JSON.stringify(prop);
+    case 'undefined': return 'NULL';
+    default: return prop;
+  }
+};
+
+const handler = {
+  get(target, key) {
+    if (typeof target[key] === 'object' && target[key] !== null) {
+      return new Proxy(target[key], handler);
+    }
+    return target[key];
+  },
+  set(target, prop, value) {
+    const equal = isEqual(target[prop], value);
+    console.log(`changed ${prop} from ${propPrint(target[prop])} to ${propPrint(value)}, equality ${equal}`);
+    if (!equal) {
+      target[prop] = value;
+    }
+    target.changed = !equal;
+    return true;
+  },
+};
+
+const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime = true, dropDrivers = true, autoUpdate = true }) => {
   const t = useTranslation();
 
   const [info, setInfo] = useState({});
@@ -35,9 +68,10 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   const [passwordSaved, setPasswordSaved] = useState('');
 
   const user = useSelector((state) => state.session.user);
+  const salidasState = useMemo(() => new Proxy({ devices: { items: {} } }, handler));
 
   const loadInfoTable = async () => {
-    const response = await fetch(`api/devices/${deviceId}/ticket`);
+    const response = await fetch(`${topDirectory}api/devices/${deviceId}/ticket`);
     if (response.ok) {
       const information = await response.json();
       setInfo(information);
@@ -100,11 +134,27 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   };
 
   useEffect(() => {
-    const intervalId = setInterval(async () => {
-      await loadInfoTable();
-    }, 1 * 10 * 1000);
+    let intervalId;
+    if (autoUpdate) {
+      intervalId = setInterval(async () => {
+        await loadInfoTable();
+      }, 1 * 10 * 1000);
+    } else {
+      console.log('subs');
+      store.subscribe(() => {
+        const s = store.getState();
+        console.log(s.devices.items);
 
-    return () => clearInterval(intervalId); // Clear interval on component unmount
+        Object.keys(s.devices.items).forEach((key) => {
+          salidasState.devices.items[key] = s.devices.items[key];
+        });
+      });
+    }
+
+    return () => {
+      console.log('unmount table ', deviceId);
+      clearInterval(intervalId);
+    }; // Clear interval on component unmount
   }, []);
 
   const calcDiffColor = (ticket) => {
@@ -158,16 +208,20 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
 
   return (
     <div>
-      <div className="btn-change">
-        <Button label={t('changeExitTime')} icon="pi pi-external-link" onClick={() => setVisible(true)} />
-      </div>
-      <DropdownComponents
-        key={`dd-${deviceId}`}
-        setOption={handleSelectedOption}
-        selectOption={optionSelected}
-        label=""
-        options={conductores}
-      />
+      {btnChangeTime && (
+        <div className="btn-change">
+          <Button label={t('changeExitTime')} icon="pi pi-external-link" onClick={() => setVisible(true)} />
+        </div>
+      )}
+      {dropDrivers && (
+        <DropdownComponents
+          key={`dd-${deviceId}`}
+          setOption={handleSelectedOption}
+          selectOption={optionSelected}
+          label=""
+          options={conductores}
+        />
+      )}
       <div className="checador">
         <div className="columns col1">
           {t('checker')}
@@ -230,4 +284,4 @@ const TableExist = ({ deviceId, handleLoadInfo }) => {
   );
 };
 
-export default TableExist;
+export default memo(TableExist);
