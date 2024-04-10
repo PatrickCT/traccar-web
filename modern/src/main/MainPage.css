@@ -4,6 +4,24 @@
     color: white;
 }
 
+.mapboxgl-popup-content-green {
+    background: green !important;
+    border-radius: 15px !important;
+    color: white;
+}
+
+.mapboxgl-popup-content-orange {
+    background: orange !important;
+    border-radius: 15px !important;
+    color: white;
+}
+
+.mapboxgl-popup-content-red {
+    background: red !important;
+    border-radius: 15px !important;
+    color: white;
+}
+
 .mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
     align-self: center;
     border-top: none;

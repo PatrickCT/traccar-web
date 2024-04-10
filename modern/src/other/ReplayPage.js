@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-vars */
+/* eslint-disable no-underscore-dangle */
 import React, {
   useState, useCallback, useRef, useEffect, useMemo, memo,
 } from 'react';
 import * as turf from '@turf/turf';
-import { Popup } from 'mapbox-gl';
+import { LngLat, Popup } from 'mapbox-gl';
 import makeStyles from '@mui/styles/makeStyles';
 // import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -21,6 +22,7 @@ import {
   createPopUpReportRoute, createPopUpSimple,
 } from '../common/util/mapPopup';
 import ReplaySideBar from './ReplaySideBar';
+import { attsGetter } from '../common/util/utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -158,16 +160,32 @@ const ReplayPage = () => {
   useEffect(() => {
     if (positions && positions.length > 0) {
       Array.from(document.getElementsByClassName('mapboxgl-popup')).filter((popup) => popup.id !== '').map((item) => item.remove());
-      requestAnimationFrame(() => {
+      const speed = parseFloat((attsGetter(positions[index], 'speed') ?? (attsGetter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -')).split(' ')[0]) || 0;
+      const currentType = (speed < value[0] ? 1 : (speed < value[1] ? 2 : 3));
+      const color = (currentType === 1 ? 'green' : (currentType === 2 ? 'orange' : 'red'));
+      if (map.getBounds().contains(new LngLat(positions[index]?.longitude, positions[index]?.latitude))) {
+        requestAnimationFrame(() => {
+          const p = new Popup()
+            .setMaxWidth('400px')
+            .setOffset(40)
+            .setHTML(createPopUpReportRoute(positions[index]))
+            .setLngLat([positions[index]?.longitude, positions[index]?.latitude])
+            .addTo(map);
+          p.getElement().id = positions[index].deviceId;
+          window.marker = p;
+          window.marker._content.classList.add(`mapboxgl-popup-content-${color}`);
+        });
+      } else {
         const p = new Popup()
           .setMaxWidth('400px')
+          .setOffset(40)
           .setHTML(createPopUpReportRoute(positions[index]))
           .setLngLat([positions[index]?.longitude, positions[index]?.latitude])
           .addTo(map);
-
         p.getElement().id = positions[index].deviceId;
         window.marker = p;
-      });
+        window.marker._content.classList.add('mapboxgl-popup-content-green');
+      }
     }
   }, [index]);
 
@@ -176,16 +194,6 @@ const ReplayPage = () => {
   }, [setIndex]);
 
   const onMarkerClick = useCallback((_, deviceId, map, event) => {
-    // console.log('on marker click ', deviceId, positions, stops);
-    // const selectedPosition = (positions.find((p) => p.deviceId === (deviceId || 0) && p.original === true) || [null])[0];
-    // Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-    // if (window.localStorage.getItem('showMapPopup') === 'true' && selectedPosition != null) {
-    //   new Popup()
-    //     .setMaxWidth('400px')
-    //     .setHTML(createPopUpReport(selectedPosition))
-    //     .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
-    //     .addTo(map);
-    // }
     if (event === undefined) return;
     const stopsMarkers = map.queryRenderedFeatures(event.point, { layers: ['stops-layer'] });
     stopsMarkers.forEach((stop) => (new Popup()
@@ -218,10 +226,14 @@ const ReplayPage = () => {
           const distance = turf.distance(turf.point([p[index].longitude, p[index].latitude]), turf.point([p[index + 1].longitude, p[index + 1].latitude]), { units: 'meters' });
           if (parseInt(distance, 10) > 0) {
             const steps = parseInt(distance / 2, 10);
+            let fillers = [];
             for (let i = 0; i < steps; i += 1) {
               const point = turf.along(turf.lineString([[p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]]), ((i + 1) * 2), { units: 'meters' });
-              positions.push({ ...position, original: false, longitude: point.geometry.coordinates[0], latitude: point.geometry.coordinates[1] });
+              fillers.push({ ...position, original: false, longitude: point.geometry.coordinates[0], latitude: point.geometry.coordinates[1] });
             }
+            const fillerCourse = (fillers.reduce((acc, obj) => acc + parseFloat(obj.course ?? ''), 0) / fillers.length);
+            fillers = fillers.map((filler) => ({ ...filler, course: fillerCourse }));
+            positions.push(...fillers);
           }
         }
       });

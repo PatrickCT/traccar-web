@@ -399,8 +399,8 @@ export const attsGetter = (obj, attribute) => {
       return value;
     }
     case 'speed': {
-      const value = obj.speed ? obj.speed : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null);
-      return `${Math.round(value * 1.85200)} Km/h`;
+      const value = obj.speed ? obj.speed : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null) || null;
+      return value ? `${Math.round(value * 1.85200)} Km/h` : null;
     }
     case 'rawspeed': {
       const value = (obj.rawspeed ? obj.rawspeed : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));

@@ -114,7 +114,7 @@ const MapPositions = ({
       source: id,
       filter: ['!has', 'point_count'],
       layout: {
-        'icon-image': `${replay ? 'replay-{color}' : '{category}-{color}'}`,
+        'icon-image': `${replay ? 'replay-neutral' : '{category}-{color}'}`,
         'icon-size': replay ? 0.08 : iconScale,
         'icon-allow-overlap': true,
         'text-field': `{${titleField || 'name'}}`,

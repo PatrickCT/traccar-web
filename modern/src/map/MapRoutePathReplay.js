@@ -88,8 +88,8 @@ const MapRoutePath = ({ name, positions, coordinates, values }) => {
     if (!coordinates) {
       let currentType = 0;
       let section = [];
-      positions.forEach((position) => {
-        const speed = parseFloat(attsGetter(position, 'speed').split(' ')[0]);
+      positions.forEach((position, index) => {
+        const speed = parseFloat((attsGetter(position, 'speed') ?? (attsGetter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -')).split(' ')[0]) || 0;
         if (currentType === 0 || currentType !== (speed < values[0] ? 1 : (speed < values[1] ? 2 : 3))) { // primer seccion o nueva seccion
           if (section.length > 0) {
             coordinatesColors.push(section);
