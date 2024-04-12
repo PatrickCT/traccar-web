@@ -27,31 +27,13 @@ const isEqual = require('react-fast-compare');
 
 window.isEqual = isEqual;
 
-const propPrint = (prop) => {
-  switch (typeof prop) {
-    case 'object': return JSON.stringify(prop);
-    case 'undefined': return 'NULL';
-    default: return prop;
-  }
-};
-
-const handler = {
-  get(target, key) {
-    if (typeof target[key] === 'object' && target[key] !== null) {
-      return new Proxy(target[key], handler);
-    }
-    return target[key];
-  },
-  set(target, prop, value) {
-    const equal = isEqual(target[prop], value);
-    console.log(`changed ${prop} from ${propPrint(target[prop])} to ${propPrint(value)}, equality ${equal}`);
-    if (!equal) {
-      target[prop] = value;
-    }
-    target.changed = !equal;
-    return true;
-  },
-};
+// const propPrint = (prop) => {
+//   switch (typeof prop) {
+//     case 'object': return JSON.stringify(prop);
+//     case 'undefined': return 'NULL';
+//     default: return prop;
+//   }
+// };
 
 const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime = true, dropDrivers = true, autoUpdate = true }) => {
   const t = useTranslation();
@@ -68,7 +50,6 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
   const [passwordSaved, setPasswordSaved] = useState('');
 
   const user = useSelector((state) => state.session.user);
-  const salidasState = useMemo(() => new Proxy({ devices: { items: {} } }, handler));
 
   const loadInfoTable = async () => {
     const response = await fetch(`${topDirectory}api/devices/${deviceId}/ticket`);
@@ -89,6 +70,30 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
       throw Error(await response.text());
     }
   };
+
+  const handler = {
+    get(target, key) {
+      if (typeof target[key] === 'object' && target[key] !== null) {
+        return new Proxy(target[key], handler);
+      }
+      return target[key];
+    },
+    set(target, prop, value) {
+      const equal = isEqual(target[prop], value);
+      // console.log(`changed ${prop} from ${propPrint(target[prop])} to ${propPrint(value)}, equality ${equal}`);
+      if (!equal) {
+        target[prop] = value;
+        if (deviceId === target.id) {
+          console.log(`updating tickets for device ${target}`);
+          loadInfoTable();
+        }
+      }
+      target.changed = !equal;
+      return true;
+    },
+  };
+
+  const salidasState = useMemo(() => new Proxy({ devices: { items: {} } }, handler));
 
   const handleChangePassword = (event) => {
     setPasswordUser(event.target.value);

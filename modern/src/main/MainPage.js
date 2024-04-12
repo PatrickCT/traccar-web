@@ -115,6 +115,7 @@ const MainPage = () => {
   const [devicesOpen, setDevicesOpen] = useState(desktop);
   const [eventsOpen, setEventsOpen] = useState(false);
   const groups = useSelector((state) => state.groups.items);
+  // console.log('main groups', JSON.stringify(groups));
 
   const [showModalRevision, setShowModalRevision] = useState(false);
 

@@ -32,6 +32,7 @@ const ReportFilter = ({
 
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
+  // console.log('report filterss groups', JSON.stringify(groups));
 
   const deviceId = useSelector((state) => state.devices.selectedId);
   const deviceIds = useSelector((state) => state.devices.selectedIds);
@@ -127,7 +128,7 @@ const ReportFilter = ({
               onChange={(e) => dispatch(reportsActions.updateGroupIds(e.target.value))}
               multiple
             >
-              {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).map((group) => (
+              {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).filter((group) => group.groupId === 0).map((group) => (
                 <MenuItem key={group.id} value={group.id}>{group.name}</MenuItem>
               ))}
             </Select>

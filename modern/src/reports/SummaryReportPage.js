@@ -102,8 +102,18 @@ const SummaryReportPage = () => {
         return formatSpeed(item[key], speedUnit, t);
       case 'engineHours':
         return formatHours(item[key]);
-      case 'spentFuel':
-        return formatVolume(item[key], volumeUnit, t);
+      case 'spentFuel': {
+        const distance = (item.endOdometer / 1000 || 0) - (item.startOdometer / 1000 || 0);
+        const lpk = devices[item.deviceId].attributes.fuelEfficiency || 0;
+        const consumed = distance / lpk;
+        let value = formatVolume(item[key], volumeUnit, t);
+        if (parseFloat(value.split(' ')[0]) === 0) {
+          if (consumed) {
+            value = formatVolume(consumed, volumeUnit, t);
+          }
+        }
+        return value;
+      }
       default:
         return item[key];
     }

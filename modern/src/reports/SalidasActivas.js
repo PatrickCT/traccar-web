@@ -22,13 +22,16 @@ const SalidasActivas = () => {
   const [perPage, setPerPage] = useState(5);
   const [page, setPage] = useState(1);
 
-  useEffect(async () => {
-    const response = await fetch('/api/salidas/report', {
-      headers: { Accept: 'application/json' },
-    });
-    const data = await response.json();
-    setSalidas(data.map((salida) => salida.deviceId));
-    setLoading(false);
+  useEffect(() => {
+    const asyncFn = async () => {
+      const response = await fetch('/api/salidas/report', {
+        headers: { Accept: 'application/json' },
+      });
+      const data = await response.json();
+      setSalidas(data.map((salida) => salida.deviceId));
+      setLoading(false);
+    };
+    asyncFn();
   }, []);
 
   useEffect(() => {
@@ -85,7 +88,7 @@ const SalidasActivas = () => {
             isLoading={loading}
           >
             <Box sx={{ flexGrow: 1, height: '100vh' }}>
-              <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 1, sm: 8, md: 12 }}>
+              <Grid container spacing={{ xs: 2, md: 4 }} columns={{ xs: 1, sm: 8, md: 12 }}>
                 {visibles.map((device) => (
                   <Grid item xs={2} sm={4} md={4}>
                     <>
@@ -99,7 +102,7 @@ const SalidasActivas = () => {
                         topDirectory="../"
                         btnChangeTime={false}
                         dropDrivers={false}
-                        autoUpdate={false}
+                        autoUpdate
                       />
                     </>
                   </Grid>
