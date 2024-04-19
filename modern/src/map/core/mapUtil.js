@@ -28,7 +28,7 @@ const canvasTintImage = (image, color) => {
   return canvas;
 };
 
-export const prepareIcon = (background, icon, color) => {
+export const prepareIcon = (background, icon, color, degrees) => {
   const canvas = document.createElement('canvas');
   canvas.width = background.width * devicePixelRatio;
   canvas.height = background.height * devicePixelRatio;
@@ -44,8 +44,34 @@ export const prepareIcon = (background, icon, color) => {
     const iconRatio = 0.5;
     const imageWidth = canvas.width * iconRatio;
     const imageHeight = canvas.height * iconRatio;
+    if (degrees) {
+      context.translate(imageWidth / 2, imageHeight / 2);
+      context.rotate((degrees * Math.PI) / 2);
+      context.translate(-imageWidth / 2, -imageHeight / 2);
+    }
     context.drawImage(canvasTintImage(icon, color), (canvas.width - imageWidth) / 2, (canvas.height - imageHeight) / 2, imageWidth, imageHeight);
   }
+
+  return context.getImageData(0, 0, canvas.width, canvas.height);
+};
+
+export const rotateIcon = (icon, degrees) => {
+  const canvas = document.createElement('canvas');
+  canvas.width = icon.width * devicePixelRatio;
+  canvas.height = icon.height * devicePixelRatio;
+  canvas.style.width = `${icon.width}px`;
+  canvas.style.height = `${icon.height}px`;
+
+  const context = canvas.getContext('2d');
+
+  const iconRatio = 0.5;
+  const imageWidth = canvas.width * iconRatio;
+  const imageHeight = canvas.height * iconRatio;
+  context.drawImage(icon, (canvas.width - imageWidth) / 2, (canvas.height - imageHeight) / 2, imageWidth, imageHeight);
+
+  context.translate(canvas.width / 2, canvas.height / 2);
+  context.rotate((degrees * Math.PI) / 2);
+  context.translate(-canvas.width / 2, -canvas.height / 2);
 
   return context.getImageData(0, 0, canvas.width, canvas.height);
 };

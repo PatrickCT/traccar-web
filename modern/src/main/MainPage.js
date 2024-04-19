@@ -196,6 +196,7 @@ const MainPage = () => {
       if (window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
         window.popup = new Popup()
           .setMaxWidth('400px')
+          .setOffset(30)
           .setHTML(createPopUp(selectedPosition))
           .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
           .addTo(map);

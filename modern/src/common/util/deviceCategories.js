@@ -21,4 +21,5 @@ export default [
   'van',
   'scooter',
   'cross',
+  'carDirection',
 ];

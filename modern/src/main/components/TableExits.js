@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import {
-  React, memo, useEffect, useMemo, useState,
+  React, memo, useEffect, useState,
 } from 'react';
 import dayjs from 'dayjs';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { Moment } from 'react-moment';
 import moment from 'moment';
@@ -21,7 +21,6 @@ import DropdownComponents from '../../common/components/DropdownComponent';
 import { useEffectAsync } from '../../reactHelper';
 import '../../common/tickets.css';
 import { useTranslation } from '../../common/components/LocalizationProvider';
-import store from '../../store';
 
 const isEqual = require('react-fast-compare');
 
@@ -35,7 +34,7 @@ window.isEqual = isEqual;
 //   }
 // };
 
-const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime = true, dropDrivers = true, autoUpdate = true }) => {
+const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime = true, dropDrivers = true }) => {
   const t = useTranslation();
 
   const [info, setInfo] = useState({});
@@ -45,12 +44,12 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
   const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [geonames, setGeonames] = useState([]);
+  const [subroutes, setSubroutes] = useState([]);
   const [hourSelected, setHour] = useState(dayjs(new Date().toISOString()));
   const [passwordUser, setPasswordUser] = useState('');
   const [passwordSaved, setPasswordSaved] = useState('');
 
-  const user = useSelector((state) => state.session.user);
-
+  // const user = useSelector((state) => state.session.user);
   const loadInfoTable = async () => {
     const response = await fetch(`${topDirectory}api/devices/${deviceId}/ticket`);
     if (response.ok) {
@@ -66,6 +65,7 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
       }));
       setTickets((information.ticket ?? []));
       setGeonames((information.geofencesNames ?? []));
+      setSubroutes((information.subroutes ?? []));
     } else {
       throw Error(await response.text());
     }
@@ -92,8 +92,6 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
       return true;
     },
   };
-
-  const salidasState = useMemo(() => new Proxy({ devices: { items: {} } }, handler));
 
   const handleChangePassword = (event) => {
     setPasswordUser(event.target.value);
@@ -139,22 +137,9 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
   };
 
   useEffect(() => {
-    let intervalId;
-    if (autoUpdate) {
-      intervalId = setInterval(async () => {
-        await loadInfoTable();
-      }, 1 * 10 * 1000);
-    } else {
-      console.log('subs');
-      store.subscribe(() => {
-        const s = store.getState();
-        console.log(s.devices.items);
-
-        Object.keys(s.devices.items).forEach((key) => {
-          salidasState.devices.items[key] = s.devices.items[key];
-        });
-      });
-    }
+    const intervalId = setInterval(async () => {
+      await loadInfoTable();
+    }, 1 * 10 * 1000);
 
     return () => {
       console.log('unmount table ', deviceId);
@@ -227,7 +212,7 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
           options={conductores}
         />
       )}
-      <div className="checador">
+      {/* <div className="checador">
         <div className="columns col1">
           {t('checker')}
           <br />
@@ -237,6 +222,12 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
           {t('date')}
           <br />
           <div className="nameChecker">{toDay}</div>
+        </div>
+      </div> */}
+      <div>
+        <div className="nameChecker">
+          Ruta:&nbsp;
+          {subroutes.find((item) => item.id === info?.salida?.subrouteId)?.name || ''}
         </div>
       </div>
       <div className="headerExitst">

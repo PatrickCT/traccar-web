@@ -76,7 +76,7 @@ const SchedulesPage = () => {
             <TableRow key={item.id}>
               <TableCell>{item.name}</TableCell>
               <TableCell>{subroutes[item.subrouteId].name}</TableCell>
-              <TableCell>{geofences[item.geofenceId].name}</TableCell>
+              <TableCell>{geofences[item.geofenceId]?.name || ''}</TableCell>
               <TableCell className={classes.columnAction} padding="none">
                 <CollectionActions
                   itemId={item.id}

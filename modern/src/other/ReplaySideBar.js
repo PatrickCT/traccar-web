@@ -1,10 +1,13 @@
 /* eslint-disable no-unused-vars */
+/* eslint-disable prefer-rest-params */
+/* eslint-disable react/no-this-in-sfc */
+
 import { useNavigate } from 'react-router-dom';
 import {
   Box, Button, IconButton, MenuItem, Paper, Select, Slider, Toolbar, Typography, useMediaQuery, useTheme,
 } from '@mui/material';
 import React, {
-  memo, useState,
+  memo, useEffect, useState,
 } from 'react';
 import makeStyles from '@mui/styles/makeStyles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -27,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     position: 'fixed',
     zIndex: 3,
-    left: 0,
+    // left: 0,
     top: 0,
     margin: theme.spacing(1.5),
     width: theme.dimensions.drawerWidthDesktop,
@@ -225,6 +228,7 @@ const ReplaySideBar = ({
   const [speed, setSpeed] = useState(500);
   const [value, setValue] = React.useState([50, 100]);
   const [showModalSpeed, setShowModalSpeed] = useState(false);
+  const [showBack, setShowBack] = useState(true);
 
   const classes = useStyles({ values: value });
   const navigate = useNavigate();
@@ -232,13 +236,20 @@ const ReplaySideBar = ({
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
+  useEffect(() => {
+    setTimeout(() => setShowBack(document.querySelectorAll('[data-testid="ArrowBackIcon"]').length <= 1), 1);
+  }, []);
+
   return (
     <div className={classes.sidebar}>
       <Paper elevation={3} square>
         <Toolbar>
-          <IconButton edge="start" sx={{ mr: 2 }} onClick={() => navigate(-1)}>
-            <ArrowBackIcon style={{ color: 'white' }} />
-          </IconButton>
+          {showBack && (
+            <IconButton edge="start" sx={{ mr: 2 }} onClick={() => navigate(-1)}>
+              <ArrowBackIcon style={{ color: 'white' }} />
+            </IconButton>
+          )}
+
           <Typography variant="h6" className={classes.title}>{t('reportReplay')}</Typography>
           {!expanded && (
             <>

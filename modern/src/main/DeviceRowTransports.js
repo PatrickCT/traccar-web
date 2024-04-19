@@ -112,6 +112,7 @@ const DeviceRowTransporte = ({ data, index }) => {
 
             new Popup()
               .setMaxWidth('400px')
+              .setOffset(30)
               .setHTML(createPopUp(position))
               .setLngLat([position.longitude, position.latitude])
               .addTo(map);

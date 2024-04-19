@@ -586,6 +586,7 @@
     "categoryTruck": "Truck",
     "categoryVan": "Van",
     "categoryScooter": "Scooter",
+    "categoryCarDirection": "Car",
     "maintenanceStart": "Start",
     "maintenancePeriod": "Period",
     "subroutes": "Subroutes",

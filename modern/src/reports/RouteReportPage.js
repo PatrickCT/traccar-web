@@ -67,6 +67,7 @@ const RouteReportPage = () => {
     setSelectedItem(items.find((it) => it.id === positionId));
     new Popup()
       .setMaxWidth('400px')
+      .setOffset(30)
       .setHTML(createPopUpReportRoute(items.find((it) => it.id === positionId)))
       .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
       .addTo(map);
@@ -147,6 +148,7 @@ const RouteReportPage = () => {
     setSelectedItem(items.find((it) => it.id === positionId));
     new Popup()
       .setMaxWidth('400px')
+      .setOffset(30)
       .setHTML(createPopUpReportRoute(items.find((it) => it.id === positionId)))
       .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
       .addTo(map);

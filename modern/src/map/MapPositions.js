@@ -55,11 +55,13 @@ const MapPositions = ({
       deviceId: position.deviceId,
       name: device.name,
       fixTime: formatTime(position.fixTime, 'seconds', hours12),
+      category: mapIconKey(device.category),
       // category: getStatusColor(device.status) === 'positive' ? mapIconKey(device.category) : mapIconKey('cross'),
-      category: ((hasPassedTime(new Date(device.lastUpdate), 40) || hasPassedTime(new Date(position.fixTime), 40)) ? mapIconKey('cross') : (hasPassedTime(new Date(position.fixTime), 10) ? mapIconKey('stop') : mapIconKey(device.category))),
+      // category: ((hasPassedTime(new Date(device.lastUpdate), 40) || hasPassedTime(new Date(position.fixTime), 40)) ? mapIconKey('cross') : (hasPassedTime(new Date(position.fixTime), 10) ? mapIconKey('stop') : mapIconKey(device.category))),
       color: showStatus ? position.attributes.color || getStatusColor(device.status) : 'neutral',
       rotation: position.course,
-      direction: showDirection,
+      direction: true,
+      rotate: device.category === 'carDirection',
     };
   };
 
@@ -123,7 +125,8 @@ const MapPositions = ({
         'text-offset': [0, -2 * iconScale],
         'text-font': findFonts(map),
         'text-size': 12,
-        'icon-rotate': replay ? ['get', 'rotation'] : 0,
+        'icon-rotate': replay ? ['get', 'rotation'] : ['case', ['==', ['get', 'rotate'], true], ['get', 'rotation'], 0],
+        // 'icon-rotate': ['get', 'rotation'],
         'icon-rotation-alignment': 'map',
       },
       paint: {

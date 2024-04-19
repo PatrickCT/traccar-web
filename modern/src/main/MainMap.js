@@ -40,6 +40,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
     if (selectedPosition !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
       new Popup()
         .setMaxWidth('400px')
+        .setOffset(30)
         .setHTML(createPopUp(selectedPosition))
         .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
         .addTo(map);

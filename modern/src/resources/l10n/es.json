@@ -587,6 +587,7 @@
     "categoryTruck": "Camión",
     "categoryVan": "Furgoneta",
     "categoryScooter": "Moto",
+    "categoryCarDirection": "Carro",
     "maintenanceStart": "Iniciar",
     "maintenancePeriod": "Período",
     "subroutes": "Subrutas",

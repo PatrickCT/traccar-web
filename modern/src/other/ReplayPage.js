@@ -23,6 +23,7 @@ import {
 } from '../common/util/mapPopup';
 import ReplaySideBar from './ReplaySideBar';
 import { attsGetter } from '../common/util/utils';
+import { toast } from '../common/util/toasts';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -89,6 +90,32 @@ const useStyles = makeStyles((theme) => ({
 
   },
 }));
+
+async function downloadUrlFetch(url) {
+  const downloadObj = await fetch(url);
+  const downloadBlob = await downloadObj.blob();
+  const downloadURL = URL.createObjectURL(downloadBlob);
+  const anchor = document.createElement('a');
+  anchor.href = downloadURL;
+  anchor.download = url.substring(url.lastIndexOf('/') + 1);
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(downloadURL);
+}
+
+async function downloadUrl(url) {
+  const downloadObj = await fetch(url);
+  const downloadBlob = await downloadObj.blob();
+  const downloadURL = URL.createObjectURL(downloadBlob);
+  const anchor = document.createElement('a');
+  anchor.href = downloadURL;
+  anchor.download = url.substring(url.lastIndexOf('/') + 1);
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(downloadURL);
+}
 
 const ReplayPage = () => {
   // Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item?.remove());
@@ -198,6 +225,7 @@ const ReplayPage = () => {
     const stopsMarkers = map.queryRenderedFeatures(event.point, { layers: ['stops-layer'] });
     stopsMarkers.forEach((stop) => (new Popup()
       .setMaxWidth('400px')
+      .setOffset(40)
       .setHTML(createPopUpSimple(stops[stop.properties.index]))
       .setLngLat([stops[stop.properties.index].longitude, stops[stop.properties.index].latitude])
       .addTo(map)));
@@ -263,7 +291,9 @@ const ReplayPage = () => {
 
   const handleDownload = () => {
     const query = new URLSearchParams({ deviceId: selectedDeviceId, from, to });
-    window.location.assign(`/api/positions/kml?${query.toString()}`);
+    toast.toast('Descargando, por favor espere');
+    window.location.assign(`/api/reports/route/xlsx?${query.toString()}`);
+    // window.location.assign(`/api/positions/kml?${query.toString()}`);
   };
 
   return (

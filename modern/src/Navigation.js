@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { LinearProgress } from '@mui/material';
 import MainPage from './main/MainPage';
 import CombinedReportPage from './reports/CombinedReportPage';
-import RouteReportPage from './reports/RouteReportPage';
+import RouteReportPage from './reports/NewRouteReportPage';
 import ServerPage from './settings/ServerPage';
 import UsersPage from './settings/UsersPage';
 import DevicePage from './settings/DevicePage';
@@ -184,6 +184,7 @@ const Navigation = () => {
           <Route path="chart" element={<ChartReportPage />} />
           <Route path="event" element={<EventReportPage />} />
           <Route path="route" element={<RouteReportPage />} />
+          {/* <Route path="route" element={<ReplayPage />} /> */}
           <Route path="stop" element={<StopReportPage />} />
           <Route path="summary" element={<SummaryReportPage />} />
           <Route path="trip" element={<TripReportPage />} />
