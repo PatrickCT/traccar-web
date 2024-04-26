@@ -1,0 +1,755 @@
+<!doctype html>
+<html class="giscom" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/giscom_76.png" sizes="76x76">
+    <link rel="apple-touch-icon" sizes="76x76" href="/giscom_76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/giscom_120.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/giscom_152.png">
+    <link rel="shortcut icon" href="/giscom_76.png">
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="kz9hiSXyq9vauvpKuHTq5ppCkVPwE6WK3c2e6J8R">
+    <title>cobertura</title>
+    <!-- Scripts -->
+    <script src="https://giscomercial.altanredes.com/js/app.js" defer></script>
+    <!-- Fonts -->
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <!-- Styles -->
+    <link href="/packages/fontawesome-free-5.14.0-web/css/all.css" rel="stylesheet">
+    <link href="https://giscomercial.altanredes.com/css/app.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+
+    <style>
+        #mapCobertura {
+            height: 180px;
+        }
+
+        .bg-search {
+            background: url(../img/search.png);
+            background-size: cover;
+            background-repeat: no-repeat;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+        }
+
+        .bg-tracker {
+            background: url(../img/tracker.png);
+            background-size: cover;
+            background-repeat: no-repeat;
+            width: 25px;
+            height: 23px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .bg-trash {
+            background: url(../img/cross-remove.png);
+            background-size: cover;
+            background-repeat: no-repeat;
+            width: 25px;
+            height: 23px;
+            cursor: pointer;
+            margin-right: 6px;
+            margin-top: 1px;
+        }
+
+        .hde {
+            display: none;
+        }
+
+        .search-w {
+            background: #FFFFFF;
+            border: 2px solid #DF3B01;
+            border-radius: 7px;
+        }
+
+        .map {
+            height: 740px;
+            position: sticky !important;
+        }
+
+        .div-search {
+            z-index: 1;
+            position: absolute;
+            margin-left: 50px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        .point {
+            height: 27px;
+            width: 300px;
+            background: #FFFFFF;
+            margin-top: 4px;
+            padding-top: 3px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+        input {
+            border-color: transparent;
+        }
+
+        .row-search {
+            display: flex;
+        }
+
+        .info-err {
+            background: #FFFFFF;
+            padding: 10px;
+            margin: 3px;
+            border-radius: 5px;
+            border: 1px solid #DF3B01;
+        }
+
+        .lst-cobertura {
+            display: grid;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #FFFFFF;
+            opacity: 0.8;
+            border-radius: 10px;
+            border: 2px solid #DF3B01;
+            width: 200px;
+        }
+
+        /* The container */
+        .container {
+            display: block;
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Hide the browser's default radio button */
+        .container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Create a custom radio button */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 15px;
+            width: 15px;
+            background-color: #eee;
+            border-radius: 15%;
+        }
+
+        /* On mouse-over, add a grey background color */
+        .container:hover input~.checkmark {
+            background-color: #ccc;
+        }
+
+        /* When the radio button is checked, add a blue background */
+        .container input:checked~.checkmark {
+            background-color: #DF3B01;
+        }
+
+        /* Create the indicator (the dot/circle - hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* Show the indicator (dot/circle) when checked */
+        .container input:checked~.checkmark:after {
+            display: block;
+        }
+
+        /* Style the indicator (dot/circle) */
+        .container .checkmark:after {
+            top: 1px;
+            left: 5px;
+            width: 3px;
+            height: 7px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(40deg);
+            -ms-transform: rotate(40deg);
+            transform: rotate(40deg);
+        }
+
+        .title_summary {
+            font-size: 16px;
+        }
+
+        summary {
+            list-style: none
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details summary::before {
+            content: url(../img/down_raw.png);
+            color: red;
+            /* you can style it however you want, use background-image for example */
+        }
+
+        /* By using [open] we can define different styles when the disclosure widget is open */
+        details[open] summary::before {
+            content: url(../img/right_raw.png);
+            color: red
+        }
+
+        @media (max-width: 768px) {}
+
+        @media (min-width: 768px) {}
+
+        /* Extra small devices (phones, 600px and down) */
+        @media only screen and (max-width: 600px) {}
+
+
+        /* Small devices (portrait tablets and large phones, 600px and up) */
+        @media only screen and (min-width: 600px) {}
+
+        /* Medium devices (landscape tablets, 768px and up) */
+        @media only screen and (min-width: 768px) {}
+
+        /* Large devices (laptops/desktops, 992px and up) */
+        @media only screen and (min-width: 992px) {}
+
+        /* Extra large devices (large laptops and desktops, 1200px and up) */
+        @media only screen and (min-width: 1200px) {}
+    </style>
+</head>
+
+<body class="giscom">
+    <div id="app">
+
+        <main class="py-4 gis-map__container">
+            <gis-map></gis-map>
+        </main>
+    </div>
+    <script>
+        var g_mvnos = [];
+        var g_layers = [{
+            "id": 1,
+            "index": 1,
+            "default": 0,
+            "name": "Cobertura_5HBB",
+            "label": "5 Mbps",
+            "color": "#ADACAC",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Cobertura - HBB - 5Mbps",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "28-03-24",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2024-03-29T18:47:53.000000Z"
+        }, {
+            "id": 2,
+            "index": 2,
+            "default": 0,
+            "name": "Cobertura_10HBB",
+            "label": "10 Mbps",
+            "color": "#64E6F2",
+            "version": "1.1.1",
+            "layer": null,
+            "permission": "Cobertura - HBB - 10Mbps",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "28-03-24",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2024-03-29T18:47:05.000000Z"
+        }, {
+            "id": 4,
+            "index": 4,
+            "default": 1,
+            "name": "Cobertura_MBB",
+            "label": "Comercial (-115 dBm)",
+            "color": "#990000",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Cobertura - MBB",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "28-03-24",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2024-03-29T18:45:58.000000Z"
+        }, {
+            "id": 5,
+            "index": 5,
+            "default": 0,
+            "name": "sectores_alta_ocupacion",
+            "label": "Alta Ocupaci\u00f3n (3,727)",
+            "color": "#FCC24C",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Cobertura - HBB - Alta Ocupacion",
+            "tiled": 0,
+            "filter": null,
+            "styles": null,
+            "last_updated": "15-04-24",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2021-06-24T16:39:34.000000Z"
+        }, {
+            "id": 6,
+            "index": 6,
+            "default": 0,
+            "name": "Sectores_saturados",
+            "label": "Saturados (1,650)",
+            "color": "#FC574C",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Cobertura - HBB - Sectores Saturados",
+            "tiled": 0,
+            "filter": null,
+            "styles": null,
+            "last_updated": "15-04-24",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2021-03-26T00:45:08.000000Z"
+        }, {
+            "id": 14,
+            "index": 14,
+            "default": 0,
+            "name": "GSM_ROAMING_GAR",
+            "label": "2G (GAR)",
+            "color": "#6892B6",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Roaming - Telcel - 2G",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "12-07-23",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2023-07-19T19:03:57.000000Z"
+        }, {
+            "id": 15,
+            "index": 15,
+            "default": 0,
+            "name": "UMTS_ROAMING_GAR",
+            "label": "3G (GAR)",
+            "color": "#66E6F2",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Roaming - Telcel - 3G",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "16-08-23",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2023-08-16T16:46:14.000000Z"
+        }, {
+            "id": 16,
+            "index": 16,
+            "default": 0,
+            "name": "LTE_ROAMING_GAR",
+            "label": "4G (GAR)",
+            "color": "#6371af",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Roaming - Telcel - 4G",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "09-08-23",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2023-08-09T23:50:46.000000Z"
+        }, {
+            "id": 17,
+            "index": 17,
+            "default": 0,
+            "name": "Roaming_Movistar_3G_GAR",
+            "label": "3G (GAR)",
+            "color": "#35D62C",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Roaming - Movistar - 3G",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "11-01-24",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2024-01-25T19:15:44.000000Z"
+        }, {
+            "id": 18,
+            "index": 18,
+            "default": 0,
+            "name": "Roaming_Movistar_LTE_GAR",
+            "label": "4G (GAR)",
+            "color": "#66B260",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Roaming - Movistar - 4G",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "11-01-24",
+            "created_at": "2021-03-26T00:45:08.000000Z",
+            "updated_at": "2024-01-25T19:15:20.000000Z"
+        }, {
+            "id": 33,
+            "index": 33,
+            "default": 0,
+            "name": "ATT_3G_Roaming",
+            "label": "3G",
+            "color": "#741b47",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Roaming - ATT - 3G",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "27-07-21",
+            "created_at": "2021-03-30T06:45:08.000000Z",
+            "updated_at": "2021-07-27T22:51:34.000000Z"
+        }, {
+            "id": 34,
+            "index": 34,
+            "default": 0,
+            "name": "ATT_Lte_Roaming_GAR",
+            "label": "4G (GAR)",
+            "color": "#9b446f",
+            "version": "1.1.0",
+            "layer": null,
+            "permission": "Roaming - ATT - 4G",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "13-03-23",
+            "created_at": "2021-03-30T06:45:08.000000Z",
+            "updated_at": "2023-03-13T18:45:01.000000Z"
+        }, {
+            "id": 35,
+            "index": 35,
+            "default": 0,
+            "name": "Zonas_Recarga",
+            "label": "Puntos de recarga",
+            "color": "#990000",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Puntos de recarga",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "27-07-21",
+            "created_at": "2021-04-08T14:45:42.000000Z",
+            "updated_at": "2021-07-27T22:53:34.000000Z"
+        }, {
+            "id": 38,
+            "index": 38,
+            "default": 0,
+            "name": "Sitios_Integrados_No_Operativos",
+            "label": "Cobertura Pre-operativa",
+            "color": "#e217aa",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Cobertura Pre-operativa",
+            "tiled": 0,
+            "filter": null,
+            "styles": null,
+            "last_updated": "15-06-22",
+            "created_at": "2021-05-24T16:25:32.000000Z",
+            "updated_at": "2022-06-16T20:59:31.000000Z"
+        }, {
+            "id": 51,
+            "index": 51,
+            "default": 0,
+            "name": "Sitos_Gis",
+            "label": "FO (5,012)",
+            "color": "#ffd966",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Sitos Gis",
+            "tiled": 0,
+            "filter": "solucion_tx=\u0027FO\u0027",
+            "styles": "Sitios_Gis_FO",
+            "last_updated": "15-04-24",
+            "created_at": "2021-06-22T22:54:56.000000Z",
+            "updated_at": "2021-06-24T23:38:43.000000Z"
+        }, {
+            "id": 52,
+            "index": 52,
+            "default": 0,
+            "name": "Sitos_Gis",
+            "label": "MW (1,457)",
+            "color": "#ff9900",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Sitos Gis",
+            "tiled": 0,
+            "filter": "solucion_tx=\u0027MW\u0027",
+            "styles": "Sitios_Gis_MW",
+            "last_updated": "15-04-24",
+            "created_at": "2021-06-22T22:55:29.000000Z",
+            "updated_at": "2021-06-24T23:38:51.000000Z"
+        }, {
+            "id": 53,
+            "index": 53,
+            "default": 0,
+            "name": "Sitos_Gis",
+            "label": "Satellite (1,959)",
+            "color": "#00ffff",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Sitos Gis",
+            "tiled": 0,
+            "filter": "solucion_tx=\u0027Satellite\u0027",
+            "styles": "Sitios_Gis_Sat",
+            "last_updated": "15-04-24",
+            "created_at": "2021-06-22T22:56:25.000000Z",
+            "updated_at": "2021-06-24T23:42:41.000000Z"
+        }, {
+            "id": 59,
+            "index": 62,
+            "default": 0,
+            "name": "Puntos_Recarga_Proveedores",
+            "label": "Cadena",
+            "color": "#0096d4",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Puntos de recarga - cadena",
+            "tiled": 1,
+            "filter": "tipo_sitio=\u0027Cadena\u0027",
+            "styles": "punto_recarga_cadena",
+            "last_updated": "07-09-21",
+            "created_at": "2021-07-28T03:49:48.000000Z",
+            "updated_at": "2021-09-07T21:58:11.000000Z"
+        }, {
+            "id": 62,
+            "index": 63,
+            "default": 0,
+            "name": "Puntos_Recarga_Proveedores",
+            "label": "Pago por Referencia",
+            "color": "#131313",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Puntos de recarga - pago por referencia",
+            "tiled": 1,
+            "filter": "tipo_sitio=\u0027Pago por referencia\u0027",
+            "styles": "punto_recarga_pago",
+            "last_updated": "07-09-21",
+            "created_at": "2021-09-07T16:04:00.000000Z",
+            "updated_at": "2021-09-07T21:58:35.000000Z"
+        }, {
+            "id": 63,
+            "index": 64,
+            "default": 0,
+            "name": "Puntos_Recarga_Proveedores",
+            "label": "Red de Pago",
+            "color": "#99c655",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Puntos de recarga - red de pago",
+            "tiled": 1,
+            "filter": "tipo_sitio=\u0027Red de Pago - Peque\u00f1os comercios\u0027",
+            "styles": "punto_recarga_red",
+            "last_updated": "07-09-21",
+            "created_at": "2021-09-07T16:04:00.000000Z",
+            "updated_at": "2021-09-07T21:58:56.000000Z"
+        }, {
+            "id": 126,
+            "index": 200,
+            "default": 0,
+            "name": "Sitos_Gis_1",
+            "label": "FO",
+            "color": "#ffd966",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Sitos Gis",
+            "tiled": 0,
+            "filter": "solucion_tx=\u0027FO\u0027",
+            "styles": "Sitios_Gis_FO",
+            "last_updated": "14-12-22",
+            "created_at": "2022-12-09T20:57:41.000000Z",
+            "updated_at": "2022-12-14T15:48:13.000000Z"
+        }, {
+            "id": 127,
+            "index": 201,
+            "default": 0,
+            "name": "Sitos_Gis_1",
+            "label": "Satellite",
+            "color": "#00ffff",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Sitos Gis",
+            "tiled": 0,
+            "filter": "solucion_tx\t=\u0027Satellite\u0027",
+            "styles": "Sitios_Gis_Sat",
+            "last_updated": "14-12-22",
+            "created_at": "2022-12-14T15:51:29.000000Z",
+            "updated_at": "2022-12-14T15:52:02.000000Z"
+        }, {
+            "id": 148,
+            "index": 222,
+            "default": 0,
+            "name": "Serviciabilidad_Mbb",
+            "label": "Serviciabilidad Mbb",
+            "color": "#718091",
+            "version": "1.0.0",
+            "layer": null,
+            "permission": "Cobertura - MBB",
+            "tiled": 1,
+            "filter": null,
+            "styles": null,
+            "last_updated": "21-06-23",
+            "created_at": "2023-06-21T21:00:08.000000Z",
+            "updated_at": "2023-06-21T21:06:03.000000Z"
+        }];
+        var g_layers_tree = [{
+            "text": "Cobertura Comercial",
+            "children": [{
+                "text": "HBB",
+                "children": [{
+                    "text": "5 Mbps",
+                    "data": {
+                        "index": 1,
+                        "name": "Cobertura_5HBB"
+                    }
+                }, {
+                    "text": "10 Mbps",
+                    "data": {
+                        "index": 2,
+                        "name": "Cobertura_10HBB"
+                    }
+                }, {
+                    "text": "Alta Ocupaci\u00f3n",
+                    "data": {
+                        "index": 5,
+                        "name": "sectores_alta_ocupacion"
+                    }
+                }, {
+                    "text": "Saturados",
+                    "data": {
+                        "index": 6,
+                        "name": "Sectores_saturados"
+                    }
+                }]
+            }, {
+                "text": "MBB",
+                "children": [{
+                    "text": "Comercial",
+                    "state": {
+                        "checked": true
+                    },
+                    "data": {
+                        "index": 4,
+                        "name": "Cobertura_MBB"
+                    }
+                }]
+            }]
+        }, {
+            "text": "Cobertura Otros Operadores",
+            "children": [{
+                "text": "Telcel (Roaming)",
+                "children": [{
+                    "text": "2G (GSM)",
+                    "data": {
+                        "index": 14,
+                        "name": "GSM_ROAMING_GAR"
+                    }
+                }, {
+                    "text": "3G (UMTS)",
+                    "data": {
+                        "index": 15,
+                        "name": "UMTS_ROAMING_GAR"
+                    }
+                }, {
+                    "text": "4G (LTE)",
+                    "data": {
+                        "index": 16,
+                        "name": "LTE_ROAMING_GAR"
+                    }
+                }]
+            }, {
+                "text": "Movistar (Roaming)",
+                "children": [{
+                    "text": "3G",
+                    "data": {
+                        "index": 17,
+                        "name": "Roaming_Movistar_3G_GAR"
+                    }
+                }, {
+                    "text": "4G",
+                    "data": {
+                        "index": 18,
+                        "name": "Roaming_Movistar_LTE_GAR"
+                    }
+                }]
+            }, {
+                "text": "ATT (Roaming)",
+                "children": [{
+                    "text": "3G",
+                    "data": {
+                        "index": 33,
+                        "name": "ATT_3G_Roaming_GAR"
+                    }
+                }, {
+                    "text": "4G (LTE)",
+                    "data": {
+                        "index": 34,
+                        "name": "ATT_Lte_Roaming_GAR"
+                    }
+                }]
+            }]
+        }, {
+            "text": "Puntos de recarga",
+            "children": [{
+                "text": "Cadena",
+                "data": {
+                    "index": 62,
+                    "name": "Puntos_Recarga_Proveedores"
+                }
+            }, {
+                "text": "Pago por Referencia",
+                "data": {
+                    "index": 63,
+                    "name": "Puntos_Recarga_Proveedores"
+                }
+            }, {
+                "text": "Red de Pago",
+                "data": {
+                    "index": 64,
+                    "name": "Puntos_Recarga_Proveedores"
+                }
+            }]
+        }, {
+            "text": "Sitios Operativos",
+            "children": [{
+                "text": "FO",
+                "data": {
+                    "index": 51,
+                    "name": "Sitos_Gis"
+                }
+            }, {
+                "text": "MW",
+                "data": {
+                    "index": 52,
+                    "name": "Sitos_Gis"
+                }
+            }, {
+                "text": "Satellite",
+                "data": {
+                    "index": 53,
+                    "name": "Sitos_Gis"
+                }
+            }]
+        }];
+        var g_user_can_see_integration_check = 0;
+    </script>
+</body>
+
+</html>

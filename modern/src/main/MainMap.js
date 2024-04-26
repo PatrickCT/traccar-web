@@ -24,6 +24,9 @@ import { createPopUp } from '../common/util/mapPopup';
 import MapPopup from '../map/showpopup/MapPopup';
 import MapShare from '../map/share/MapShare';
 import LinksPage from '../settings/LinksPage';
+import MapCoverage from '../map/coverage/MapCoverage';
+import { showCoberturaMap } from '../common/util/utils';
+import { useAdministrator } from '../common/util/permissions';
 
 const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const theme = useTheme();
@@ -33,6 +36,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const eventsAvailable = useSelector((state) => !!state.events.items.length);
   const features = useFeatures();
   const [showModalShareLocation, setShowModalShareLocation] = useState(false);
+  const admin = useAdministrator();
 
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
@@ -75,6 +79,9 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
       )}
       <MapPopup />
       <MapShare onClick={() => setShowModalShareLocation(true)} />
+      {admin && (
+        <MapCoverage onClick={() => showCoberturaMap()} />
+      )}
       <Modal
         isOpen={showModalShareLocation}
         onClose={() => setShowModalShareLocation(false)} // Close modal when the overlay is clicked or Esc is pressed

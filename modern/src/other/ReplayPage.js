@@ -150,15 +150,17 @@ const ReplayPage = () => {
     setValue(newValue);
   };
 
-  // const deviceName = useSelector((state) => {
-  //   if (selectedDeviceId) {
-  //     const device = state.devices.items[selectedDeviceId];
-  //     if (device) {
-  //       return device.name;
-  //     }
-  //   }
-  //   return null;
-  // });
+  const deviceName = useSelector((state) => {
+    if (selectedDeviceId) {
+      const device = state.devices.items[selectedDeviceId];
+      if (device) {
+        return device.name;
+      }
+    }
+    return null;
+  });
+
+  window.deviceName = deviceName;
 
   const changeIndex = useCallback((_, index) => {
     setIndex(index);

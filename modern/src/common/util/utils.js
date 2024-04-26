@@ -1,21 +1,4 @@
-// const getDevice = (deviceId) => {
-//   const request = new XMLHttpRequest();
-//   request.open('GET', `/api/devices/${deviceId}`, false);
-//   request.send();
-
-//   if (request.status === 200) {
-//     const data = JSON.parse(request.responseText);
-//     return data;
-//   }
-//   return null;
-// };
-// const lastIndexOf = (array, key) => {
-//   // eslint-disable-next-line no-plusplus
-//   for (let i = array.length - 1; i >= 0; i--) {
-//     if (array[i].data.deviceId === key) { return i; }
-//   }
-//   return -1;
-// };
+/* eslint-disable prefer-const */
 const requestCache = {};
 const alarmTranslator = (alarm) => {
   switch (alarm.toUpperCase()) {
@@ -532,3 +515,102 @@ export const isMobile = () => /Mobi|Android/i.test(navigator.userAgent);
 export const hasPassedTime = (date, min) => Math.abs((date - new Date()) / 60000) > min;
 
 export const generateArray = (size, start = 1) => Array.from({ length: size }, (_, i) => start + i);
+
+export const showCoberturaMap = () => {
+  window.jsPanel.create({
+    theme: '#011842 filled',
+    headerTitle: 'Cobertura',
+    contentSize: {
+      width: window.innerWidth * 0.8,
+      height: window.innerHeight * 0.8,
+    },
+    contentOverflow: 'hidden',
+    content: '<iframe src="./cobertura.html" style="width: 100%; height: 100%;"></iframe>',
+  });
+};
+
+window.createMenuItem = (iconClass, text, isSubmenu = false, callback = () => { }) => {
+  if (document.querySelector('.menu') === null) window.generateMenu();
+  let menu = document.querySelector('.menu');
+
+  const li = document.createElement('li');
+  li.classList.add('menu-item');
+  if (isSubmenu) {
+    li.classList.add('menu-item-submenu');
+  }
+  const button = document.createElement('button');
+  button.setAttribute('type', 'button');
+  button.classList.add('menu-btn');
+  if (iconClass) {
+    const icon = document.createElement('i');
+    icon.classList.add('fa', iconClass);
+    button.appendChild(icon);
+  }
+  const span = document.createElement('span');
+  span.classList.add('menu-text');
+  span.textContent = text;
+  button.appendChild(span);
+  li.appendChild(button);
+
+  button.onclick = callback;
+  menu.appendChild(li);
+  return li;
+};
+
+window.createMenuSeparator = () => {
+  if (document.querySelector('.menu') === null) window.generateMenu();
+  let menu = document.querySelector('.menu');
+
+  const li = document.createElement('li');
+  li.classList.add('menu-separator');
+
+  menu.appendChild(li);
+  return li;
+};
+
+window.createSubmenu = (items) => {
+  if (document.querySelector('.menu') === null) window.generateMenu();
+  let menu = document.querySelector('.menu');
+
+  const ul = document.createElement('ul');
+  ul.classList.add('menu');
+  items.forEach((item) => {
+    ul.appendChild(item);
+  });
+
+  menu.appendChild(ul);
+  return ul;
+};
+
+window.generateMenu = () => {
+  if (document.querySelector('.menu') !== null) return;
+  const menuContainer = document.createElement('ul');
+  menuContainer.classList.add('menu');
+  document.body.appendChild(menuContainer);
+
+  let menu = document.querySelector('.menu');
+
+  function showMenu(x, y) {
+    menu.style.left = `${x}px`;
+    menu.style.top = `${y}px`;
+    menu.classList.add('menu-show');
+  }
+
+  function hideMenu() {
+    menu.classList.remove('menu-show');
+  }
+
+  function onMouseDown(e) {
+    if (e.target.className.split(' ').some((c) => /menu-.*/.test(c))) return;
+    hideMenu();
+    document.removeEventListener('mousedown', onMouseDown);
+  }
+
+  function onContextMenu(e) {
+    e.preventDefault();
+    showMenu(e.pageX, e.pageY);
+    document.addEventListener('mousedown', onMouseDown, false);
+  }
+
+  document.addEventListener('contextmenu', onContextMenu, false);
+};

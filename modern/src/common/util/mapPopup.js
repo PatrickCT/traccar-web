@@ -388,8 +388,7 @@ export const createPopUpReportRoute = (position) => {
   let html = '<div>';
   html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
 
-  html += `<h3><b>${attsGetter(position, 'name')}</b></h3></div>`;
-  html += '<br />';
+  html += `<h3 style="margin: 0px"><b>${window.deviceName || ''}</b></h3></div>`;
   html += valueParser(position, specialAtts(position, 'ignition'));
   html += '<br />';
   html += valueParser(position, specialAtts(position, 'motion'));
