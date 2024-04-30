@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react';
+/* eslint-disable import/no-extraneous-dependencies */
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Popup } from 'maplibre-gl';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -29,6 +30,7 @@ import { showCoberturaMap } from '../common/util/utils';
 import { useAdministrator } from '../common/util/permissions';
 
 const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
+  console.log('MainMap');
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -50,6 +52,48 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
         .addTo(map);
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    const propPrint = (prop) => {
+      try {
+        switch (typeof prop) {
+          case 'object': return JSON.stringify(prop);
+          case 'undefined': return 'NULL';
+          default: return prop;
+        }
+      } catch (error) {
+        return prop;
+      }
+    };
+    const handler = {
+      get(target, key) {
+        if (typeof target[key] === 'object' && target[key] !== null) {
+          return new Proxy(target[key], handler);
+        }
+        return target[key];
+      },
+      set(target, prop, value) {
+        console.log(`changed ${prop} from ${propPrint(target[prop])} to ${propPrint(value)}`);
+        target[prop] = value;
+        return true;
+      },
+    };
+    if (window.app === undefined || window.app === null) {
+      console.log('init app');
+      window.app = new Proxy({ positions: [], index: 0, selectedPosition, lastPosition: null }, handler);
+    } else {
+      console.log('update app');
+      if ((selectedPosition?.deviceId !== window.app.selectedDevice) || selectedPosition === null) {
+        window.app.positions = [];
+        window.app.lastPosition = null;
+        window.app.index = 0;
+      }
+      window.app.lastPosition = window.app.selectedPosition;
+      window.app.selectedPosition = selectedPosition;
+      window.app.selectedDevice = selectedPosition?.deviceId;
+      console.log((selectedPosition?.deviceId !== window.app.selectedDevice));
+    }
+  }, [selectedPosition]);
 
   return (
     <>
@@ -93,4 +137,4 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   );
 };
 
-export default MainMap;
+export default memo(MainMap);

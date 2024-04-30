@@ -80,11 +80,10 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
     },
     set(target, prop, value) {
       const equal = isEqual(target[prop], value);
-      // console.log(`changed ${prop} from ${propPrint(target[prop])} to ${propPrint(value)}, equality ${equal}`);
+      // console.log(`changed ${prop} from ${propPrint(target[prop])} to ${propPrint(value)}`);
       if (!equal) {
         target[prop] = value;
         if (deviceId === target.id) {
-          console.log(`updating tickets for device ${target}`);
           loadInfoTable();
         }
       }

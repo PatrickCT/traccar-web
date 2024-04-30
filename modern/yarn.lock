@@ -8352,6 +8352,11 @@ launch-editor@^2.6.0:
     picocolors "^1.0.0"
     shell-quote "^1.7.3"
 
+leaflet.animatedmarker@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/leaflet.animatedmarker/-/leaflet.animatedmarker-1.0.0.tgz"
+  integrity sha512-dURiGulr/wTf2/jY1b5JxETpPdNIvU5UGtmmz3FIjdImEfbYShgZHwRepeywjjE7m02kF8nLjD5juE1z+tnWkA==
+
 leven@^3.1.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/leven/-/leven-3.1.0.tgz"
