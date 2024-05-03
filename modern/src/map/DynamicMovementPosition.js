@@ -1,155 +1,237 @@
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unused-vars */
-import {
-  useId, useCallback, useEffect, memo, useState,
-  useRef,
+/* eslint-disable no-underscore-dangle */
+import React, {
+  useState, useCallback, useRef, useEffect, useMemo,
 } from 'react';
-import * as turf from '@turf/turf';
-
+import { LngLat, Popup } from 'mapbox-gl';
+import makeStyles from '@mui/styles/makeStyles';
 import { useSelector } from 'react-redux';
-import { useMediaQuery } from '@mui/material';
-import { useTheme } from '@mui/styles';
-import { map } from './core/MapView';
-import { formatTime, getStatusColor } from '../common/util/formatter';
-import { mapIconKey } from './core/preloadImages';
-import { findFonts } from './core/mapUtil';
-import { useAttributePreference, usePreference } from '../common/util/preferences';
-import { hasPassedTime } from '../common/util/utils';
-// import { createPopUpSimple } from '../common/util/mapPopup';
+import MapView, { map } from './core/MapView';
+import MapPositions from './MapPositions';
+import { useTranslation } from '../common/components/LocalizationProvider';
+import {
+  createPopUpReportRoute, createPopUpSimple,
+} from '../common/util/mapPopup';
+import { attsGetter } from '../common/util/utils';
 
-const DynamicMovementPosition = ({
-  test = false,
-}) => {
-  const id = useId();
-  const direction = `${id}-dynamic-direction`;
+const useStyles = makeStyles((theme) => ({
+  root: {
+    height: '100%',
+  },
+  sidebar: {
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'fixed',
+    zIndex: 3,
+    left: 0,
+    top: 0,
+    // margin: theme.spacing(1.5),
+    // width: theme.dimensions.drawerWidthDesktop,
+    margin: 0,
+    width: '100%',
+    [theme.breakpoints.down('md')]: {
+      width: '100%',
+      margin: 0,
+    },
+  },
+  title: {
+    flexGrow: 1,
+    color: 'white',
+  },
+  slider: {
+    width: '100%',
+  },
+  controls: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  formControlLabel: {
+    height: '100%',
+    width: '100%',
+    paddingRight: theme.spacing(1),
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  content: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '1px',
+    paddingLeft: '20px',
+    paddingRight: '20px',
+    width: '97.5%',
+    [theme.breakpoints.down('md')]: {
+      margin: theme.spacing(2),
+      position: 'fixed',
+      width: '90%',
+      bottom: '8%',
+    },
+    [theme.breakpoints.up('md')]: {
+      // marginTop: theme.spacing(1),
+    },
+    lineHeight: '1px',
+    backgroundColor: 'transparent',
+    pointerEvents: 'none',
+    '&:hover': {
+      backgroundColor: 'white',
+      pointerEvents: 'auto',
+    },
 
-  const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
-  const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
+  },
+}));
 
-  const devices = useSelector((state) => state.devices.items);
-  const hours12 = usePreference('twelveHourFormat');
+async function downloadUrlFetch(url) {
+  const downloadObj = await fetch(url);
+  const downloadBlob = await downloadObj.blob();
+  const downloadURL = URL.createObjectURL(downloadBlob);
+  const anchor = document.createElement('a');
+  anchor.href = downloadURL;
+  anchor.download = url.substring(url.lastIndexOf('/') + 1);
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(downloadURL);
+}
 
+async function downloadUrl(url) {
+  const downloadObj = await fetch(url);
+  const downloadBlob = await downloadObj.blob();
+  const downloadURL = URL.createObjectURL(downloadBlob);
+  const anchor = document.createElement('a');
+  anchor.href = downloadURL;
+  anchor.download = url.substring(url.lastIndexOf('/') + 1);
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(downloadURL);
+}
+
+const DynamicMovementPosition = ({ pos }) => {
+  // Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item?.remove());
+  // console.log('DynamicMovementPosition');
   const timerRef = useRef();
-  const [positions, setPositions] = useState([]);
-  const [speed, setSpeed] = useState(100);
+  const t = useTranslation();
+  const classes = useStyles();
+  // const navigate = useNavigate();
+
+  // const hours12 = usePreference('twelveHourFormat');
+
+  const defaultDeviceId = useSelector((state) => state.devices.selectedId);
+
+  const [positions, setPositions] = useState(pos);
+  const [stops, setStops] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [selectedDeviceId, setSelectedDeviceId] = useState(defaultDeviceId);
+  // const [showCard, setShowCard] = useState(false);
+  const [from, setFrom] = useState();
+  const [to, setTo] = useState();
+  const [expanded, setExpanded] = useState(true);
   const [playing, setPlaying] = useState(true);
+  const [speed, setSpeed] = useState(500);
 
-  const createFeature = (devices, position) => {
-    const device = devices[position.deviceId];
+  const [value, setValue] = React.useState([50, 100]);
+  // const [marker, setMarker] = useState(null);
 
-    return {
-      id: position.id,
-      deviceId: position.deviceId,
-      name: device.name,
-      fixTime: formatTime(position.fixTime, 'seconds', hours12),
-      category: mapIconKey(device.category),
-      color: 'neutral',
-      rotation: position.course,
-      direction: true,
-      rotate: device.category === 'carDirection',
-    };
-  };
+  const memoPositions = useMemo(() => positions, [positions]);
+  const memoStops = useMemo(() => stops, [stops]);
+
+  const deviceName = useSelector((state) => {
+    if (selectedDeviceId) {
+      const device = state.devices.items[selectedDeviceId];
+      if (device) {
+        return device.name;
+      }
+    }
+    return null;
+  });
+
+  window.deviceName = deviceName;
 
   useEffect(() => {
-    map.addSource(`${id}-dynamic`, {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-    });
-
-    map.addLayer({
-      id,
-      type: 'symbol',
-      source: `${id}-dynamic`,
-      filter: ['!has', 'point_count'],
-      layout: {
-        'icon-image': `${'{category}-{color}'}`,
-        'icon-size': 0.08,
-        'icon-allow-overlap': true,
-        'text-field': `{${'name'}}`,
-        'text-allow-overlap': true,
-        'text-anchor': 'bottom',
-        'text-offset': [0, -2 * iconScale],
-        'text-font': findFonts(map),
-        'text-size': 12,
-        'icon-rotate': ['get', 'rotation'],
-        // 'icon-rotate': ['get', 'rotation'],
-        'icon-rotation-alignment': 'map',
-      },
-      paint: {
-        'text-halo-color': 'white',
-        'text-halo-width': 1,
-      },
-    });
-
-    map.addLayer({
-      id: direction,
-      type: 'symbol',
-      source: `${id}-dynamic`,
-      filter: [
-        'all',
-        ['!has', 'point_count'],
-        ['==', 'direction', true],
-      ],
-      layout: {
-        'icon-image': 'direction',
-        'icon-size': iconScale,
-        'icon-allow-overlap': true,
-        'icon-rotate': ['get', 'rotation'],
-        'icon-rotation-alignment': 'map',
-      },
-    });
-
     clearInterval(timerRef.current);
-    if (playing) {
+    if (playing && positions.length > 0) {
       timerRef.current = setInterval(() => {
         // changeIndex(null, (index) => index + 1);
-        window.app.index += 1;
+        setIndex((index) => index + 1);
       }, speed);
     }
 
     return () => clearInterval(timerRef.current);
+  }, [playing, positions, speed]);
+
+  useEffect(() => {
+    if (index >= positions.length - 1) {
+      clearInterval(timerRef.current);
+      // setPlaying(false);
+      window.marker = null;
+    }
+  }, [index, positions]);
+
+  useEffect(() => {
+    if (positions && positions.length > 0) {
+      Array.from(document.getElementsByClassName('mapboxgl-popup')).filter((popup) => popup.id !== '').map((item) => item.remove());
+      const speed = parseFloat((attsGetter(positions[index], 'speed') ?? (attsGetter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -')).split(' ')[0]) || 0;
+      const currentType = (speed < value[0] ? 1 : (speed < value[1] ? 2 : 3));
+      const color = (currentType === 1 ? 'green' : (currentType === 2 ? 'orange' : 'red'));
+      if (map.getBounds().contains(new LngLat(positions[index]?.longitude, positions[index]?.latitude))) {
+        requestAnimationFrame(() => {
+          const p = new Popup()
+            .setMaxWidth('400px')
+            .setOffset(40)
+            .setHTML(createPopUpReportRoute(positions[index]))
+            .setLngLat([positions[index]?.longitude, positions[index]?.latitude])
+            .addTo(map);
+          p.getElement().id = positions[index].deviceId;
+          window.marker = p;
+          window.marker._content.classList.add(`mapboxgl-popup-content-${color}`);
+        });
+      } else {
+        const p = new Popup()
+          .setMaxWidth('400px')
+          .setOffset(40)
+          .setHTML(createPopUpReportRoute(positions[index]))
+          .setLngLat([positions[index]?.longitude, positions[index]?.latitude])
+          .addTo(map);
+        p.getElement().id = positions[index].deviceId;
+        window.marker = p;
+        window.marker._content.classList.add('mapboxgl-popup-content-green');
+      }
+    }
+  }, [index]);
+
+  const onMarkerClick = useCallback((_, deviceId, map, event) => {
+    if (event === undefined) return;
+    const stopsMarkers = map.queryRenderedFeatures(event.point, { layers: ['stops-layer'] });
+    stopsMarkers.forEach((stop) => (new Popup()
+      .setMaxWidth('400px')
+      .setOffset(40)
+      .setHTML(createPopUpSimple(stops[stop.properties.index]))
+      .setLngLat([stops[stop.properties.index].longitude, stops[stop.properties.index].latitude])
+      .addTo(map)));
+  }, [memoPositions, memoStops]);
+
+  useEffect(() => {
+    console.log('init');
+    setIndex(0);
+    console.log(positions);
   }, []);
 
   useEffect(() => {
-    window.app.index = 0;
-    console.log('================================');
-    const positions = [];
-    if (window.app.lastPosition !== null && window.app.lastPosition !== undefined && window.app.selectedPosition !== null && window.app.selectedPosition !== undefined) {
-      const distance = turf.distance(turf.point([window.app.lastPosition?.longitude, window.app.lastPosition?.latitude]), turf.point([window.app.selectedPosition?.longitude, window.app.selectedPosition?.latitude]), { units: 'meters' });
-      if (parseInt(distance, 10) > 0) {
-        const steps = parseInt(distance / 2, 10);
-        let fillers = [];
-        for (let i = 0; i < steps; i += 1) {
-          const point = turf.along(turf.lineString([[window.app.lastPosition.longitude, window.app.lastPosition.latitude], [window.app.selectedPosition.longitude, window.app.selectedPosition.latitude]]), ((i + 1) * 2), { units: 'meters' });
-          fillers.push({ course: window.app.selectedPosition.course, original: false, longitude: point.geometry.coordinates[0], latitude: point.geometry.coordinates[1] });
-        }
-        const fillerCourse = (fillers.reduce((acc, obj) => acc + parseFloat(obj.course ?? ''), 0) / fillers.length);
-        fillers = fillers.map((filler) => ({ ...filler, course: fillerCourse }));
-        positions.push(...fillers);
-      }
-    }
-
-    positions.push(window.app.selectedPosition);
+    console.log('init');
+    setIndex(0);
     console.log(positions);
+    setPlaying(true);
+  }, [positions]);
 
-    map.getSource(`${id}-dynamic`)?.setData({
-      type: 'FeatureCollection',
-      features: [positions[window.app.index]].filter((it) => devices.hasOwnProperty(it?.deviceId)).map((position) => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [position.longitude, position.latitude],
-        },
-        properties: createFeature(devices, position),
-      })),
-    });
-  }, [window.app.selectedPosition]);
-
-  return null;
+  return (
+    <div className={classes.root}>
+      <MapView>
+        {index < memoPositions.length && (
+          <MapPositions positions={memoPositions} index={index} onClick={onMarkerClick} titleField="fixTime" replay showStatus />
+        )}
+      </MapView>
+    </div>
+  );
 };
 
-export default memo(DynamicMovementPosition);
+export default DynamicMovementPosition;

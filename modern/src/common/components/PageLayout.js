@@ -73,6 +73,7 @@ const PageLayout = ({ menu, breadcrumbs, children }) => {
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
   const [openDrawer, setOpenDrawer] = useState(false);
+  window.openDrawer = setOpenDrawer;
 
   return desktop ? (
     <div className={classes.desktopRoot}>

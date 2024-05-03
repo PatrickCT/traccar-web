@@ -1,6 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import React, { memo, useCallback, useEffect, useState } from 'react';
-import { Popup } from 'maplibre-gl';
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-underscore-dangle */
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import * as turf from '@turf/turf';
+import { Marker } from 'mapbox-gl';
+import { LngLat, Popup } from 'maplibre-gl';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,79 +25,91 @@ import MapGeocoder from '../map/geocoder/MapGeocoder';
 import MapScale from '../map/MapScale';
 import MapNotification from '../map/notification/MapNotification';
 import useFeatures from '../common/util/useFeatures';
-import { createPopUp } from '../common/util/mapPopup';
+import { createPopUp, createPopUpReportRoute } from '../common/util/mapPopup';
 import MapPopup from '../map/showpopup/MapPopup';
 import MapShare from '../map/share/MapShare';
 import LinksPage from '../settings/LinksPage';
 import MapCoverage from '../map/coverage/MapCoverage';
-import { showCoberturaMap } from '../common/util/utils';
+import { attsGetter, showCoberturaMap } from '../common/util/utils';
 import { useAdministrator } from '../common/util/permissions';
+import RealTimeMovement from './components/RealTimeMarker';
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
+}
 
 const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
-  console.log('MainMap');
+  const timerRef = useRef();
   const theme = useTheme();
   const dispatch = useDispatch();
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const eventsAvailable = useSelector((state) => !!state.events.items.length);
   const features = useFeatures();
-  const [showModalShareLocation, setShowModalShareLocation] = useState(false);
   const admin = useAdministrator();
+  const [showModalShareLocation, setShowModalShareLocation] = useState(false);
+  const [lastPosition, setLastPosition] = useState(null);
+  const [currentPosition, setCurrentPosition] = useState(null);
+
+  // replay replica
+  const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(100);
+  const [positions, setPositions] = useState([]);
+  const memoPositions = useMemo(() => positions, [positions]);
+
+  const rtm = new RealTimeMovement();
 
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
-    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-    if (selectedPosition !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
-      new Popup()
-        .setMaxWidth('400px')
-        .setOffset(30)
-        .setHTML(createPopUp(selectedPosition))
-        .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
-        .addTo(map);
-    }
+    // if (window.rtm !== undefined && window.rtm.positions.length === 0) {
+    //   Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+    //   if (selectedPosition !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
+    //     new Popup()
+    //       .setMaxWidth('400px')
+    //       .setOffset(30)
+    //       .setHTML(createPopUp(selectedPosition))
+    //       .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
+    //       .addTo(map);
+    //   }
+    // }
+    window.rtmPopUp(selectedPosition);
   }, [dispatch]);
 
   useEffect(() => {
-    const propPrint = (prop) => {
-      try {
-        switch (typeof prop) {
-          case 'object': return JSON.stringify(prop);
-          case 'undefined': return 'NULL';
-          default: return prop;
-        }
-      } catch (error) {
-        return prop;
-      }
-    };
-    const handler = {
-      get(target, key) {
-        if (typeof target[key] === 'object' && target[key] !== null) {
-          return new Proxy(target[key], handler);
-        }
-        return target[key];
-      },
-      set(target, prop, value) {
-        console.log(`changed ${prop} from ${propPrint(target[prop])} to ${propPrint(value)}`);
-        target[prop] = value;
-        return true;
-      },
-    };
-    if (window.app === undefined || window.app === null) {
-      console.log('init app');
-      window.app = new Proxy({ positions: [], index: 0, selectedPosition, lastPosition: null }, handler);
-    } else {
-      console.log('update app');
-      if ((selectedPosition?.deviceId !== window.app.selectedDevice) || selectedPosition === null) {
-        window.app.positions = [];
-        window.app.lastPosition = null;
-        window.app.index = 0;
-      }
-      window.app.lastPosition = window.app.selectedPosition;
-      window.app.selectedPosition = selectedPosition;
-      window.app.selectedDevice = selectedPosition?.deviceId;
-      console.log((selectedPosition?.deviceId !== window.app.selectedDevice));
-    }
+    window.rtm?.updateSelectedPosition(selectedPosition);
   }, [selectedPosition]);
+
+  useEffect(() => {
+    window.turf = turf;
+    window.map = map;
+    window.Marker = Marker;
+    if (window.rtm === undefined || window.rtm === null) {
+      window.rtm = rtm;
+    }
+    window.sleep = sleep;
+    window.rtmPopUp = (position) => {
+      if (position === undefined || position === null) return;
+      Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+      const p = new Popup()
+        .setMaxWidth('400px')
+        .setOffset(40)
+        .setHTML(createPopUp(position))
+        .setLngLat([position?.longitude, position?.latitude])
+        .addTo(map);
+      p.getElement().id = position.deviceId;
+      window.marker = p;
+      window.marker._content.classList.add(`mapboxgl-popup-content-${'#06376A'}`);
+    };
+
+    return () => {
+      window.rtm = null;
+    };
+  }, []);
 
   return (
     <>
@@ -103,11 +119,24 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
         <MapAccuracy positions={filteredPositions} />
         <MapLiveRoutes />
         <MapPositions
-          positions={filteredPositions}
+          // positions={(window.rtm?.positions.length > 0) ? filteredPositions.filter((p) => p.id !== selectedPosition.id) : filteredPositions}
+          // positions={filteredPositions}
+          positions={filteredPositions.filter((p) => p.id !== selectedPosition?.id)}
           onClick={onMarkerClick}
           selectedPosition={selectedPosition}
           showStatus
         />
+        {/* {selectedPosition && (
+          <MapPositions
+            positions={memoPositions}
+            index={index}
+            onClick={onMarkerClick}
+            replay
+            showStatus
+            main
+            stops={[]}
+          />
+        )} */}
         <MapDefaultCamera />
         <MapSelectedDevice />
         <PoiMap />

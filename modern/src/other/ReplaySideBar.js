@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import makeStyles from '@mui/styles/makeStyles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import MenuIcon from '@mui/icons-material/Menu';
 import TuneIcon from '@mui/icons-material/Tune';
 import DownloadIcon from '@mui/icons-material/Download';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -237,7 +238,7 @@ const ReplaySideBar = ({
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
   useEffect(() => {
-    setTimeout(() => setShowBack(document.querySelectorAll('[data-testid="ArrowBackIcon"]').length <= 1), 1);
+    setTimeout(() => setShowBack(document.querySelectorAll('[data-testid="ArrowBackIcon"]').length <= 1), 10);
   }, []);
 
   return (
@@ -247,6 +248,11 @@ const ReplaySideBar = ({
           {showBack && (
             <IconButton edge="start" sx={{ mr: 2 }} onClick={() => navigate(-1)}>
               <ArrowBackIcon style={{ color: 'white' }} />
+            </IconButton>
+          )}
+          {!desktop && (
+            <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => window.openDrawer(true)}>
+              <MenuIcon style={{ color: 'white' }} />
             </IconButton>
           )}
 

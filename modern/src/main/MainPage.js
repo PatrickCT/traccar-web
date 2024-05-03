@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
-import { Popup } from 'maplibre-gl';
+// import { Popup } from 'maplibre-gl';
 import {
   FormControlLabel,
   FormGroup,
@@ -24,7 +24,7 @@ import MainToolbar from './MainToolbar';
 import MainMap from './MainMap';
 // import { useAttributePreference } from '../common/util/preferences';
 import {
-  createPopUp,
+  // createPopUp,
   streetView,
   generateRoute,
 } from '../common/util/mapPopup';
@@ -192,15 +192,15 @@ const MainPage = () => {
       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
       window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
       window.position = selectedPosition;
-
-      if (window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
-        window.popup = new Popup()
-          .setMaxWidth('400px')
-          .setOffset(30)
-          .setHTML(createPopUp(selectedPosition))
-          .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
-          .addTo(map);
-      }
+      window.rtmPopUp(selectedPosition);
+      // if (window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
+      //   window.popup = new Popup()
+      //     .setMaxWidth('400px')
+      //     .setOffset(30)
+      //     .setHTML(createPopUp(selectedPosition))
+      //     .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
+      //     .addTo(map);
+      // }
     } catch (error) {
       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     }

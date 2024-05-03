@@ -13,10 +13,19 @@ import { mapIconKey } from './core/preloadImages';
 import { findFonts } from './core/mapUtil';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { hasPassedTime } from '../common/util/utils';
-// import { createPopUpSimple } from '../common/util/mapPopup';
+
+const isEqual = require('react-fast-compare');
+
+const propPrint = (prop) => {
+  switch (typeof prop) {
+    case 'object': return JSON.stringify(prop);
+    case 'undefined': return 'NULL';
+    default: return prop;
+  }
+};
 
 const MapPositions = ({
-  positions, onClick, titleField, selectedPosition, stops, showStatus, index, replay = false,
+  positions, onClick, titleField, selectedPosition, stops, showStatus = true, index, replay = false, main = false,
 }) => {
   const id = useId();
   window.id = id;
@@ -58,12 +67,26 @@ const MapPositions = ({
       category: mapIconKey(device.category),
       // category: getStatusColor(device.status) === 'positive' ? mapIconKey(device.category) : mapIconKey('cross'),
       // category: ((hasPassedTime(new Date(device.lastUpdate), 40) || hasPassedTime(new Date(position.fixTime), 40)) ? mapIconKey('cross') : (hasPassedTime(new Date(position.fixTime), 10) ? mapIconKey('stop') : mapIconKey(device.category))),
-      color: showStatus ? position.attributes.color || getStatusColor(device.status) : 'neutral',
+      color: showStatus ? (position.attributes.color || getStatusColor(device.status)) : 'neutral',
       rotation: position.course,
       direction: true,
       rotate: device.category === 'carDirection',
     };
   };
+
+  const dataGenerator = (visiblePositions) => (
+    {
+      type: 'FeatureCollection',
+      features: visiblePositions.filter((it) => devices.hasOwnProperty(it?.deviceId)).map((position) => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [position.longitude, position.latitude],
+        },
+        properties: createFeature(devices, position, selectedPosition && selectedPosition.id),
+      })),
+    }
+  );
 
   const onMouseEnter = () => map.getCanvas().style.cursor = 'pointer';
   const onMouseLeave = () => map.getCanvas().style.cursor = '';
@@ -116,7 +139,7 @@ const MapPositions = ({
       source: id,
       filter: ['!has', 'point_count'],
       layout: {
-        'icon-image': `${replay ? 'replay-neutral' : '{category}-{color}'}`,
+        'icon-image': `${(replay) ? 'replay-neutral' : '{category}-{color}'}`,
         'icon-size': replay ? 0.08 : iconScale,
         'icon-allow-overlap': true,
         'text-field': `{${titleField || 'name'}}`,
@@ -132,6 +155,60 @@ const MapPositions = ({
       paint: {
         'text-halo-color': 'white',
         'text-halo-width': 1,
+      },
+    });
+
+    map.addSource('realTime', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+      cluster: mapCluster,
+      clusterMaxZoom: 14,
+      clusterRadius: 50,
+    });
+
+    map.addLayer({
+      id: 'realTime',
+      type: 'symbol',
+      source: 'realTime',
+      filter: ['!has', 'point_count'],
+      layout: {
+        'icon-image': `${(replay) ? 'replay-neutral' : '{category}-{color}'}`,
+        'icon-size': replay ? 0.08 : iconScale,
+        'icon-allow-overlap': true,
+        'text-field': `{${titleField || 'name'}}`,
+        'text-allow-overlap': true,
+        'text-anchor': 'bottom',
+        'text-offset': [0, -2 * iconScale],
+        'text-font': findFonts(map),
+        'text-size': 12,
+        'icon-rotate': replay ? ['get', 'rotation'] : ['case', ['==', ['get', 'rotate'], true], ['get', 'rotation'], 0],
+        // 'icon-rotate': ['get', 'rotation'],
+        'icon-rotation-alignment': 'map',
+      },
+      paint: {
+        'text-halo-color': 'white',
+        'text-halo-width': 1,
+      },
+    });
+
+    map.addLayer({
+      id: `${direction}2`,
+      type: 'symbol',
+      source: 'realTime',
+      filter: [
+        'all',
+        ['!has', 'point_count'],
+        ['==', 'direction', true],
+      ],
+      layout: {
+        'icon-image': 'direction',
+        'icon-size': iconScale,
+        'icon-allow-overlap': true,
+        'icon-rotate': ['get', 'rotation'],
+        'icon-rotation-alignment': 'map',
       },
     });
 
@@ -167,7 +244,7 @@ const MapPositions = ({
       },
     });
 
-    if (replay) {
+    if (replay && !main) {
       map.addSource('stops', {
         type: 'geojson',
         data: {
@@ -330,7 +407,18 @@ const MapPositions = ({
     // map.on('moveend', () => setRecalculate(new Date()));
     // map.on('zoom', () => setRecalculate(new Date()));
 
+    window.createFeature = createFeature;
+    window.devices = devices;
+    window.dataGenerator = dataGenerator;
+    window.isEqual = isEqual;
+    window.propPrint = propPrint;
+
     return () => {
+      window.createFeature = null;
+      window.devices = null;
+      window.dataGenerator = null;
+      window.isEqual = null;
+      window.propPrint = null;
       map.off('mouseenter', id, onMouseEnter);
       map.off('mouseleave', id, onMouseLeave);
       map.off('mouseenter', clusters, onMouseEnter);
@@ -341,37 +429,45 @@ const MapPositions = ({
       // map.off('moveend', id, () => setRecalculate(new Date()));
       // map.off('zoom', id, () => setRecalculate(new Date()));
 
-      if (map.getLayer(id)) {
-        map.removeLayer(id);
-      }
-      if (map.getLayer(clusters)) {
-        map.removeLayer(clusters);
-      }
-      if (map.getLayer(direction)) {
-        map.removeLayer(direction);
-      }
-      if (map.getLayer('stops-layer')) {
-        map.removeLayer('stops-layer');
-      }
-      if (map.getLayer('start-layer')) {
-        map.removeLayer('start-layer');
-      }
-      if (map.getLayer('end-layer')) {
-        map.removeLayer('end-layer');
-      }
+      [clusters, direction, 'stops-layer', 'start-layer', 'end-layer', id, `${direction}2`, 'realTime'].forEach((layer) => {
+        console.log('Removed ', layer);
+        if (map.getLayer(layer)) map.removeLayer(layer);
+        if (map.getSource(layer)) map.removeSource(layer);
+      });
+      // if (map.getLayer(id)) {
+      //   map.removeLayer(id);
+      // }
+      // if (map.getLayer(clusters)) {
+      //   map.removeLayer(clusters);
+      // }
+      // if (map.getLayer(direction)) {
+      //   map.removeLayer(direction);
+      // }
+      // if (map.getLayer('stops-layer')) {
+      //   map.removeLayer('stops-layer');
+      // }
+      // if (map.getLayer('start-layer')) {
+      //   map.removeLayer('start-layer');
+      // }
+      // if (map.getLayer('end-layer')) {
+      //   map.removeLayer('end-layer');
+      // }
+      // if (map.getLayer('realTime')) {
+      //   map.removeLayer('realTime');
+      // }
 
-      if (map.getSource(id)) {
-        map.removeSource(id);
-      }
-      if (map.getSource('stops')) {
-        map.removeSource('stops');
-      }
-      if (map.getSource('start')) {
-        map.removeSource('start');
-      }
-      if (map.getSource('end')) {
-        map.removeSource('end');
-      }
+      // if (map.getSource(id)) {
+      //   map.removeSource(id);
+      // }
+      // if (map.getSource('stops')) {
+      //   map.removeSource('stops');
+      // }
+      // if (map.getSource('start')) {
+      //   map.removeSource('start');
+      // }
+      // if (map.getSource('end')) {
+      //   map.removeSource('end');
+      // }
 
       // window.marker = null;
     };
@@ -383,25 +479,16 @@ const MapPositions = ({
       const coordinates = [position.longitude, position.latitude];
       const bounds = map.getBounds();
 
-      return (
-        coordinates[0] >= bounds._sw.lng &&
-        coordinates[0] <= bounds._ne.lng &&
-        coordinates[1] >= bounds._sw.lat &&
-        coordinates[1] <= bounds._ne.lat
-      );
+      // return (
+      //   coordinates[0] >= bounds._sw.lng &&
+      //   coordinates[0] <= bounds._ne.lng &&
+      //   coordinates[1] >= bounds._sw.lat &&
+      //   coordinates[1] <= bounds._ne.lat
+      // );
+      return true;
     });
     // if (replay && map.getSource(id)?.)
-    map.getSource(id)?.setData({
-      type: 'FeatureCollection',
-      features: visiblePositions.filter((it) => devices.hasOwnProperty(it.deviceId)).map((position) => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [position.longitude, position.latitude],
-        },
-        properties: createFeature(devices, position, selectedPosition && selectedPosition.id),
-      })),
-    });
+    map.getSource(id)?.setData(dataGenerator(visiblePositions));
   }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index]);
 
   return null;

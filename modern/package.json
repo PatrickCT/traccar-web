@@ -21,7 +21,6 @@
     "base-64": "^1.0.0",
     "dayjs": "^1.11.9",
     "intro.js-react": "^1.0.0",
-    "leaflet.animatedmarker": "^1.0.0",
     "mapbox-expression": "^0.0.3",
     "mapbox-gl": "^1.13.3",
     "maplibre-gl": "^2.4.0",
