@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import {
   Accordion,
   AccordionSummary,
@@ -20,7 +20,7 @@ import PageLayout from '../common/components/PageLayout';
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(0),
   },
   details: {
     display: 'flex',
@@ -38,7 +38,7 @@ const UserConnectionsPage = () => {
 
   const [item, setItem] = useState({});
 
-  const user = useSelector((state) => state.session.user);
+  // const user = useSelector((state) => state.session.user);
 
   useEffect(() => {
     fetch(`/api/users/${id}`, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
@@ -51,7 +51,7 @@ const UserConnectionsPage = () => {
       menu={<SettingsMenu />}
       breadcrumbs={['settingsTitle', 'settingsUser', 'sharedConnections', `Usuario: ${item?.name}`]}
     >
-      <Container maxWidth="xs" className={classes.container}>
+      <Container maxWidth="m" className={classes.container}>
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" style={{ flexGrow: 1 }}>
@@ -149,7 +149,7 @@ const UserConnectionsPage = () => {
               keyLink="maintenanceId"
               label={t('sharedMaintenance')}
             />
-            {user.administrator && (
+            {/* {user.administrator && (
               <LinkField
                 endpointAll="/api/extramodules?all=true"
                 endpointLinked={`/api/extramodules?userId=${id}`}
@@ -158,7 +158,7 @@ const UserConnectionsPage = () => {
                 keyLink="extramoduleId"
                 label={t('extraModulesTitle')}
               />
-            )}
+            )} */}
           </AccordionDetails>
         </Accordion>
       </Container>

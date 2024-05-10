@@ -53,27 +53,16 @@ class RealTimeMovement {
     this.interval = null;
     this.device = null;
     this.pos = new FixedSizeArray(2, () => { this.generatePositions(); });
+    this.reset();
     // this._app = new Proxy({ positions: new FixedSizeArray(2, () => { this.generatePositions(); }) }, handler);
   }
 
   updateSelectedPosition(p) {
-    if (p === undefined || p === null) {
-      this.reset();
-      return;
-    }
-    if (p.deviceId === this.device) {
-      this.pos.push(p);
-      if (this.pos.array.length === 1) {
-        this.show(p);
-      }
-    } else {
-      this.reset();
-      this.device = p.deviceId;
-      this.pos.push(p);
-      if (this.pos.array.length === 1) {
-        this.show(p);
-      }
-    }
+    if (this.pos.array.find((position) => position.id === p.id)) return;
+    this.stop();
+    this.pos.push(p);
+    this.device = p.deviceId;
+    this.show(p);
   }
 
   reset() {
@@ -85,10 +74,23 @@ class RealTimeMovement {
   }
 
   show(position) {
-    window.map.getSource('realTime').setData(window.dataGenerator([position]));
-    if (window.localStorage.getItem('showMapPopup') === 'true') {
+    if (!position) return;
+    const newFeature = window.dataGenerator([position]).features[0];
+
+    const data = window.map?.getSource(window.id)?._data;
+    const index = data.features.findIndex((f) => f?.properties?.deviceId === this.device);
+    if (index !== -1) {
+      data.features[index] = newFeature;
+    } else {
+      data.features.push(newFeature);
+    }
+    window.map?.getSource(window.id)?.setData(data);
+    if (window.device?.id === this.device) {
       window.rtmPopUp(position);
     }
+    // if (window.localStorage.getItem('showMapPopup') === 'true' && window.position) {
+    //   window.rtmPopUp(window.position);
+    // }
   }
 
   get(prop) { return this[prop]; }
@@ -103,20 +105,25 @@ class RealTimeMovement {
     const positions = [];
 
     p.forEach((position, index) => {
-      positions.push({ ...position, original: true });
-      if (index < p.length - 1) {
-        const distance = window.turf.distance(window.turf.point([p[index].longitude, p[index].latitude]), window.turf.point([p[index + 1].longitude, p[index + 1].latitude]), { units: 'meters' });
-        if (parseInt(distance, 10) > 0) {
-          const steps = parseInt(distance / 2, 10);
-          let fillers = [];
-          for (let i = 0; i < steps; i += 1) {
-            const point = window.turf.along(window.turf.lineString([[p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]]), ((i + 1) * 2), { units: 'meters' });
-            fillers.push({ ...position, original: false, longitude: point.geometry.coordinates[0], latitude: point.geometry.coordinates[1] });
+      try {
+        positions.push({ ...position, original: true });
+        if (index < p.length - 1) {
+          const distance = window.turf.distance(window.turf.point([p[index].longitude, p[index].latitude]), window.turf.point([p[index + 1].longitude, p[index + 1].latitude]), { units: 'meters' });
+          if (parseInt(distance, 10) > 0) {
+            const steps = parseInt(distance / 2, 10);
+            let fillers = [];
+            for (let i = 0; i < steps; i += 1) {
+              const point = window.turf.along(window.turf.lineString([[p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]]), ((i + 1) * 2), { units: 'meters' });
+              fillers.push({ ...position, original: false, longitude: point?.geometry.coordinates[0], latitude: point?.geometry.coordinates[1] });
+            }
+            const fillerCourse = (fillers.reduce((acc, obj) => acc + parseFloat(obj.course ?? ''), 0) / fillers.length);
+            fillers = fillers.map((filler) => ({ ...filler, course: fillerCourse }));
+            positions.push(...fillers);
           }
-          const fillerCourse = (fillers.reduce((acc, obj) => acc + parseFloat(obj.course ?? ''), 0) / fillers.length);
-          fillers = fillers.map((filler) => ({ ...filler, course: fillerCourse }));
-          positions.push(...fillers);
         }
+      } catch (error) {
+        console.log(error.message);
+        console.log(error);
       }
     });
     this.positions.push(...positions);
@@ -124,16 +131,28 @@ class RealTimeMovement {
   }
 
   async play() {
+    if (this.positions.length < 2) {
+      this.stop();
+    }
     this.interval = setInterval(async () => {
-      requestAnimationFrame(async () => {
-        this.show(this.positions[0]);
-        this.positions.shift();
-        if (this.positions.length <= 0) {
-          this.playing = false;
-          clearInterval(this.interval);
-        }
-        // await window.sleep(10);
-      });
+      try {
+        requestAnimationFrame(async () => {
+          try {
+            this.show(this.positions[0]);
+            this.positions.shift();
+            if (this.positions.length <= 0) {
+              this.stop();
+            }
+          } catch (error) {
+            console.log('Error inside animationFrame');
+            console.error(error);
+          }
+          // await window.sleep(10);
+        });
+      } catch (error) {
+        console.log('Error requestAnimationFrame');
+        console.error(error);
+      }
     }, 25);
   }
 

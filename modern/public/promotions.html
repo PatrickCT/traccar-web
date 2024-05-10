@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Swiper demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+    <!-- Link Swiper's CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- Demo styles -->
+    <style>
+        html,
+        body {
+            position: relative;
+            height: 100%;
+        }
+
+        body {
+            background: #eee;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .swiper {
+            width: 100%;
+            height: 100%;
+        }
+
+        .swiper-slide {
+            text-align: center;
+            font-size: 18px;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            list-style-type: none;
+            margin: 20px;
+            padding: 0px;
+        }
+
+        .image-gallery>li {
+            cursor: pointer;
+            position: relative;
+            height: max-content;
+        }
+
+        .image-gallery li img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            vertical-align: middle;
+            border-radius: 5px;
+        }
+
+        .image-gallery li:hover .overlay {
+            transform: scale(1);
+        }
+
+        .overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(57, 57, 57, 0.502);
+            top: 0;
+            left: 0;
+            transform: scale(0);
+            transition: all 0.2s 0.1s ease-in-out;
+            color: #fff;
+            border-radius: 5px;
+            /* center overlay text */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Swiper -->
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!-- Initialize Swiper -->
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+            direction: "vertical",
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            autoplay: true,
+            keyboard: {
+                enabled: true,
+                onlyInViewport: false,
+            },
+            loop: true,
+            mousewheel: {
+                invert: false,
+            },
+        });
+
+
+        window.onload = () => {
+
+        }
+
+        addPromotion = (image, info) => {
+            let promo_div = document.createElement('div');
+            promo_div.classList.add('swiper-slide');
+
+            let promo_ul = document.createElement('ul');
+            promo_ul.classList.add('image-gallery');
+
+            let promo_li = document.createElement('li');
+            let promo_img = document.createElement('img');
+            promo_img.src = image;
+            promo_li.appendChild(promo_img);
+            if (info) {
+                let promo_info = document.createElement('div');
+                promo_info.classList.add('overlay');
+                let promo_info_span = document.createElement('span');
+                promo_info_span.innerText = info;
+                promo_info.appendChild(promo_info_span);
+                promo_li.appendChild(promo_info);
+            }
+
+            promo_ul.appendChild(promo_li);
+            promo_div.appendChild(promo_ul);
+            swiper.addSlide(0, promo_div);
+        }
+    </script>
+</body>
+
+</html>

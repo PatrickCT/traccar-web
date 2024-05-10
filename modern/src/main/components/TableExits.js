@@ -4,6 +4,7 @@ import {
   React, memo, useEffect, useState,
 } from 'react';
 import dayjs from 'dayjs';
+import { useSelector } from 'react-redux';
 // import { useSelector } from 'react-redux';
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import { Moment } from 'react-moment';
@@ -43,14 +44,16 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
   const [visible, setVisible] = useState(false);
   const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
-  const [geonames, setGeonames] = useState([]);
   const [subroutes, setSubroutes] = useState([]);
   const [hourSelected, setHour] = useState(dayjs(new Date().toISOString()));
   const [passwordUser, setPasswordUser] = useState('');
   const [passwordSaved, setPasswordSaved] = useState('');
-
+  const [loading, setLoading] = useState(false);
+  const geofences = useSelector((state) => state.geofences.items);
   // const user = useSelector((state) => state.session.user);
   const loadInfoTable = async () => {
+    if (loading) return;
+    setLoading(false);
     const response = await fetch(`${topDirectory}api/devices/${deviceId}/ticket`);
     if (response.ok) {
       const information = await response.json();
@@ -64,9 +67,10 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
         });
       }));
       setTickets((information.ticket ?? []));
-      setGeonames((information.geofencesNames ?? []));
       setSubroutes((information.subroutes ?? []));
+      setLoading(false);
     } else {
+      setLoading(false);
       throw Error(await response.text());
     }
   };
@@ -138,7 +142,7 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
   useEffect(() => {
     const intervalId = setInterval(async () => {
       await loadInfoTable();
-    }, 1 * 10 * 1000);
+    }, 1 * 15 * 1000);
 
     return () => {
       console.log('unmount table ', deviceId);
@@ -246,7 +250,7 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
 
         <div style={calcDiffColor(ticket)} key={`t-${ticket.id}`} className="bodyExitst">
           <div className="columns bodyCol1">
-            {geonames.find((g) => g.id === ticket.geofenceId) !== undefined ? `${geonames.find((g) => g.id === ticket.geofenceId).name}` : `${t('geofence')} - ${ticket.geofeceId}`}
+            {geofences[ticket.geofenceId] !== undefined ? `${geofences[ticket.geofenceId].name}` : `${t('geofence')} - ${ticket.geofenceId}`}
           </div>
           <div className="columns bodyCol2">
             {('expectedTime' in ticket) ? `${t('expectedTime')}: ${moment(ticket.expectedTime).tz('America/Mexico_City').format('HH:mm:ss')}` : `${t('no-data')}`}

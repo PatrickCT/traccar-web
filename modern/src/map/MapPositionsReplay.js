@@ -2,7 +2,6 @@
 /* eslint-disable no-unused-vars */
 import {
   useId, useCallback, useEffect, memo, useState,
-  useRef,
 } from 'react';
 // import { Popup } from 'mapbox-gl';
 import { useSelector } from 'react-redux';
@@ -14,7 +13,6 @@ import { mapIconKey } from './core/preloadImages';
 import { findFonts } from './core/mapUtil';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { hasPassedTime } from '../common/util/utils';
-import RealTimeMovement from '../main/components/RealTimeMarker';
 
 const isEqual = require('react-fast-compare');
 
@@ -45,7 +43,7 @@ const MapPositions = ({
   const hours12 = usePreference('twelveHourFormat');
   const directionType = useAttributePreference('mapDirection', 'selected');
 
-  const [recalculate, setRecalculate] = useState(new Date());
+  // const [recalculate, setRecalculate] = useState(new Date());
 
   const createFeature = (devices, position, selectedPositionId) => {
     const device = devices[position.deviceId];
@@ -406,8 +404,8 @@ const MapPositions = ({
     map.on('click', id, onMarkerClick);
     map.on('click', clusters, onClusterClick);
     map.on('click', onMapClick);
-    map.on('moveend', () => setRecalculate(new Date()));
-    map.on('zoom', () => setRecalculate(new Date()));
+    // map.on('moveend', () => setRecalculate(new Date()));
+    // map.on('zoom', () => setRecalculate(new Date()));
 
     window.createFeature = createFeature;
     window.devices = devices;
@@ -418,6 +416,7 @@ const MapPositions = ({
     return () => {
       window.createFeature = null;
       window.devices = null;
+      window.dataGenerator = null;
       window.isEqual = null;
       window.propPrint = null;
       map.off('mouseenter', id, onMouseEnter);
@@ -427,10 +426,10 @@ const MapPositions = ({
       map.off('click', id, onMarkerClick);
       map.off('click', clusters, onClusterClick);
       map.off('click', onMapClick);
-      map.off('moveend', id, () => setRecalculate(new Date()));
-      map.off('zoom', id, () => setRecalculate(new Date()));
+      // map.off('moveend', id, () => setRecalculate(new Date()));
+      // map.off('zoom', id, () => setRecalculate(new Date()));
 
-      [clusters, direction, 'stops-layer', 'start-layer', 'end-layer', id, `${direction}2`, 'realTime'].forEach((layer) => {
+      [clusters, direction, 'stops-layer', 'start-layer', 'end-layer', 'stops', 'start', 'end', id, `${direction}2`, 'realTime'].forEach((layer) => {
         console.log('Removed ', layer);
         if (map.getLayer(layer)) map.removeLayer(layer);
         if (map.getSource(layer)) map.removeSource(layer);
@@ -476,29 +475,15 @@ const MapPositions = ({
 
   useEffect(() => {
     if (!positions || positions.length <= 0) return;
-    // map.getSource(id)?.setData(dataGenerator(visiblePositions));
-
-    const visiblePositions = positions.filter((position) => {
+    const visiblePositions = (replay ? [positions[index]] : positions).filter((position) => {
       const coordinates = [position.longitude, position.latitude];
       const bounds = map.getBounds();
 
-      return (
-        coordinates[0] >= bounds._sw.lng &&
-        coordinates[0] <= bounds._ne.lng &&
-        coordinates[1] >= bounds._sw.lat &&
-        coordinates[1] <= bounds._ne.lat
-      );
+      return true;
     });
-
-    visiblePositions?.forEach((position) => {
-      if (window.players) {
-        if (!window.players?.hasOwnProperty(position.deviceId)) {
-          window.players[position.deviceId] = new RealTimeMovement();
-        }
-        window.players[position.deviceId].updateSelectedPosition(position);
-      }
-    });
-  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index, recalculate]);
+    // if (replay && map.getSource(id)?.)
+    map.getSource(id)?.setData(dataGenerator(visiblePositions));
+  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index]);
 
   return null;
 };

@@ -3,7 +3,7 @@ import {
   Divider, List, ListItemButton, ListItemIcon, ListItemText,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
-import StarIcon from '@mui/icons-material/Star';
+// import StarIcon from '@mui/icons-material/Star';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
@@ -40,12 +40,12 @@ const ReportsMenu = () => {
   return (
     <>
       <List id="lst-reports">
-        <MenuItem
+        {/* <MenuItem
           title={t('reportCombined')}
           link="/reports/combined"
           icon={<StarIcon />}
           selected={location.pathname === '/reports/combined'}
-        />
+        /> */}
         <MenuItem
           title={t('reportRoute')}
           link="/reports/route"

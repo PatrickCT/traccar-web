@@ -29,6 +29,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
     integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="stylesheet" href="./styles/tingle.min.css">
+  <script src="./libs/tingle.min.js"></script>
 
   <title>GpsTracker</title>
 
@@ -50,6 +52,58 @@
 
     // Call the function to add the meta tag
     addViewportMetaTag();
+
+    window.onload = () => {
+      document.addEventListener('visibilitychange', (event) => {
+        if (document.visibilityState == 'visible') {
+          console.log('tab is active');
+          // notifyMe('El movimiento de los marcadores se restablecera');
+
+        } else {
+          console.log('tab is inactive');
+          Object.keys(window.players).forEach((id) => window.players[id].reset());
+          // notifyMe('El movimiento de los marcadores se pausara');
+        }
+      });
+    }
+
+    const notifyMe = (message, icon, image) => {
+      if (!('Notification' in window)) return;
+      if (!Notification.permission === 'granted') {
+        Notification.requestPermission().then((permission) => {
+          if (permission === 'granted') {
+            browserNotification(message, icon, image);
+            return;
+          }
+        });
+      }
+      browserNotification(message, icon, image);
+      return;
+    }
+
+    const browserNotification = (message, icon, image) => {
+      const options = {
+        timestamp: new Date()
+      };
+      if (icon) {
+        options.icon = icon;
+      }
+      if (image) {
+        options.image = image;
+      }
+      const notification = new Notification(message, options);
+      notification.onclick = () => notification.close();
+      setTimeout(() => {
+        notification.close()
+      }, 3000);
+    }
+
+    const clearAllIntervals = () => {
+      var highestTimeoutId = setTimeout(';');
+      for (var i = 0; i < highestTimeoutId; i++) {
+        clearTimeout(i);
+      }
+    }
   </script>
 </head>
 
@@ -62,6 +116,7 @@
     llevaremos a cabo una actualización de sistema, esto podría llevar desde unos minutos hasta más de una hora,
     lamentamos los inconvenientes, en caso de una emergencia comuníquese con soporte técnico.
   </div>
+
 </body>
 
 </html>

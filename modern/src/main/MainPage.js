@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +8,7 @@ import {
   FormGroup,
   Paper,
 } from '@mui/material';
+import Drawer from 'react-bottom-drawer';
 import Checkbox from '@mui/material/Checkbox';
 import { makeStyles } from '@mui/styles';
 import { useTheme } from '@mui/material/styles';
@@ -119,6 +121,11 @@ const MainPage = () => {
 
   const [showModalRevision, setShowModalRevision] = useState(false);
 
+  // drawer
+  const [isVisible, setIsVisible] = React.useState(false);
+  const openDrawer = React.useCallback(() => setIsVisible(true), []);
+  const closeDrawer = React.useCallback(() => setIsVisible(false), []);
+
   // Function to open the modal
   const openModal = () => {
     setShowModalRevision(true);
@@ -160,6 +167,8 @@ const MainPage = () => {
     window.groupsNames = groups;
     window.openModal = openModal;
     window.closeModal = closeModal;
+    window.openDrawer = openDrawer;
+    window.closeDrawer = closeDrawer;
 
     // Clean up the function when the component unmounts
     return () => {
@@ -174,12 +183,13 @@ const MainPage = () => {
       window.localStorage.removeItem('showMapPopup');
       delete window.openModal;
       delete window.closeModal;
+      delete window.openDrawer;
+      delete window.closeDrawer;
     };
   }, []);
 
   useEffect(() => {
     const handleVisibilityChange = () => { };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
@@ -193,18 +203,16 @@ const MainPage = () => {
       window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
       window.position = selectedPosition;
       window.rtmPopUp(selectedPosition);
-      // if (window.position !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
-      //   window.popup = new Popup()
-      //     .setMaxWidth('400px')
-      //     .setOffset(30)
-      //     .setHTML(createPopUp(selectedPosition))
-      //     .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
-      //     .addTo(map);
-      // }
     } catch (error) {
       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     }
   }, [selectedPosition]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      // setIsVisible(true);
+    }, 1000);
+  }, []);
 
   return (
     <div className={classes.root}>
@@ -279,6 +287,15 @@ const MainPage = () => {
           <DebtModal />
         )
       }
+      <Drawer
+        className="drawer"
+        duration={250}
+        hideScrollbars={false}
+        onClose={closeDrawer}
+        isVisible={isVisible}
+      >
+        <iframe title="Promociones" src="./promotions.html" frameBorder="0" width="100%" height="90%" />
+      </Drawer>
     </div>
   );
 };

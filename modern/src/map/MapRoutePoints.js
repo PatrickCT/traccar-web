@@ -35,7 +35,7 @@ const MapRoutePoints = ({
         map.getSource(id).getClusterExpansionZoom(clusterId, (error, zoom) => {
           if (!error) {
             map.easeTo({
-              center: feature.geometry.coordinates,
+              center: feature?.geometry.coordinates,
               zoom,
             });
           }
@@ -53,7 +53,7 @@ const MapRoutePoints = ({
     map.getSource(id).getClusterExpansionZoom(clusterId, (error, zoom) => {
       if (!error) {
         map.easeTo({
-          center: features[0].geometry.coordinates,
+          center: features[0]?.geometry.coordinates,
           zoom,
         });
       }

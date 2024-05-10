@@ -62,38 +62,29 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const [positions, setPositions] = useState([]);
   const memoPositions = useMemo(() => positions, [positions]);
 
-  const rtm = new RealTimeMovement();
-
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
-    // if (window.rtm !== undefined && window.rtm.positions.length === 0) {
-    //   Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-    //   if (selectedPosition !== undefined && window.localStorage.getItem('showMapPopup') === 'true') {
-    //     new Popup()
-    //       .setMaxWidth('400px')
-    //       .setOffset(30)
-    //       .setHTML(createPopUp(selectedPosition))
-    //       .setLngLat([selectedPosition.longitude, selectedPosition.latitude])
-    //       .addTo(map);
-    //   }
-    // }
-    window.rtmPopUp(selectedPosition);
   }, [dispatch]);
 
   useEffect(() => {
-    window.rtm?.updateSelectedPosition(selectedPosition);
+    // window.rtm?.updateSelectedPosition(selectedPosition);
   }, [selectedPosition]);
 
   useEffect(() => {
     window.turf = turf;
     window.map = map;
     window.Marker = Marker;
-    if (window.rtm === undefined || window.rtm === null) {
-      window.rtm = rtm;
+
+    if (window.players === undefined || window.players === null) {
+      window.players = {};
     }
+
     window.sleep = sleep;
     window.rtmPopUp = (position) => {
-      if (position === undefined || position === null) return;
+      if (position === undefined || position === null || window.position === null || window.localStorage.getItem('showMapPopup') === 'false') {
+        console.log('no show');
+        return;
+      }
       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
       const p = new Popup()
         .setMaxWidth('400px')
@@ -107,7 +98,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
     };
 
     return () => {
-      window.rtm = null;
+      window.players = null;
     };
   }, []);
 
@@ -121,22 +112,12 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
         <MapPositions
           // positions={(window.rtm?.positions.length > 0) ? filteredPositions.filter((p) => p.id !== selectedPosition.id) : filteredPositions}
           // positions={filteredPositions}
-          positions={filteredPositions.filter((p) => p.id !== selectedPosition?.id)}
+          positions={filteredPositions}
           onClick={onMarkerClick}
           selectedPosition={selectedPosition}
           showStatus
         />
-        {/* {selectedPosition && (
-          <MapPositions
-            positions={memoPositions}
-            index={index}
-            onClick={onMarkerClick}
-            replay
-            showStatus
-            main
-            stops={[]}
-          />
-        )} */}
+
         <MapDefaultCamera />
         <MapSelectedDevice />
         <PoiMap />

@@ -63,7 +63,7 @@ const MapGeofenceEdit = ({ selectedGeofenceId }) => {
   useEffect(() => {
     const listener = async (event) => {
       const feature = event.features[0];
-      const newItem = { name: '', area: geometryToArea(feature.geometry) };
+      const newItem = { name: '', area: geometryToArea(feature?.geometry) };
       draw.delete(feature.id);
       try {
         const response = await fetch('/api/geofences', {
@@ -110,7 +110,7 @@ const MapGeofenceEdit = ({ selectedGeofenceId }) => {
       const feature = event.features[0];
       const item = Object.values(geofences).find((i) => i.id === feature.id);
       if (item) {
-        const updatedItem = { ...item, area: geometryToArea(feature.geometry) };
+        const updatedItem = { ...item, area: geometryToArea(feature?.geometry) };
         try {
           const response = await fetch(`/api/geofences/${feature.id}`, {
             method: 'PUT',

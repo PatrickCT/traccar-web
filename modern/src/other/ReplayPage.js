@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import MapView, { map } from '../map/core/MapView';
 import MapRoutePath from '../map/MapRoutePathReplay';
 import MapRoutePoints from '../map/MapRoutePoints';
-import MapPositions from '../map/MapPositions';
+import MapPositions from '../map/MapPositionsReplay';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useCatch } from '../reactHelper';
 import MapCamera from '../map/MapCamera';
@@ -259,7 +259,7 @@ const ReplayPage = () => {
             let fillers = [];
             for (let i = 0; i < steps; i += 1) {
               const point = turf.along(turf.lineString([[p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]]), ((i + 1) * 2), { units: 'meters' });
-              fillers.push({ ...position, original: false, longitude: point.geometry.coordinates[0], latitude: point.geometry.coordinates[1] });
+              fillers.push({ ...position, original: false, longitude: point?.geometry.coordinates[0], latitude: point?.geometry.coordinates[1] });
             }
             const fillerCourse = (fillers.reduce((acc, obj) => acc + parseFloat(obj.course ?? ''), 0) / fillers.length);
             fillers = fillers.map((filler) => ({ ...filler, course: fillerCourse }));
