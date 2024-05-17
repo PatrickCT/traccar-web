@@ -36,6 +36,8 @@ import Counter from '../common/components/Counter';
 import Modal from './components/BasicModal';
 import ConnectionStatus from '../common/components/ConnectionStatus';
 import DebtModal from '../common/components/DebtModal';
+import PositionDrawer from './PositionInfoDrawer';
+import { useAdministrator } from '../common/util/permissions';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -126,6 +128,9 @@ const MainPage = () => {
   const openDrawer = React.useCallback(() => setIsVisible(true), []);
   const closeDrawer = React.useCallback(() => setIsVisible(false), []);
 
+  const [infoDrawer, setInfoDrawer] = useState(true);
+  const admin = useAdministrator();
+
   // Function to open the modal
   const openModal = () => {
     setShowModalRevision(true);
@@ -138,12 +143,6 @@ const MainPage = () => {
 
   const onEventsClick = useCallback(() => setEventsOpen(true), [setEventsOpen]);
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (!desktop && mapOnSelect && selectedDeviceId) {
-  //     setDevicesOpen(false);
-  //   }
-  // }, [desktop, mapOnSelect, selectedDeviceId]);
 
   useFilter(
     keyword,
@@ -202,17 +201,11 @@ const MainPage = () => {
       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
       window.device = filteredDevices.find((item) => item.id === selectedDeviceId);
       window.position = selectedPosition;
-      window.rtmPopUp(selectedPosition);
+      window.rtmPopUp(selectedPosition || { deviceId: window.device.id, id: 0, latitude: window.map.getCenter().lat, longitude: window.map.getCenter().lng });
     } catch (error) {
       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
     }
-  }, [selectedPosition]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      // setIsVisible(true);
-    }, 1000);
-  }, []);
+  }, [selectedDeviceId]);
 
   return (
     <div className={classes.root}>
@@ -240,6 +233,7 @@ const MainPage = () => {
             setFilterSort={setFilterSort}
             filterMap={filterMap}
             setFilterMap={setFilterMap}
+            setPositionInfoOpen={setInfoDrawer}
           />
         </Paper>
         <div className={classes.middle}>
@@ -296,6 +290,9 @@ const MainPage = () => {
       >
         <iframe title="Promociones" src="./promotions.html" frameBorder="0" width="100%" height="90%" />
       </Drawer>
+      {selectedPosition && admin && (
+        <PositionDrawer onClose={() => setInfoDrawer(false)} open={infoDrawer} />
+      )}
     </div>
   );
 };

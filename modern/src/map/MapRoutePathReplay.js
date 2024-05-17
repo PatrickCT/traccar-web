@@ -3,7 +3,7 @@ import { useId, useEffect, memo } from 'react';
 import { useSelector } from 'react-redux';
 import { map } from './core/MapView';
 import { findFonts } from './core/mapUtil';
-import { attsGetter } from '../common/util/utils';
+import { attConverter } from '../common/util/utils';
 
 const MapRoutePath = ({ name, positions, coordinates, values }) => {
   // console.log('Render MapRoutePath');
@@ -89,7 +89,12 @@ const MapRoutePath = ({ name, positions, coordinates, values }) => {
       let currentType = 0;
       let section = [];
       positions.forEach((position, index) => {
-        const speed = parseFloat((attsGetter(position, 'speed') ?? (attsGetter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -')).split(' ')[0]) || 0;
+        let speed = 0;
+        try {
+          speed = parseFloat((attConverter(position, 'speed') ?? (attConverter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -'))?.split(' ')[0]) || 0;
+        } catch (error) {
+          console.log(error);
+        }
         if (currentType === 0 || currentType !== (speed < values[0] ? 1 : (speed < values[1] ? 2 : 3))) { // primer seccion o nueva seccion
           if (section.length > 0) {
             coordinatesColors.push(section);

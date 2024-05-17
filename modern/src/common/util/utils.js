@@ -1,4 +1,7 @@
 /* eslint-disable prefer-const */
+/* eslint-disable no-constant-binary-expression */
+/* eslint-disable no-use-before-define */
+/* eslint-disable dot-notation */
 const requestCache = {};
 const alarmTranslator = (alarm) => {
   switch (alarm.toUpperCase()) {
@@ -283,6 +286,148 @@ const getEvent = () => {
   return null;
 };
 
+export const attConverter = (obj, attribute) => {
+  switch (attribute) {
+    case 'status': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return { online: 'En linea', offline: 'Fuera de linea', unknown: 'Desconocido' }[value] || null;
+    }
+    case 'temperaturaC': {
+      const value = attVariantsEvaluator(obj, 'temperature');
+      return value ? value.toFixed(1) : null;
+    }
+    case 'temperaturaF': {
+      const value = attVariantsEvaluator(obj, 'temperature');
+      return value ? ((value * 1.8) + 32).toFixed(1) : null;
+    }
+    case 'name': {
+      return window.deviceName || window.device?.name || null;
+    }
+    case 'ignition': {
+      const motion = attConverter(obj, 'motion');
+      const value = attVariantsEvaluator(obj, attribute);
+      return (value != null ? (value ? 'Si' : 'No') : null) || motion || null;
+    }
+    case 'motion': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return (value != null ? (value ? 'Si' : 'No') : null) || null;
+    }
+    case 'fuel': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value || null;
+    }
+    case 'hours': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return `${Math.floor(value / 3600000)}H ${Math.floor((value % 3600000) / 60000)}m` || null;
+    }
+    case 'totalDistance': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value || null;
+    }
+    case 'dateTime': {
+      const value = attVariantsEvaluator(obj, 'fixTime');
+      return formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') || null;
+    }
+    case 'fixTime': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') || null;
+    }
+    case 'serverTime': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') || null;
+    }
+    case 'deviceTime': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') || null;
+    }
+    case 'speed': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return `${Math.round(value * 1.85200)} Km/h` || null;
+    }
+    case 'rawspeed': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value || null;
+    }
+    case 'bateria': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value?.toFixed(2) || null;
+    }
+    case 'bateriapercentage': {
+      const value = attVariantsEvaluator(obj, 'bateria');
+      return ((Math.min(value ?? 0, 3.96) * 100) / 3.96).toFixed(2) || null;
+    }
+    case 'lastAlarm': {
+      const event = getEvent();
+      return alarmTranslator((event?.type || '').toUpperCase());
+    }
+    case 'policy': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value || null;
+    }
+    case 'expiration': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return formatDate(new Date(value), 'yyyy-MM-dd', 'es-MX') || null;
+    }
+    case 'lastUpdate': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') || null;
+    }
+    case 'phone': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value || null;
+    }
+    case 'imei': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value || null;
+    }
+    case 'groupName': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value || null;
+    }
+    case 'startTime': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return formatDate(new Date(value), 'yyyy-MM-dd', 'es-MX') || null;
+    }
+    case 'endTime': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return formatDate(new Date(value), 'yyyy-MM-dd', 'es-MX') || null;
+    }
+    case 'deviceName': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value || null;
+    }
+    case 'alarm': {
+      const value = attVariantsEvaluator(obj, attribute);
+      return alarmTranslator(value) || null;
+    }
+    case 'simType': {
+      const value = { 1: 'PT', 2: 'RT', 3: 'Ox' }[obj.simType];
+      return value || null;
+    }
+    case 'simKey': {
+      const value = obj.simKey;
+      return value || null;
+    }
+    default: {
+      const value = attVariantsEvaluator(obj, attribute);
+      return value || null;
+    }
+  }
+};
+
+let attVariantsEvaluator = (obj, attribute) => attsGetter(obj, attVariants(attribute).find((key) => attsGetter(obj, key) != null)) ?? null;
+
+let attVariants = (att) => {
+  switch (att) {
+    case 'temperature': return ['deviceTemp', 'temp1', 'bleeTemperature', 'temp2'];
+    case 'motion': return ['motion', 'io173'];
+    case 'group': return ['group', 'groupName'];
+    default: return [att];
+  }
+};
+
+export const attsGetter = (obj, attribute) => (obj[specialAtts(obj, attribute)] ?? obj['attributes']?.[specialAtts(obj, attribute)] ?? obj[`attributes.${specialAtts(obj, attribute)}`] ?? obj[`attribute.${specialAtts(obj, attribute)}`] ?? null) ?? (obj[specialAtts(obj, attribute)] || obj['attributes']?.[specialAtts(obj, attribute)] || obj[`attributes.${specialAtts(obj, attribute)}`] || obj[`attribute.${specialAtts(obj, attribute)}`] || null);
+
 export const specialAtts = (obj, attribute) => {
   switch (obj.protocol) {
     case 'ruptela':
@@ -314,198 +459,75 @@ export const specialAtts = (obj, attribute) => {
       return attribute;
   }
 };
-export const attsGetter = (obj, attribute) => {
-  switch (attribute) {
-    case 'status': {
-      const status = (obj.status ? obj.status : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : ''));
-      return (status === 'online') ? 'online' : (status === 'offline') ? 'offline' : null;
-    }
-    case 'temperaturaC': {
-      const temperature = attsGetter(obj, 'temperature');
-      return temperature ? temperature.toFixed(1) : null;
-    }
-    case 'temperaturaF': {
-      const temperature = attsGetter(obj, 'temperature');
-      return temperature ? ((temperature * 1.8) + 32).toFixed(1) : null;
-    }
-    case 'temperature': {
-      const temperature = attsGetter(obj, 'deviceTemp') ? attsGetter(obj, 'deviceTemp') : attsGetter(obj, 'temp1') ? attsGetter(obj, 'temp1') : attsGetter(obj, 'bleeTemperature') ? attsGetter(obj, 'bleeTemperature') : attsGetter(obj, 'temp2') ? attsGetter(obj, 'temp2') : null;
-      return temperature;
-    }
-    case 'attribute.deviceTemp': {
-      const temperature = attsGetter(obj, 'temp1') !== '' ? attsGetter(obj, 'temp1') : attsGetter(obj);
-      return temperature;
-    }
-    case 'name':
-      return `${window.device?.name || ''} ${window.device?.maker || ''} ${window.device?.model || ''} ${window.device?.year || ''}`;
-    case 'ignition': {
-      const motion = attsGetter(obj, 'motion');
-      const value = (obj.ignition ? obj.ignition : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : (obj.attributes[`attribute.${attribute}`] ? obj.attributes[`attribute.${attribute}`] : null)));
-      return value ? 'Si' : (motion === 'Si') ? 'Si' : 'No';
-    }
-    case 'io409': {
-      const value = (obj.io409 ? obj.io409 : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : attsGetter(obj, 'ignition')));
-      return (value === 'Si' || value === 'No') ? value : (value !== null && value !== undefined && value === 1) ? 'Si' : 'No';
-    }
-    case 'motion': {
-      const value = (obj.motion ? obj.motion : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : (obj.attributes[specialAtts(obj, attribute)] !== undefined ? obj.attributes[specialAtts(obj, attribute)] : null)));
-      return value ? 'Si' : 'No';
-    }
-    case 'io173': {
-      const value = (obj.io173 ? obj.io173 : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : attsGetter(obj, 'motion')));
-      return (value !== null && value === 1 && value !== undefined) ? 'Si' : 'No';
-    }
-    case 'fuel': {
-      const value = (obj['attribute.fuel'] ? obj['attribute.fuel'] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-      return value;
-    }
-    case 'hours': {
-      const value = (obj['attribute.hours'] ? obj['attribute.hours'] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-      const hours = Math.floor(value / 3600000);
-      const minutes = Math.floor((value % 3600000) / 60000);
-      return value ? `${hours}H ${minutes}m` : null;
-    }
-    case 'totalDistance': {
-      const value = (obj['attribute.totalDistance'] ? obj['attribute.totalDistance'] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-      return value;
-    }
-    case 'dateTime': {
-      let value = attsGetter(obj, 'fixTime');
-      const dt = new Date(value);
-      value = dt.toLocaleString().replace(',', '');
-      return value;
-    }
-    case 'fixTime': {
-      let value = (obj.fixTime ? obj.fixTime : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-      const dt = new Date(value);
-      value = dt.toISOString();
-      return value;
-    }
-    case 'speed': {
-      const value = obj.speed ? obj.speed : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null) || null;
-      return value ? `${Math.round(value * 1.85200)} Km/h` : null;
-    }
-    case 'rawspeed': {
-      const value = (obj.rawspeed ? obj.rawspeed : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-      return (value || 0);
-    }
-    case 'address': {
-      const value = (obj.address ? obj.address : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-      return value !== null ? value : "<a href='#' onclick='Ext.fireEvent(\"stategeocode\")' style='font-weight: bold; color:white;'>Click para ver</a>";
-    }
-    case 'bateria': {
-      const bat = obj.attributes.batteryLevel ? obj.attributes.batteryLevel : obj.attributes.battery ? obj.attributes.battery : null;
-      return bat !== null ? bat.toFixed(2) : null;
-    }
-    case 'bateriapercentage': {
-      const bat = obj.attributes.batteryLevel ? obj.attributes.batteryLevel : obj.attributes.battery ? obj.attributes.battery : null;
-      const calculatedValue = bat !== null ? ((Math.min(bat, 3.96) * 100) / 3.96).toFixed(2) : null;
-      return calculatedValue;
-    }
-    case 'lastAlarm': {
-      const event = getEvent();
-      return alarmTranslator((event?.type || '').toUpperCase());
-    }
-    case 'policy': {
-      return window.device?.policy || '';
-    }
-    case 'expiration': {
-      return formatDateToCustomString(new Date(window.device?.insuranceExpiration || ''));
-    }
-    case 'lastUpdate': {
-      return formatDate(new Date(window.device?.lastUpdate || ''), 'dd/MM/yyyy HH:mm:ss');
-    }
-    case 'phone': {
-      return window.device?.phone || '';
-    }
-    case 'imei': {
-      return window.device?.uniqueId || '';
-    }
-    case 'group': {
-      return window.groupsNames?.[window.device?.groupId]?.name || 'Sin grupo';
-    }
-    case 'startTime': {
-      let value = (obj.startTime ? obj.startTime : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-      const dt = new Date(value);
-      value = dt.toLocaleString().replace(',', '');
-      return value;
-    }
-    case 'endTime': {
-      let value = (obj.endTime ? obj.endTime : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-      const dt = new Date(value);
-      value = dt.toLocaleString().replace(',', '');
-      return value;
-    }
-    case 'deviceName': {
-      return (obj.deviceName || obj[attribute] || obj.attributes[attribute] || '');
-    }
-    default: {
-      return (obj[attribute] ? obj[attribute] : (obj.attributes[attribute] !== undefined ? obj.attributes[attribute] : null));
-    }
-  }
-};
+
 export const valueParser = (obj, value) => {
-  if (!attsGetter(obj, value)) {
+  console.log('search att ', obj, value);
+  if (!attConverter(obj, value)) {
+    console.log('no att ', obj, value);
     return '';
   }
   // eslint-disable-next-line default-case
   switch (value) {
     case 'name':
-      return `<h3><b>${attsGetter(obj, value)}</b></h3>`;
+      return `<h3><b>${attConverter(obj, value)}</b></h3>`;
     case 'ignition':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Encendido:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Encendido:</b> ${attConverter(obj, value)} `;
     case 'io409':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Encendido:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Encendido:</b> ${attConverter(obj, value)} `;
     case 'motion':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Movimiento:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Movimiento:</b> ${attConverter(obj, value)} `;
     case 'io173':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Movimiento:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Movimiento:</b> ${attConverter(obj, value)} `;
     case 'dateTime':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Posición:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Posición:</b> ${attConverter(obj, value)} `;
     case 'fixTime':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Fecha:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Fecha:</b> ${attConverter(obj, value)} `;
     case 'status':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Estado:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Estado:</b> ${attConverter(obj, value)} `;
     case 'speed':
-      return `<b style="font-weight: bold;text-transform: uppercase;">⏲:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">⏲:</b> ${attConverter(obj, value)} `;
     case 'address':
-      return `<div id='pop-up-address'><b style='font-weight: bold;text-transform: uppercase;'>Dirección:</b> ${attsGetter(obj, 'address')}</div>`;
+      return `<div id='pop-up-address'><b style='font-weight: bold;text-transform: uppercase;'>Dirección:</b> ${attConverter(obj, 'address')}</div>`;
     case 'fuel':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Combustible:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Combustible:</b> ${attConverter(obj, value)} `;
     case 'hours':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Horas:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Horas:</b> ${attConverter(obj, value)} `;
     case 'totalDistance':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Distancia total :</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Distancia total :</b> ${attConverter(obj, value)} `;
     case 'temperaturaC':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ${attConverter(obj, value)} `;
     case 'temperaturaF':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °F:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °F:</b> ${attConverter(obj, value)} `;
     case 'temp2':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Temperatura °C:</b> ${attConverter(obj, value)} `;
     case 'bateria':
-      return `<b style="font-weight: bold;text-transform: uppercase;">🔋:</b> ${attsGetter(obj, specialAtts(obj, value))}% `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">🔋:</b> ${attConverter(obj, value)}% `;
     case 'lastAlarm':
-      return `<b style="font-weight: bold;text-transform: uppercase;">❗:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">❗:</b> ${attConverter(obj, value)} `;
     case 'protocol':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Protocolo:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Protocolo:</b> ${attConverter(obj, value)} `;
     case 'policy':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Poliza:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Poliza:</b> ${attConverter(obj, value)} `;
     case 'expiration':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Expiración:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Expiración:</b> ${attConverter(obj, value)} `;
     case 'lastUpdate':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Conexión:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Conexión:</b> ${attConverter(obj, value)} `;
     case 'phone':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Telefono:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Telefono:</b> ${attConverter(obj, value)} `;
     case 'imei':
-      return `<b style="font-weight: bold;text-transform: uppercase;">IMEI:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">IMEI:</b> ${attConverter(obj, value)} `;
     case 'group':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Grupo:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Grupo:</b> ${attConverter(obj, value)} `;
     case 'deviceName':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Nombre:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Nombre:</b> ${attConverter(obj, value)} `;
     case 'startTime':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Hora inicial:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Hora inicial:</b> ${attConverter(obj, value)} `;
     case 'endTime':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Hora final:</b> ${attsGetter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Hora final:</b> ${attConverter(obj, value)} `;
+    case 'simType':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Tipo de sim:</b> ${attConverter(obj, value)} `;
+    case 'simKey':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Clave de sim:</b> ${attConverter(obj, value)} `;
   }
   return '';
 };

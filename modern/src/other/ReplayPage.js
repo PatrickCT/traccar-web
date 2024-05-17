@@ -22,7 +22,7 @@ import {
   createPopUpReportRoute, createPopUpSimple,
 } from '../common/util/mapPopup';
 import ReplaySideBar from './ReplaySideBar';
-import { attsGetter } from '../common/util/utils';
+import { attConverter } from '../common/util/utils';
 import { toast } from '../common/util/toasts';
 
 const useStyles = makeStyles((theme) => ({
@@ -189,7 +189,7 @@ const ReplayPage = () => {
   useEffect(() => {
     if (positions && positions.length > 0) {
       Array.from(document.getElementsByClassName('mapboxgl-popup')).filter((popup) => popup.id !== '').map((item) => item.remove());
-      const speed = parseFloat((attsGetter(positions[index], 'speed') ?? (attsGetter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -')).split(' ')[0]) || 0;
+      const speed = parseFloat((attConverter(positions[index], 'speed') ?? (attConverter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -')).split(' ')[0]) || 0;
       const currentType = (speed < value[0] ? 1 : (speed < value[1] ? 2 : 3));
       const color = (currentType === 1 ? 'green' : (currentType === 2 ? 'orange' : 'red'));
       if (map.getBounds().contains(new LngLat(positions[index]?.longitude, positions[index]?.latitude))) {

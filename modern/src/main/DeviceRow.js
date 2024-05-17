@@ -121,6 +121,7 @@ const DeviceRow = ({ data, index, style }) => {
         key={item.id}
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
+          window.device = window.devices[item.id] || null;
           if (!desktop) { window.showDevicesList(false); }
           if (position) {
             map.flyTo({ center: [position.longitude, position.latitude], zoom: 18, duration: 1000 });

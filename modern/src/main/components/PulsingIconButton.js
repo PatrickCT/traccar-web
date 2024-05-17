@@ -5,15 +5,16 @@ import {
 import './PulsingIconButton.css';
 import { Help } from '@mui/icons-material';
 
-const PulsingIconButton = ({ onClick, disabled, title }) => (
+const PulsingIconButton = ({ onClick, disabled, title, icon = <Help style={{ color: 'orange' }} />, color = 'rgba(255, 0, 0, 0.5)' }) => (
   <IconButton
     edge="end"
     onClick={onClick}
     disabled={disabled}
     className="pulsing-button"
+    style={{ '--color': color }}
   >
     <Tooltip open={false} title={title} arrow>
-      <Help style={{ color: 'orange' }} />
+      {icon}
     </Tooltip>
     {disabled && <span />}
   </IconButton>

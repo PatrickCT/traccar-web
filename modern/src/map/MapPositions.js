@@ -435,42 +435,6 @@ const MapPositions = ({
         if (map.getLayer(layer)) map.removeLayer(layer);
         if (map.getSource(layer)) map.removeSource(layer);
       });
-      // if (map.getLayer(id)) {
-      //   map.removeLayer(id);
-      // }
-      // if (map.getLayer(clusters)) {
-      //   map.removeLayer(clusters);
-      // }
-      // if (map.getLayer(direction)) {
-      //   map.removeLayer(direction);
-      // }
-      // if (map.getLayer('stops-layer')) {
-      //   map.removeLayer('stops-layer');
-      // }
-      // if (map.getLayer('start-layer')) {
-      //   map.removeLayer('start-layer');
-      // }
-      // if (map.getLayer('end-layer')) {
-      //   map.removeLayer('end-layer');
-      // }
-      // if (map.getLayer('realTime')) {
-      //   map.removeLayer('realTime');
-      // }
-
-      // if (map.getSource(id)) {
-      //   map.removeSource(id);
-      // }
-      // if (map.getSource('stops')) {
-      //   map.removeSource('stops');
-      // }
-      // if (map.getSource('start')) {
-      //   map.removeSource('start');
-      // }
-      // if (map.getSource('end')) {
-      //   map.removeSource('end');
-      // }
-
-      // window.marker = null;
     };
   }, []);
 
@@ -478,19 +442,19 @@ const MapPositions = ({
     if (!positions || positions.length <= 0) return;
     // map.getSource(id)?.setData(dataGenerator(visiblePositions));
 
-    const visiblePositions = positions.filter((position) => {
-      const coordinates = [position.longitude, position.latitude];
-      const bounds = map.getBounds();
+    // const nonVisiblePositions = positions.filter((position) => {
+    //   const coordinates = [position.longitude, position.latitude];
+    //   const bounds = map.getBounds();
 
-      return (
-        coordinates[0] >= bounds._sw.lng &&
-        coordinates[0] <= bounds._ne.lng &&
-        coordinates[1] >= bounds._sw.lat &&
-        coordinates[1] <= bounds._ne.lat
-      );
-    });
+    //   return (
+    //     coordinates[0] <= bounds._sw.lng &&
+    //     coordinates[0] >= bounds._ne.lng &&
+    //     coordinates[1] <= bounds._sw.lat &&
+    //     coordinates[1] >= bounds._ne.lat
+    //   );
+    // });
 
-    visiblePositions?.forEach((position) => {
+    positions?.forEach((position) => {
       if (window.players) {
         if (!window.players?.hasOwnProperty(position.deviceId)) {
           window.players[position.deviceId] = new RealTimeMovement();
@@ -498,6 +462,10 @@ const MapPositions = ({
         window.players[position.deviceId].updateSelectedPosition(position);
       }
     });
+
+    // nonVisiblePositions?.forEach((position) => {
+    //   window.players[position.deviceId].stop();
+    // });
   }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index, recalculate]);
 
   return null;

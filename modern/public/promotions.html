@@ -126,7 +126,12 @@
 
 
         window.onload = () => {
-
+            fetch('http://45.79.45.108:4040/api/external/promotions/list').then((response) => response.json()).then((data) => {
+                for (const item of data.data) {
+                    addPromotion(item.image, item.desc);
+                }
+                swiper.autoplay.start();
+            })
         }
 
         addPromotion = (image, info) => {
@@ -138,7 +143,7 @@
 
             let promo_li = document.createElement('li');
             let promo_img = document.createElement('img');
-            promo_img.src = image;
+            promo_img.src = `http://45.79.45.108:4040${image}`;
             promo_li.appendChild(promo_img);
             if (info) {
                 let promo_info = document.createElement('div');

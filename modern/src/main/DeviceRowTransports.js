@@ -9,7 +9,6 @@ import {
   ListItemButton,
   useMediaQuery,
 } from '@mui/material';
-import { Popup } from 'maplibre-gl';
 import Collapse from 'react-collapse';
 import { devicesActions } from '../store';
 import {
@@ -19,7 +18,6 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useAdministrator } from '../common/util/permissions';
 import { useAttributePreference } from '../common/util/preferences';
 import { map } from '../map/core/MapView';
-import { createPopUp } from '../common/util/mapPopup';
 import TableExist from './components/TableExits';
 
 const useStyles = makeStyles((theme) => ({
@@ -99,6 +97,8 @@ const DeviceRowTransporte = ({ data, index }) => {
         key={item.id}
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
+          window.device = window.devices[item.id] || null;
+
           setIsOpen(!isOpened);
           if (!desktop && user.attributes.hasOwnProperty('Transporte')) {
             window.showDevicesList(true);
@@ -108,14 +108,6 @@ const DeviceRowTransporte = ({ data, index }) => {
               center: [position.longitude, position.latitude],
               zoom: Math.max(map.getZoom(), 16),
             });
-            Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
-
-            new Popup()
-              .setMaxWidth('400px')
-              .setOffset(30)
-              .setHTML(createPopUp(position))
-              .setLngLat([position.longitude, position.latitude])
-              .addTo(map);
           }
         }}
         disabled={!admin && item.disabled}

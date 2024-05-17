@@ -31,6 +31,9 @@
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <link rel="stylesheet" href="./styles/tingle.min.css">
   <script src="./libs/tingle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js"
+    integrity="sha512-dUlSLLkxslGILhPdCkALwk4szPhp3xmZIKFtlUD+O9Lslq41Aksmdt5OGqpomDoT4FsCUH70jQU8ezZHI3v1RQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <title>GpsTracker</title>
 
@@ -61,7 +64,9 @@
 
         } else {
           console.log('tab is inactive');
-          Object.keys(window.players).forEach((id) => window.players[id].reset());
+          if (window.players) {
+            Object.keys(window.players).forEach((id) => window.players[id].reset());
+          }
           // notifyMe('El movimiento de los marcadores se pausara');
         }
       });

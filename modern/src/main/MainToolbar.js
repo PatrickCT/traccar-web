@@ -3,7 +3,9 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Toolbar, IconButton, OutlinedInput, InputAdornment, Popover, FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel, Checkbox, Badge, ListItemButton, ListItemText, Tooltip, Button,
+  useMediaQuery,
 } from '@mui/material';
+import { Info } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
 import MapIcon from '@mui/icons-material/Map';
 import ViewListIcon from '@mui/icons-material/ViewList';
@@ -40,6 +42,7 @@ const MainToolbar = ({
   setFilterSort,
   filterMap,
   setFilterMap,
+  setPositionInfoOpen,
 }) => {
   const classes = useStyles();
   const theme = useTheme();
@@ -56,6 +59,8 @@ const MainToolbar = ({
   const inputRef = useRef();
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [devicesAnchorEl, setDevicesAnchorEl] = useState(null);
+
+  const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
   const deviceStatusCount = (status) => Object.values(devices).filter((d) => d.status === status).length;
 
@@ -193,6 +198,15 @@ const MainToolbar = ({
         disabled={deviceReadonly && Object.keys(devices).length === 0}
         title={t('help')}
       />
+
+      {!desktop && (
+        <PulsingIconButton
+          onClick={() => setPositionInfoOpen(true)}
+          title=""
+          icon={<Info style={{ color: 'white' }} />}
+          color="#ede0a7"
+        />
+      )}
     </Toolbar>
   );
 };

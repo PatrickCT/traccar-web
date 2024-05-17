@@ -134,6 +134,7 @@ class RealTimeMovement {
     if (this.positions.length < 2) {
       this.stop();
     }
+    clearInterval(this.interval);
     this.interval = setInterval(async () => {
       try {
         requestAnimationFrame(async () => {

@@ -1,8 +1,7 @@
 import {
-  attsGetter,
+  attConverter,
   hasPassedTime,
   isMobile,
-  specialAtts,
   valueParser,
 } from './utils';
 
@@ -198,27 +197,27 @@ const popupBtns = () => {
   html += "<div style='display: table; margin: auto'>";
 
   html += "<div style='float: left; padding: 2px;' >";
-  html += '<a class="link-google-maps" onclick="(function(){engineLock();}());" ><img src="./././images/botones-popup/apagar.svg" width="35" height="35" style="border-radius:6px;"/></a>';
+  html += '<a class="link-google-maps" onclick="(function(){engineLock();window.noInfoPanel?.close();}());" ><img src="./././images/botones-popup/apagar.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
 
   html += "<div style='float: left; padding: 2px;' >";
-  html += '<a class="link-google-maps" onclick="(function(){engineReactivate();}());" ><img src="./././images/botones-popup/encender.svg" width="35" height="35" style="border-radius:6px;"/></a>';
+  html += '<a class="link-google-maps" onclick="(function(){engineReactivate();window.noInfoPanel?.close();}());" ><img src="./././images/botones-popup/encender.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
 
   html += "<div style='float: left; padding: 2px;' >";
-  html += "<a class='link-google-maps' onclick='(function(){streetView();}());' ><img src='./././images/botones-popup/calle.svg' width='35' height='35' style='border-radius:6px;'/></a>";
+  html += "<a class='link-google-maps' onclick='(function(){streetView();window.noInfoPanel?.close();}());' ><img src='./././images/botones-popup/calle.svg' width='35' height='35' style='border-radius:6px;'/></a>";
   html += '</div>';
 
   html += "<div style='float: left; padding: 2px;'>";
-  html += '<a class="link-google-maps" onclick="(function(){generateRoute();}());"><img src="./././images/botones-popup/maps.svg" width="35" height="35" style="border-radius:6px;"/></a>';
+  html += '<a class="link-google-maps" onclick="(function(){generateRoute();window.noInfoPanel?.close();}());"><img src="./././images/botones-popup/maps.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
 
   html += "<div style='float: left; padding: 2px;' >";
-  html += "<a class='link-google-maps' onclick='(function(){navigate(`/reports/route`);}());'><img src='./././images/botones-popup/recorrido.svg' width='35' height='35' style='border-radius:6px;'/></a>";
+  html += "<a class='link-google-maps' onclick='(function(){navigate(`/reports/route`);window.noInfoPanel?.close();}());'><img src='./././images/botones-popup/recorrido.svg' width='35' height='35' style='border-radius:6px;'/></a>";
   html += '</div>';
 
   html += "<div id='div_replay' style='float: left; padding:2px;' >";
-  html += '<a class="link-google-maps" onClick="(function(){navigate(`/replay`);}());"><img src="./././images/botones-popup/replay.svg" width="35" height="35" style="border-radius:6px;"/></a>';
+  html += '<a class="link-google-maps" onClick="(function(){navigate(`/replay`);window.noInfoPanel?.close();}());"><img src="./././images/botones-popup/replay.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
 
   html += '</div>';
@@ -243,9 +242,12 @@ const popupRevision = () => {
 };
 
 export const createPopUp = (position) => {
+  console.log('popup ', position);
   let html = '';
-
-  if (hasPassedTime(new Date(position.fixTime), 40)) {
+  let today = new Date();
+  today.setHours(today.getHours() - 1);
+  today = new Date(today);
+  if (hasPassedTime(new Date(position.fixTime || today), 40)) {
     html += '<div style="width: 250px;">';
     if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
       html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
@@ -253,19 +255,23 @@ export const createPopUp = (position) => {
       html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>`;
       html += ` <a class="link-google-maps" onclick="(function(){navigate('/position/${position.id}');}());" ><img src="./././images/botones-popup/position.svg" width="14" height="14" /></a>`;
 
-      html += `<h3><b>${attsGetter(position, 'name')}</b>`;
+      html += `<h3><b>${attConverter(position, 'name')}</b>`;
       html += '</h3></div>';
     }
 
-    html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attsGetter(position, 'name')}, no esta reportando, usuario: ${window.getUser()?.name}, servidor: ${window.findServerName(window.location.hostname)}" style="left: 40%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
+    html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attConverter(position, 'name')}, no esta reportando, usuario: ${window.getUser()?.name}, servidor: ${window.findServerName(window.location.hostname)}" style="left: 40%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
 
     html += '<br />';
     if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
-      html += valueParser(position, specialAtts(position, 'protocol'));
+      html += valueParser(position, 'protocol');
       html += '<br />';
-      html += valueParser(position, specialAtts(position, 'phone'));
+      html += valueParser(window.device, 'phone');
       html += '<br />';
-      html += valueParser(position, specialAtts(position, 'imei'));
+      html += valueParser(window.device, 'imei');
+      html += '<br />';
+      html += valueParser(window.device, 'simType');
+      html += '<br />';
+      html += valueParser(window.device, 'simKey');
     }
     html += '<br />';
     html += popupBtns();
@@ -284,44 +290,49 @@ export const createPopUp = (position) => {
     html += ` <a class="link-google-maps" onclick="(function(){navigate('/position/${position.id}');}());" ><img src="./././images/botones-popup/position.svg" width="14" height="14" /></a>`;
     html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/accumulators/${position.deviceId}');}());" ><img src="./././images/botones-popup/accumulator.svg" width="14" height="14" /></a>`;
   }
-  html += `<h3><b>${attsGetter(position, 'name')}</b>`;
+  html += `<h3><b>${valueParser(position, 'name')}</b>`;
   html += '</h3></div>';
   html += '<div style="text-align: center;">';
-  html += `${valueParser(position, specialAtts(position, 'ignition'))}  -  `;
-  html += valueParser(position, specialAtts(position, 'motion'));
+  html += `${valueParser(position, 'ignition')}  -  `;
+  html += valueParser(position, 'motion');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'dateTime'));
+  html += valueParser(position, 'dateTime');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'lastUpdate'));
+  html += valueParser(window.device, 'lastUpdate');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'status'));
+  html += valueParser(position, 'status');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'direccion'));
+  html += valueParser(position, 'direccion');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'fuel'));
+  html += valueParser(position, 'fuel');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'totalDistance'));
+  html += valueParser(position, 'totalDistance');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'speed'));
+  html += valueParser(position, 'speed');
   html += valueParser(position, 'bateria');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'odometer'));
+  html += valueParser(position, 'odometer');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'group'));
+  html += valueParser(position, 'group');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'hours'));
-  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
-  html += valueParser(position, specialAtts(position, 'temperaturaF')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
-
-  html += valueParser(position, specialAtts(position, 'lastAlarm'));
+  html += valueParser(position, 'hours');
+  html += '<br />';
+  html += valueParser(position, 'temperaturaC');
+  html += valueParser(position, 'temperaturaF');
+  html += '<br />';
+  html += valueParser(position, 'lastAlarm');
   html += '<br />';
 
   if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
-    html += valueParser(position, specialAtts(position, 'protocol'));
+    html += valueParser(position, 'protocol');
     html += '<br />';
-    html += valueParser(position, specialAtts(position, 'phone'));
+    html += valueParser(window.device, 'phone');
     html += '<br />';
-    html += valueParser(position, specialAtts(position, 'imei'));
+    html += valueParser(window.device, 'imei');
+    html += '<br />';
+    html += valueParser(window.device, 'simType');
+    html += '<br />';
+    html += valueParser(window.device, 'simKey');
   }
 
   html += '<br />';
@@ -335,8 +346,8 @@ export const createPopUp = (position) => {
   }
 
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'policy'));
-  html += valueParser(position, specialAtts(position, 'expiration'));
+  html += valueParser(position, 'policy');
+  html += valueParser(position, 'expiration');
   html += '</div>';
   html += '</div>';
 
@@ -349,34 +360,40 @@ export const createPopUp = (position) => {
   return html;
 };
 
+window.createPopUp = createPopUp;
+
 export const createPopUpReport = (position) => {
   let html = '<div>';
   html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
 
-  html += `<h3><b>${attsGetter(position, 'name')}</b></h3></div>`;
-  html += valueParser(position, specialAtts(position, 'ignition'));
+  html += `<h3><b>${attConverter(position, 'name')}</b></h3></div>`;
+  html += valueParser(position, 'ignition');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'motion'));
+  html += valueParser(position, 'motion');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'dateTime'));
+  html += valueParser(position, 'dateTime');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'status'));
+  html += valueParser(position, 'status');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'direccion'));
+  html += valueParser(position, 'direccion');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'fuel'));
+  html += valueParser(position, 'fuel');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'totalDistance'));
+  html += valueParser(position, 'totalDistance');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'speed'));
+  html += valueParser(position, 'speed');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'hours'));
+  html += valueParser(position, 'hours');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
+  html += valueParser(position, 'temperaturaC');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
+  html += valueParser(position, 'temperaturaC');
   html += '<br />';
   html += valueParser(position, 'bateria');
+  html += '<br />';
+  html += valueParser(position, 'simType');
+  html += '<br />';
+  html += valueParser(position, 'simKey');
   html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
 
   html += '</div>';
@@ -389,27 +406,27 @@ export const createPopUpReportRoute = (position) => {
   html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
 
   html += `<h3 style="margin: 0px"><b>${window.deviceName || ''}</b></h3></div>`;
-  html += valueParser(position, specialAtts(position, 'ignition'));
+  html += valueParser(position, 'ignition');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'motion'));
+  html += valueParser(position, 'motion');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'dateTime'));
+  html += valueParser(position, 'dateTime');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'status'));
+  html += valueParser(position, 'status');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'direccion'));
+  html += valueParser(position, 'direccion');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'fuel'));
+  html += valueParser(position, 'fuel');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'totalDistance'));
+  html += valueParser(position, 'totalDistance');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'speed'));
+  html += valueParser(position, 'speed');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'hours'));
+  html += valueParser(position, 'hours');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaC')) : '';
+  html += valueParser(position, 'temperaturaC');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'temperaturaC')) !== '' ? valueParser(position, specialAtts(position, 'temperaturaF')) : '';
+  html += valueParser(position, 'temperaturaC');
   html += '<br />';
   html += valueParser(position, 'bateria');
   html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
@@ -432,9 +449,9 @@ export const createPopUpReportRoute = (position) => {
 export const createPopUpSimple = (position) => {
   let html = '<div>';
 
-  html += valueParser(position, specialAtts(position, 'startTime'));
+  html += valueParser(position, 'startTime');
   html += '<br />';
-  html += valueParser(position, specialAtts(position, 'endTime'));
+  html += valueParser(position, 'endTime');
   html += '<br />';
   html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
   html += '<br>';

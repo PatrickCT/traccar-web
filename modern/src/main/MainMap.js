@@ -1,7 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+/* eslint-disable no-floating-decimal */
+
+import React, {
+  memo, useCallback, useEffect, useMemo, useRef, useState,
+} from 'react';
 import * as turf from '@turf/turf';
 import { Marker } from 'mapbox-gl';
 import { LngLat, Popup } from 'maplibre-gl';
@@ -25,14 +29,15 @@ import MapGeocoder from '../map/geocoder/MapGeocoder';
 import MapScale from '../map/MapScale';
 import MapNotification from '../map/notification/MapNotification';
 import useFeatures from '../common/util/useFeatures';
-import { createPopUp, createPopUpReportRoute } from '../common/util/mapPopup';
+import { createPopUp } from '../common/util/mapPopup';
 import MapPopup from '../map/showpopup/MapPopup';
 import MapShare from '../map/share/MapShare';
 import LinksPage from '../settings/LinksPage';
 import MapCoverage from '../map/coverage/MapCoverage';
-import { attsGetter, showCoberturaMap } from '../common/util/utils';
+import { showCoberturaMap } from '../common/util/utils';
 import { useAdministrator } from '../common/util/permissions';
-import RealTimeMovement from './components/RealTimeMarker';
+import MapPromotions from '../map/promotions/MapPromotions';
+import PulsingIconButton from './components/PulsingIconButton';
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -67,7 +72,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    // window.rtm?.updateSelectedPosition(selectedPosition);
+    dispatch(devicesActions.selectPosition(selectedPosition));
   }, [selectedPosition]);
 
   useEffect(() => {
@@ -80,9 +85,9 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
     }
 
     window.sleep = sleep;
+    window.createPopUp = createPopUp;
     window.rtmPopUp = (position) => {
       if (position === undefined || position === null || window.position === null || window.localStorage.getItem('showMapPopup') === 'false') {
-        console.log('no show');
         return;
       }
       Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
@@ -136,6 +141,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
       {admin && (
         <MapCoverage onClick={() => showCoberturaMap()} />
       )}
+      <MapPromotions />
       <Modal
         isOpen={showModalShareLocation}
         onClose={() => setShowModalShareLocation(false)} // Close modal when the overlay is clicked or Esc is pressed
