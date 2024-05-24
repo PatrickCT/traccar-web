@@ -174,6 +174,20 @@ class RealTimeMovement {
     const dy = (a[1] - b[1]) * 111.139;
     return Math.sqrt((dx * dx) + (dy * dy)) * 1000;
   }
+
+  animate() {
+    if (this.positions.length < 2) {
+      this.stop();
+    }
+
+    this.show(this.positions[0]);
+    this.positions.shift();
+    if (this.positions.length <= 0) {
+      this.stop();
+    }
+
+    this.animationFrame = requestAnimationFrame(this.animate.bind(this));
+  }
 }
 
 module.exports = RealTimeMovement;
