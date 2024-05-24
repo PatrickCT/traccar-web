@@ -32,7 +32,6 @@ const ReportFilter = ({
 
   const devices = useSelector((state) => state.devices.items);
   const groups = useSelector((state) => state.groups.items);
-  // console.log('report filterss groups', JSON.stringify(groups));
 
   const deviceId = useSelector((state) => state.devices.selectedId);
   const deviceIds = useSelector((state) => state.devices.selectedIds);

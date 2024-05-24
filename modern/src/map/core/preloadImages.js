@@ -85,7 +85,7 @@ export default async () => {
 
         // eslint-disable-next-line no-unused-vars
       }).catch((error) => {
-        console.error(`Error loading image '${category}-${color}' from path '${imagePath}':`, error);
+        console.log(`Error loading image '${category}-${color}' from path '${imagePath}':`, error);
       }));
     });
     await Promise.all(results);

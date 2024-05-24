@@ -40,6 +40,7 @@ const MapPositions = ({
   const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
 
   const devices = useSelector((state) => state.devices.items);
+  window.devices = useSelector((state) => state.devices.items);
 
   const mapCluster = useAttributePreference('mapCluster', true);
   const hours12 = usePreference('twelveHourFormat');
@@ -76,10 +77,10 @@ const MapPositions = ({
     };
   };
 
-  const dataGenerator = (visiblePositions) => (
+  const dataGenerator = (visiblePositions, devices) => (
     {
       type: 'FeatureCollection',
-      features: visiblePositions.filter((it) => devices.hasOwnProperty(it?.deviceId)).map((position) => ({
+      features: visiblePositions.map((position) => ({
         type: 'Feature',
         geometry: {
           type: 'Point',
@@ -114,7 +115,7 @@ const MapPositions = ({
     });
     const clusterId = features[0].properties.cluster_id;
     map.getSource(id).getClusterExpansionZoom(clusterId, (error, zoom) => {
-      if (!error) {
+      if (!error && features[0] && features[0].hasOwnProperty('geometry')) {
         map.easeTo({
           center: features[0]?.geometry?.coordinates,
           zoom,
@@ -410,7 +411,6 @@ const MapPositions = ({
     map.on('zoom', () => setRecalculate(new Date()));
 
     window.createFeature = createFeature;
-    window.devices = devices;
     window.dataGenerator = dataGenerator;
     window.isEqual = isEqual;
     window.propPrint = propPrint;
@@ -431,10 +431,10 @@ const MapPositions = ({
       map.off('zoom', id, () => setRecalculate(new Date()));
 
       [clusters, direction, 'stops-layer', 'start-layer', 'end-layer', id, `${direction}2`, 'realTime'].forEach((layer) => {
-        console.log('Removed ', layer);
         if (map.getLayer(layer)) map.removeLayer(layer);
         if (map.getSource(layer)) map.removeSource(layer);
       });
+      Object.keys(window.players ?? {}).forEach((id) => window.players[id].reset());
     };
   }, []);
 
@@ -462,13 +462,9 @@ const MapPositions = ({
         window.players[position.deviceId].updateSelectedPosition(position);
       }
     });
-
-    // nonVisiblePositions?.forEach((position) => {
-    //   window.players[position.deviceId].stop();
-    // });
   }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index, recalculate]);
 
-  return null;
+  return true;
 };
 
 export default memo(MapPositions);

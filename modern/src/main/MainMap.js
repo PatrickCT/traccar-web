@@ -38,6 +38,7 @@ import { showCoberturaMap } from '../common/util/utils';
 import { useAdministrator } from '../common/util/permissions';
 import MapPromotions from '../map/promotions/MapPromotions';
 import PulsingIconButton from './components/PulsingIconButton';
+import NotificationsBanner from './components/NotificationBanner';
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -109,6 +110,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
 
   return (
     <>
+      {/* <NotificationsBanner /> */}
       <MapView>
         <MapOverlay />
         <MapGeofence />

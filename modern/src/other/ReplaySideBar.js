@@ -149,7 +149,6 @@ const DiscreteSlider = (props) => {
     }
   };
 
-  // console.log(value, perc, marks);
   return (
     <Box
       sx={{
@@ -224,8 +223,6 @@ const DiscreteSlider = (props) => {
 const ReplaySideBar = ({
   setExpanded, setIndex, setPlaying, handleDownload, handleChange, handleSubmit, changeSpeed, index, max, playing, expanded,
 }) => {
-  // console.log('ReplaySideBar');
-
   const [speed, setSpeed] = useState(500);
   const [value, setValue] = React.useState([50, 100]);
   const [showModalSpeed, setShowModalSpeed] = useState(false);
@@ -274,7 +271,7 @@ const ReplaySideBar = ({
         {!expanded ? (
           <>
             <div className={classes.controls}>
-              <div style={{ width: '95%' }}>
+              <div style={{ width: '95%', marginRight: '20px' }}>
                 <Slider
                   className={classes.slider}
                   max={max - 1}

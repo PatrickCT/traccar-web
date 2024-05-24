@@ -3,6 +3,7 @@ import { Autocomplete, Button, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { useEffectAsync } from '../../reactHelper';
+import LoadingSpinner from './LoadingSpinner';
 
 const LinkField = ({
   label,
@@ -18,6 +19,7 @@ const LinkField = ({
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState();
   const [linked, setLinked] = useState();
+  const [itemsLoading, setItemsLoading] = useState();
 
   useEffectAsync(async () => {
     if (active) {
@@ -43,6 +45,12 @@ const LinkField = ({
     }
   }, [active]);
 
+  useEffect(() => {
+    const loadings = {};
+    (items ?? []).forEach((item) => loadings[item.id] = false);
+    setItemsLoading(loadings);
+  }, [items]);
+
   const createBody = (linkId) => {
     const body = {};
     body[keyBase] = baseId;
@@ -51,6 +59,11 @@ const LinkField = ({
   };
 
   const onChange = async (value) => {
+    const loadings = itemsLoading;
+    loadings[value.id] = true;
+    setItemsLoading(loadings);
+    setActive(!active);
+
     if (value.checked) {
       await fetch('/api/permissions', {
         method: 'DELETE',
@@ -65,6 +78,8 @@ const LinkField = ({
       });
     }
 
+    loadings[value.id] = false;
+    setItemsLoading(loadings);
     setActive(!active);
   };
 
@@ -74,11 +89,13 @@ const LinkField = ({
       headerName: '',
       width: 100,
       renderCell: (params) => (
-        <input
-          type="checkbox"
-          checked={params.value}
-          onChange={() => onChange(params.row)}
-        />
+        (itemsLoading[params.row.id]) ? <span>⌛</span> : (
+          <input
+            type="checkbox"
+            checked={params.value}
+            onChange={() => onChange(params.row)}
+          />
+        )
       ),
     },
     { field: 'id', headerName: 'ID', width: 30 },
@@ -118,22 +135,6 @@ const LinkField = ({
         />
       </div>
       <br />
-      {/* <Autocomplete
-        loading={active && !items}
-        isOptionEqualToValue={(i1, i2) => keyGetter(i1) === keyGetter(i2)}
-        options={items || []}
-        getOptionLabel={(item) => titleGetter(item)}
-        renderInput={(params) => <TextField {...params} label={label} />}
-        value={(items && linked) || []}
-        onChange={(_, value) => onChange(value)}
-        open={open}
-        onOpen={() => {
-          setOpen(true);
-          setActive(true);
-        }}
-        onClose={() => setOpen(false)}
-        multiple
-      /> */}
     </>
   );
 };

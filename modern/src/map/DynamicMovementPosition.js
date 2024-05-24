@@ -211,15 +211,11 @@ const DynamicMovementPosition = ({ pos }) => {
   }, [memoPositions, memoStops]);
 
   useEffect(() => {
-    console.log('init');
     setIndex(0);
-    console.log(positions);
   }, []);
 
   useEffect(() => {
-    console.log('init');
     setIndex(0);
-    console.log(positions);
     setPlaying(true);
   }, [positions]);
 

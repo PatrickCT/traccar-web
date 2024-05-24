@@ -1,4 +1,6 @@
-import { React, useState } from 'react';
+import {
+  React, memo, useEffect, useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import makeStyles from '@mui/styles/makeStyles';
@@ -64,6 +66,8 @@ const DeviceRowTransporte = ({ data, index }) => {
   const [isOpened, setIsOpen] = useState(false);
   const [info, setInfo] = useState({});
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
+  const [hasSalida, setHasSalida] = useState(false);
+  const devices = useSelector((state) => state.devices.items);
 
   const formatProperty = (key) => {
     if (key === 'geofenceIds') {
@@ -89,6 +93,13 @@ const DeviceRowTransporte = ({ data, index }) => {
   const handleLoadInfo = (infoChild) => {
     setInfo(infoChild);
   };
+
+  useEffect(() => {
+    const device = devices[item.id];
+    if (device) {
+      setHasSalida(device.attributes.hasOwnProperty('Salida') ? device.attributes.Salida : false);
+    }
+  });
 
   return (
     <div style={{ position: 'relative' }}>
@@ -119,12 +130,13 @@ const DeviceRowTransporte = ({ data, index }) => {
           secondaryTypographyProps={{ noWrap: true }}
         />
 
-        {Object.keys(info).length > 0 ? (
+        {isOpened && Object.keys(info).length > 0 ? (
           <IconButton size="small">
             {`${t('laps')}${info.vueltas}`}
           </IconButton>
         ) : <div />}
 
+        <span style={{ fontWeight: 'bold', fontSize: '16px', color: `${hasSalida ? 'green' : 'red'}` }}>•</span>
       </ListItemButton>
       <Collapse isOpened={isOpened}>
         <div className="text" style={{ padding: '1rem', width: '100%' }}><TableExist deviceId={item.id} handleLoadInfo={handleLoadInfo} /></div>
@@ -133,4 +145,4 @@ const DeviceRowTransporte = ({ data, index }) => {
   );
 };
 
-export default DeviceRowTransporte;
+export default memo(DeviceRowTransporte);

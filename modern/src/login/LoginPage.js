@@ -127,7 +127,6 @@ const LoginPage = () => {
         navigate('/');
         setTimeout(async () => {
           fetch('http://45.79.45.108:4040/api/external/promotions/list').then((response) => response.json()).then((result) => {
-            console.log(result);
             if (result.data.length > 0) {
               window.jsPanel.modal.create({
                 theme: 'primary',

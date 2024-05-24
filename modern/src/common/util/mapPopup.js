@@ -242,7 +242,6 @@ const popupRevision = () => {
 };
 
 export const createPopUp = (position) => {
-  console.log('popup ', position);
   let html = '';
   let today = new Date();
   today.setHours(today.getHours() - 1);

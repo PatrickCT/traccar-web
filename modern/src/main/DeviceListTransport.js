@@ -47,18 +47,6 @@ const DeviceListTransport = ({ devices }) => {
   return (
     <AutoSizer className={classes.list}>
       {({ height, width }) => (
-        // <FixedSizeList
-        //   width={width}
-        //   height={height}
-        //   itemCount={devices.length}
-        //   itemData={devices}
-        //   itemSize={72}
-        //   overscanCount={10}
-        //   innerRef={listInnerEl}
-        //   position="relative"
-        // >
-        //   {DeviceRowTransporte}
-        // </FixedSizeList>
         <div style={{ width, height, overflow: 'auto' }}>
           {devices.map((device) => <DeviceRowTransporte key={device.id} data={devices} index={devices.indexOf(device)} />)}
         </div>

@@ -430,7 +430,6 @@ const MapPositions = ({
       // map.off('zoom', id, () => setRecalculate(new Date()));
 
       [clusters, direction, 'stops-layer', 'start-layer', 'end-layer', 'stops', 'start', 'end', id, `${direction}2`, 'realTime'].forEach((layer) => {
-        console.log('Removed ', layer);
         if (map.getLayer(layer)) map.removeLayer(layer);
         if (map.getSource(layer)) map.removeSource(layer);
       });

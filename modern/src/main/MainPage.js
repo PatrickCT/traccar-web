@@ -38,6 +38,7 @@ import ConnectionStatus from '../common/components/ConnectionStatus';
 import DebtModal from '../common/components/DebtModal';
 import PositionDrawer from './PositionInfoDrawer';
 import { useAdministrator } from '../common/util/permissions';
+import BroadcastAlert from './components/BroadcastAlert';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -293,6 +294,7 @@ const MainPage = () => {
       {selectedPosition && admin && (
         <PositionDrawer onClose={() => setInfoDrawer(false)} open={infoDrawer} />
       )}
+      <BroadcastAlert notifications={[]} />
     </div>
   );
 };

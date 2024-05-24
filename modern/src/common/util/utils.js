@@ -461,9 +461,7 @@ export const specialAtts = (obj, attribute) => {
 };
 
 export const valueParser = (obj, value) => {
-  console.log('search att ', obj, value);
   if (!attConverter(obj, value)) {
-    console.log('no att ', obj, value);
     return '';
   }
   // eslint-disable-next-line default-case

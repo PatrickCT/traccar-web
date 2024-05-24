@@ -119,7 +119,6 @@ async function downloadUrl(url) {
 
 const ReplayPage = () => {
   // Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item?.remove());
-  // console.log('ReplayPage');
   const timerRef = useRef();
   const t = useTranslation();
   const classes = useStyles();
@@ -259,7 +258,9 @@ const ReplayPage = () => {
             let fillers = [];
             for (let i = 0; i < steps; i += 1) {
               const point = turf.along(turf.lineString([[p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]]), ((i + 1) * 2), { units: 'meters' });
-              fillers.push({ ...position, original: false, longitude: point?.geometry.coordinates[0], latitude: point?.geometry.coordinates[1] });
+              if (point) {
+                fillers.push({ ...position, original: false, longitude: point?.geometry.coordinates[0], latitude: point?.geometry.coordinates[1] });
+              }
             }
             const fillerCourse = (fillers.reduce((acc, obj) => acc + parseFloat(obj.course ?? ''), 0) / fillers.length);
             fillers = fillers.map((filler) => ({ ...filler, course: fillerCourse }));

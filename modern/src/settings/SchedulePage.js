@@ -35,6 +35,7 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import SettingsMenu from './components/SettingsMenu';
 import { useCatch } from '../reactHelper';
 import { groupsActions } from '../store';
+import SearchSelect from '../reports/components/SearchableSelect';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -276,7 +277,6 @@ const SchedulePage = () => {
   ];
 
   /// fin alta de tramos
-
   const handleChange = (event) => {
     const newDays = {
       ...days,
@@ -343,6 +343,22 @@ const SchedulePage = () => {
     setItem({ ...{ ...item, attributes: { ...item?.attributes, hours: horas } } });
   }, [horas]);
 
+  // useEffect(() => {
+  //   const handler = {
+  //     get(target, key) {
+  //       if (typeof target[key] === 'object' && target[key] !== null) {
+  //         return new Proxy(target[key], handler);
+  //       }
+  //       return target[key];
+  //     },
+  //     set(target, prop, value) {
+  //       target[prop] = value;
+  //       return true;
+  //     },
+  //   };
+
+  //   const stored = new Proxy(JSON.parse(localStorage.getItem('schedule-stored') || '{}'), handler);
+  // }, []);
   const updateSubruta = (evt) => {
     setSubruta(evt.target.value);
     setItem({
@@ -384,7 +400,7 @@ const SchedulePage = () => {
     }
   });
 
-  const validate = () => item && item.name && item.days && item.subrouteId;
+  const validate = () => item && item?.name && item.days && item.subrouteId;
 
   return (
     <EditItemView
@@ -406,7 +422,7 @@ const SchedulePage = () => {
             </AccordionSummary>
             <AccordionDetails className={classes.details}>
               <TextField
-                value={item.name || ''}
+                value={item?.name || ''}
                 onChange={(event) => setItem({ ...item, name: event.target.value })}
                 label={t('sharedName')}
               />
@@ -642,7 +658,7 @@ const SchedulePage = () => {
                   onChange={updateSubruta}
                 >
                   {subrutas && (
-                    subrutas.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
+                    subrutas.map((s) => <MenuItem key={s.id} value={s.id}>{s?.name}</MenuItem>)
                   )}
                 </Select>
               </FormControl>
@@ -657,44 +673,35 @@ const SchedulePage = () => {
                 >
                   <MenuItem key={null} value={null}>Manual</MenuItem>
                   {geofences && (
-                    geofences.map((s) => <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>)
+                    geofences.map((s) => <MenuItem key={s.id} value={s.id}>{s?.name}</MenuItem>)
                   )}
                 </Select>
               </FormControl>
 
               <FormControl fullWidth>
-                <InputLabel id="horas">Tabla de salidas</InputLabel>
-                <Select
+                <SearchSelect
                   labelId="horas"
                   id="horasid"
-                  value={item.horasId || hour}
+                  value={item.horasId || hour || ''}
                   label="Tabla de salidas"
                   onChange={updateHora}
-                >
-                  <MenuItem value={0}>--Sin horario--</MenuItem>
-                  {hours && (
-                    hours.map((s) => <MenuItem key={s?.id} value={s?.id}>{s?.name}</MenuItem>)
-                  )}
-                </Select>
+                  options={[{ id: 0, name: 'Sin horario' }, ...hours]}
+                />
+
               </FormControl>
 
               {
                 (user.administrator || (user.attributes.hasOwnProperty('vp') &&
                   user.attributes.vp)) && (
                   <FormControl fullWidth>
-                    <InputLabel id="horasRel">Tabla de salidas relacionada</InputLabel>
-                    <Select
+                    <SearchSelect
                       labelId="horasRel"
                       id="horasidRel"
                       value={item.horasIdRel || hourRel}
                       label="Tabla de salidas relacionada"
                       onChange={updateHoraRel}
-                    >
-                      <MenuItem value={0}>--Sin horario--</MenuItem>
-                      {hours && (
-                        hours.map((s) => <MenuItem key={s?.id} value={s?.id}>{s?.name}</MenuItem>)
-                      )}
-                    </Select>
+                      options={[{ id: 0, name: 'Sin horario' }, ...hours]}
+                    />
                   </FormControl>
                 )
               }
@@ -738,6 +745,7 @@ const SchedulePage = () => {
           }
         </>
       )}
+
       {notifications.map((notification) => (
         <Snackbar
           key={notification.id}
