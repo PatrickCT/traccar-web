@@ -301,7 +301,7 @@ export const attConverter = (obj, attribute) => {
       return value ? ((value * 1.8) + 32).toFixed(1) : null;
     }
     case 'name': {
-      return window.deviceName || window.device?.name || null;
+      return window.device?.name || window.deviceName || null;
     }
     case 'ignition': {
       const motion = attConverter(obj, 'motion');

@@ -4,7 +4,7 @@ import {
   useId, useCallback, useEffect, memo, useState,
 } from 'react';
 // import { Popup } from 'mapbox-gl';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/styles';
 import { map } from './core/MapView';
@@ -13,6 +13,7 @@ import { mapIconKey } from './core/preloadImages';
 import { findFonts } from './core/mapUtil';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { hasPassedTime } from '../common/util/utils';
+import { devicesActions } from '../store';
 
 const isEqual = require('react-fast-compare');
 
@@ -28,6 +29,7 @@ const MapPositions = ({
   positions, onClick, titleField, selectedPosition, stops, showStatus = true, index, replay = false, main = false,
 }) => {
   const id = useId();
+  const dispatch = useDispatch();
   window.id = id;
   window.map = map;
   const clusters = `${id}-clusters`;
@@ -46,7 +48,8 @@ const MapPositions = ({
   // const [recalculate, setRecalculate] = useState(new Date());
 
   const createFeature = (devices, position, selectedPositionId) => {
-    const device = devices[position.deviceId];
+    const device = (devices || window.devices || {})[position.deviceId];
+
     let showDirection;
     switch (directionType) {
       case 'none':
@@ -62,15 +65,15 @@ const MapPositions = ({
     return {
       id: position.id,
       deviceId: position.deviceId,
-      name: device.name,
+      name: device?.name || '',
       fixTime: formatTime(position.fixTime, 'seconds', hours12),
-      category: mapIconKey(device.category),
+      category: mapIconKey(device?.category),
       // category: getStatusColor(device.status) === 'positive' ? mapIconKey(device.category) : mapIconKey('cross'),
       // category: ((hasPassedTime(new Date(device.lastUpdate), 40) || hasPassedTime(new Date(position.fixTime), 40)) ? mapIconKey('cross') : (hasPassedTime(new Date(position.fixTime), 10) ? mapIconKey('stop') : mapIconKey(device.category))),
-      color: showStatus ? (position.attributes.color || getStatusColor(device.status)) : 'neutral',
+      color: showStatus ? (position.attributes.color || getStatusColor(device?.status)) : 'neutral',
       rotation: position.course,
       direction: true,
-      rotate: device.category === 'carDirection',
+      rotate: device?.category === 'carDirection' || true,
     };
   };
 
@@ -412,6 +415,7 @@ const MapPositions = ({
     window.dataGenerator = dataGenerator;
     window.isEqual = isEqual;
     window.propPrint = propPrint;
+    window.deviceName = null;
 
     return () => {
       window.createFeature = null;
@@ -433,42 +437,7 @@ const MapPositions = ({
         if (map.getLayer(layer)) map.removeLayer(layer);
         if (map.getSource(layer)) map.removeSource(layer);
       });
-      // if (map.getLayer(id)) {
-      //   map.removeLayer(id);
-      // }
-      // if (map.getLayer(clusters)) {
-      //   map.removeLayer(clusters);
-      // }
-      // if (map.getLayer(direction)) {
-      //   map.removeLayer(direction);
-      // }
-      // if (map.getLayer('stops-layer')) {
-      //   map.removeLayer('stops-layer');
-      // }
-      // if (map.getLayer('start-layer')) {
-      //   map.removeLayer('start-layer');
-      // }
-      // if (map.getLayer('end-layer')) {
-      //   map.removeLayer('end-layer');
-      // }
-      // if (map.getLayer('realTime')) {
-      //   map.removeLayer('realTime');
-      // }
-
-      // if (map.getSource(id)) {
-      //   map.removeSource(id);
-      // }
-      // if (map.getSource('stops')) {
-      //   map.removeSource('stops');
-      // }
-      // if (map.getSource('start')) {
-      //   map.removeSource('start');
-      // }
-      // if (map.getSource('end')) {
-      //   map.removeSource('end');
-      // }
-
-      // window.marker = null;
+      dispatch(devicesActions.selectId(null));
     };
   }, []);
 

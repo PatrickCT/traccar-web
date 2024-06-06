@@ -47,6 +47,9 @@ const BroadcastAlert = ({ notifications }) => {
 
   useEffect(() => {
     window.updateBroadcastNotifications = (notification) => {
+      if (typeof notification === 'string') {
+        notification = { text: notification, permanent: false, type: '1l' };
+      }
       setActiveNotifications((prev) => [
         ...prev,
         { ...notification, id: prev.length + 1 },

@@ -49,7 +49,8 @@ const MapPositions = ({
   const [recalculate, setRecalculate] = useState(new Date());
 
   const createFeature = (devices, position, selectedPositionId) => {
-    const device = devices[position.deviceId];
+    const device = (devices || window.devices || {})[position.deviceId];
+
     let showDirection;
     switch (directionType) {
       case 'none':
@@ -65,15 +66,15 @@ const MapPositions = ({
     return {
       id: position.id,
       deviceId: position.deviceId,
-      name: device.name,
+      name: device?.name || '',
       fixTime: formatTime(position.fixTime, 'seconds', hours12),
-      category: mapIconKey(device.category),
+      category: mapIconKey(device?.category),
       // category: getStatusColor(device.status) === 'positive' ? mapIconKey(device.category) : mapIconKey('cross'),
       // category: ((hasPassedTime(new Date(device.lastUpdate), 40) || hasPassedTime(new Date(position.fixTime), 40)) ? mapIconKey('cross') : (hasPassedTime(new Date(position.fixTime), 10) ? mapIconKey('stop') : mapIconKey(device.category))),
-      color: showStatus ? (position.attributes.color || getStatusColor(device.status)) : 'neutral',
+      color: showStatus ? (position.attributes.color || getStatusColor(device?.status)) : 'neutral',
       rotation: position.course,
       direction: true,
-      rotate: device.category === 'carDirection',
+      rotate: device?.category === 'carDirection',
     };
   };
 

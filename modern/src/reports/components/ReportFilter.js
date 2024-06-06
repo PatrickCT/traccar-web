@@ -23,6 +23,7 @@ const ReportFilter = ({
   includeGroups,
   unified,
   forceDisabled,
+  extra,
 }) => {
   const classes = useReportStyles();
   const dispatch = useDispatch();
@@ -213,6 +214,11 @@ const ReportFilter = ({
               />
             </FormGroup>
           </FormControl>
+        </div>
+      )}
+      {extra && (
+        <div className={classes.filterItem}>
+          {extra}
         </div>
       )}
       <div className={classes.filterItem}>

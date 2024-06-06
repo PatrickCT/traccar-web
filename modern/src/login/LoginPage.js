@@ -126,7 +126,7 @@ const LoginPage = () => {
         dispatch(sessionActions.updateUser(user));
         navigate('/');
         setTimeout(async () => {
-          fetch('http://45.79.45.108:4040/api/external/promotions/list').then((response) => response.json()).then((result) => {
+          fetch('https://t-urban.com.mx:3003/api/external/promotions/list').then((response) => response.json()).then((result) => {
             if (result.data.length > 0) {
               window.jsPanel.modal.create({
                 theme: 'primary',
@@ -147,7 +147,7 @@ const LoginPage = () => {
               });
             }
           });
-        }, 1000);
+        }, 3000);
       } else {
         throw Error(await response.text());
       }
@@ -185,6 +185,7 @@ const LoginPage = () => {
     localStorage.removeItem('UGFzc3dvcmRVc2Vy');
     localStorage.removeItem('aXNBZG1pbg==');
     localStorage.removeItem('aXNSZXZpc29y');
+    window.internalTools?.destroy();
     const listener = (token) => handleTokenLogin(token);
     handleLoginTokenListeners.add(listener);
     return () => handleLoginTokenListeners.delete(listener);

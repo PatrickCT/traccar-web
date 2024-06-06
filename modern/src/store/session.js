@@ -9,6 +9,7 @@ const { reducer, actions } = createSlice({
     socket: null,
     positions: {},
     history: {},
+    subusers: [],
   },
   reducers: {
     updateServer(state, action) {
@@ -36,6 +37,9 @@ const { reducer, actions } = createSlice({
           state.history = {};
         }
       });
+    },
+    updateSubusers(state, action) {
+      state.subusers = action.payload;
     },
   },
 });

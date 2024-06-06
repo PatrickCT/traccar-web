@@ -5,6 +5,11 @@ export const useAdministrator = () => useSelector((state) => {
   return admin;
 });
 
+export const useSupport = () => useSelector((state) => {
+  const { admin, support } = state.session.user;
+  return admin && support;
+});
+
 export const useManager = () => useSelector((state) => {
   const admin = state.session.user.administrator;
   const manager = (state.session.user.userLimit || 0) !== 0;

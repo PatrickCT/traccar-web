@@ -17,7 +17,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { TextField } from '@mui/material';
-import { decode } from 'base-64';
 import DropdownComponents from '../../common/components/DropdownComponent';
 import { useEffectAsync } from '../../reactHelper';
 import '../../common/tickets.css';
@@ -47,9 +46,9 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
   const [subroutes, setSubroutes] = useState([]);
   const [hourSelected, setHour] = useState(dayjs(new Date().toISOString()));
   const [passwordUser, setPasswordUser] = useState('');
-  const [passwordSaved, setPasswordSaved] = useState('');
   const [loading, setLoading] = useState(false);
   const geofences = useSelector((state) => state.geofences.items);
+  const subusers = useSelector((state) => state.session.subusers);
   // const user = useSelector((state) => state.session.user);
   const loadInfoTable = async () => {
     if (loading) return;
@@ -100,15 +99,11 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
     setPasswordUser(event.target.value);
   };
 
-  const passwordEquals = () => passwordUser === passwordSaved;
+  const passwordEquals = () => [...subusers.map((item) => item.pass)].includes(passwordUser);
 
   useEffect(() => {
     setDate(moment().format('YYYY-MM-D'));
   }, [toDay]);
-
-  useEffect(() => {
-    setPasswordSaved(decode((localStorage.getItem('UGFzc3dvcmRVc2Vy') ?? '')));
-  }, []);
 
   useEffectAsync(async () => {
     await loadInfoTable();
@@ -130,6 +125,7 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
       },
       body: JSON.stringify({
         time: moment(hourSelected.$d).utc().format('HH:mm'),
+        pass: passwordUser,
       }),
     });
     if (response.ok) {
@@ -145,7 +141,6 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
     }, 1 * 15 * 1000);
 
     return () => {
-      console.log('unmount table ', deviceId);
       clearInterval(intervalId);
     }; // Clear interval on component unmount
   }, []);
@@ -201,7 +196,7 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
 
   return (
     <div>
-      {btnChangeTime && (
+      {btnChangeTime && (info?.salida?.modifiedBy === 0 || info?.salida?.modifiedBy === null) && (
         <div className="btn-change">
           <Button label={t('changeExitTime')} icon="pi pi-external-link" onClick={() => setVisible(true)} />
         </div>

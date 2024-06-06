@@ -34,7 +34,7 @@ const DevicesPage = () => {
   useEffectAsync(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/devices');
+      const response = await fetch('/api/devices?all=true');
       if (response.ok) {
         setItems(await response.json());
       } else {

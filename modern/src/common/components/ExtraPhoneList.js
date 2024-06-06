@@ -83,10 +83,10 @@ const ExtraPhoneList = (props) => {
 
               <Box component="form" sx={{ display: 'flex', gap: '10px' }} onSubmit={handleEditSubmit}>
                 <TextField label="Edit Item" value={newItem} onChange={handleInputChange} />
-                <Button variant="contained" type="submit">
+                <Button variant="outlined" type="submit">
                   {t('sharedSave')}
                 </Button>
-                <Button variant="contained" type="button" onClick={() => { setEditingItem(null); setNewItem(''); }}>
+                <Button variant="outlined" type="button" onClick={() => { setEditingItem(null); setNewItem(''); }}>
                   {t('sharedCancel')}
                 </Button>
               </Box>

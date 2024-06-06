@@ -297,7 +297,7 @@ export const createPopUp = (position) => {
   html += '<br />';
   html += valueParser(position, 'dateTime');
   html += '<br />';
-  html += valueParser(window.device, 'lastUpdate');
+  html += valueParser(window.devices[position.deviceId], 'lastUpdate');
   html += '<br />';
   html += valueParser(position, 'status');
   html += '<br />';

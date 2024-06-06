@@ -35,6 +35,7 @@ import useMapStyles from '../map/core/useMapStyles';
 import { map } from '../map/core/MapView';
 import ExtraEmailList from '../common/components/ExtraEmailList';
 import ExtraPhoneList from '../common/components/ExtraPhoneList';
+import SubUserList from '../common/components/SubUserList';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -445,6 +446,19 @@ const UserPage = () => {
             </AccordionDetails>
 
           </Accordion>
+
+          {admin && (
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle1">
+                  Contraseñas
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <SubUserList />
+              </AccordionDetails>
+            </Accordion>
+          )}
 
           {registrationEnabled && item.id === currentUser.id && !manager && (
             <Accordion>

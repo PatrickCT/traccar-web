@@ -13,7 +13,7 @@ const DeviceConnectionGroupPage = () => {
   const t = useTranslation();
 
   useEffect(() => {
-    fetch('/api/devices', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+    fetch('/api/devices?all=true', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
       .then((response) => response.json())
       .then((responseData) => setDevices(responseData));
   }, []);
@@ -43,7 +43,7 @@ const DeviceConnectionGroupPage = () => {
       <SelectField
         value={group || -1}
         onChange={(event) => setGroup(Number(event.target.value))}
-        endpoint="/api/groups"
+        endpoint="/api/groups?all=true"
         label={t('groupParent')}
       />
       <FormGroup>

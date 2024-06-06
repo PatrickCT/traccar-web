@@ -35,6 +35,8 @@ const App = () => {
       const response = await fetch('/api/session');
       if (response.ok) {
         dispatch(sessionActions.updateUser(await response.json()));
+        const subusers = await fetch('/api/subusers');
+        dispatch(sessionActions.updateSubusers(await subusers.json()));
       } else if (newServer) {
         navigate('/register');
       } else {

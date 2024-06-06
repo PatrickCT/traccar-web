@@ -54,6 +54,7 @@
     "react-window": "^1.8.9",
     "recharts": "^2.5.0",
     "redux": "^4.2.1",
+    "styled-components": "^6.1.11",
     "tingle.js": "^0.16.0",
     "typeface-roboto": "^1.1.13",
     "wellknown": "^0.5.0",

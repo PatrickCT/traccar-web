@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/no-string-refs */
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
 import moment from 'moment';
@@ -23,11 +29,15 @@ const TicketReportPage = () => {
   const navigate = useNavigate();
   const classes = useReportStyles();
   const t = useTranslation();
+  const tableBodyRef = useRef(null);
 
   const devices = useSelector((state) => state.devices.items);
 
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [validity, setValidity] = useState(0);
+
+  const calcValidity = (tickets) => ((tickets.reduce((acc, obj) => acc + (obj.enterTime ? 1 : 0), 0) * 100) / tickets.length) >= validity;
 
   const handleDownload = (url) => {
     // Disable the button and set loading state to true
@@ -142,6 +152,30 @@ const TicketReportPage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    let ticking = false;
+
+    const tableBodyNode = tableBodyRef.current.parentNode.parentNode;
+    if (tableBodyNode) {
+      const handleScroll = (_) => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            ticking = false;
+          });
+
+          ticking = true;
+        }
+      };
+
+      tableBodyNode.addEventListener('scroll', handleScroll);
+
+      return () => {
+        tableBodyNode.removeEventListener('scroll', handleScroll);
+      };
+    }
+    return () => null;
+  }, [tableBodyRef]);
+
   const calcDiffColor = (ticket) => {
     let border = '#163b61';
     let backgroundColor = '#9dc5ff  ';
@@ -171,7 +205,34 @@ const TicketReportPage = () => {
       <div className={classes.container}>
         <div className={classes.containerMain}>
           <div className={classes.header}>
-            <ReportFilter handleSubmit={handleSubmit} handleSchedule={handleSchedule} multiDevice includeGroups unified />
+            <ReportFilter
+              handleSubmit={handleSubmit}
+              handleSchedule={handleSchedule}
+              multiDevice
+              includeGroups
+              unified
+            >
+              <FormControl style={{ width: '10%' }}>
+                <InputLabel>%</InputLabel>
+                <Select
+                  label="%"
+                  value={validity}
+                  onChange={(event) => setValidity(event.target.value)}
+                >
+                  <MenuItem key={`k-validity-${0}`} value={0}>-- Sin filtrar --</MenuItem>
+                  <MenuItem key={`k-validity-${10}`} value={10}>10</MenuItem>
+                  <MenuItem key={`k-validity-${20}`} value={20}>20</MenuItem>
+                  <MenuItem key={`k-validity-${30}`} value={30}>30</MenuItem>
+                  <MenuItem key={`k-validity-${40}`} value={40}>40</MenuItem>
+                  <MenuItem key={`k-validity-${50}`} value={50}>50</MenuItem>
+                  <MenuItem key={`k-validity-${60}`} value={60}>60</MenuItem>
+                  <MenuItem key={`k-validity-${70}`} value={70}>70</MenuItem>
+                  <MenuItem key={`k-validity-${80}`} value={80}>80</MenuItem>
+                  <MenuItem key={`k-validity-${90}`} value={90}>90</MenuItem>
+                  <MenuItem key={`k-validity-${100}`} value={100}>100</MenuItem>
+                </Select>
+              </FormControl>
+            </ReportFilter>
           </div>
           <Table>
             <TableHead>
@@ -189,8 +250,10 @@ const TicketReportPage = () => {
               </TableRow>
             </TableHead>
 
-            <TableBody>
-              {!loading ? Object.keys(groups).map((salida) => (
+            <TableBody
+              ref={tableBodyRef}
+            >
+              {!loading ? Object.keys(groups).filter((salida) => calcValidity(groups[salida])).map((salida) => (
                 // Create a row for each group
                 <React.Fragment key={salida}>
                   <TableRow>

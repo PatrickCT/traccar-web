@@ -38,7 +38,7 @@ const GroupsPage = () => {
   useEffectAsync(async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/groups');
+      const response = await fetch('/api/groups?all=true');
       if (response.ok) {
         setItems(await response.json());
       } else {

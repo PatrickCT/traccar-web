@@ -11,7 +11,7 @@ import PageLayout from '../common/components/PageLayout';
 import SettingsMenu from './components/SettingsMenu';
 import CollectionFab from './components/CollectionFab';
 import CollectionActions from './components/CollectionActions';
-import { useManager } from '../common/util/permissions';
+import { useManager, useSupport } from '../common/util/permissions';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import { usePreference } from '../common/util/preferences';
 import LoadingComponent from './components/LoadingComponent';
@@ -21,6 +21,7 @@ const UsersPage = () => {
   const t = useTranslation();
 
   const manager = useManager();
+  const support = useSupport();
 
   const hours12 = usePreference('twelveHourFormat');
 
@@ -117,7 +118,7 @@ const UsersPage = () => {
           editPath="/settings/user"
           endpoint="users"
           setTimestamp={setTimestamp}
-          customActions={manager ? [actionLogin, actionConnections] : [actionConnections]}
+          customActions={(manager && !support) ? [actionLogin, actionConnections] : [actionConnections]}
         />,
       ],
     },

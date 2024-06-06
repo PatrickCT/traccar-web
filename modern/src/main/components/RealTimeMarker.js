@@ -55,11 +55,12 @@ class RealTimeMovement {
     this.device = null;
     this.pos = new FixedSizeArray(2, () => { this.generatePositions(); });
     this.reset();
+    this.animate = true;
     // this._app = new Proxy({ positions: new FixedSizeArray(2, () => { this.generatePositions(); }) }, handler);
   }
 
   updateSelectedPosition(p) {
-    if (this.pos.array.find((position) => position.id === p.id)) return;
+    if (this.pos.array.find((position) => position.id === p.id)) { return; }
     this.stop();
     this.device = p.deviceId;
     this.pos.push(p);
@@ -75,6 +76,7 @@ class RealTimeMovement {
     this.playing = false;
     this.positions = [];
     clearInterval(this.interval);
+    cancelAnimationFrame(this.animationFrame);
   }
 
   show(position) {
@@ -82,6 +84,7 @@ class RealTimeMovement {
     const newFeature = window.dataGenerator([position], window.devices).features[0];
 
     const data = window.map?.getSource(window.id)?._data;
+    data.features = data.features.filter((value, index, self) => index === self.findIndex((item) => item.properties.deviceId === value.properties.deviceId));
     const index = data.features.findIndex((f) => f?.properties?.deviceId === this.device);
     if (index !== -1) {
       data.features[index] = newFeature;
@@ -96,7 +99,7 @@ class RealTimeMovement {
 
   get(prop) { return this[prop]; }
 
-  set(prop, value) { this[prop] = value; }
+  setState(prop, value) { this[prop] = value; }
 
   generatePositions() {
     try {
@@ -106,66 +109,98 @@ class RealTimeMovement {
       const p = [...this.pos.array];
       const positions = [];
 
-      p.forEach((position, index) => {
-        try {
-          positions.push({ ...position, original: true });
-          if (index < p.length - 1) {
-            // const distance = window.turf.distance(window.turf.point([p[index].longitude, p[index].latitude]), window.turf.point([p[index + 1].longitude, p[index + 1].latitude]), { units: 'meters' });
-            const distance = parseInt(this.fastDistance([p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]), 10);
-            if (distance > 0) {
-              const steps = parseInt(distance / 3, 10);
-              let fillers = [];
-              for (let i = 0; i < steps; i += 1) {
-                const point = window.turf.along(window.turf.lineString([[p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]]), ((i + 1) * 3), { units: 'meters' });
-                fillers.push({ ...position, original: false, longitude: point?.geometry.coordinates[0], latitude: point?.geometry.coordinates[1] });
+      if (Math.abs((new Date(p[0].serverTime) - new Date(p[1].serverTime)) / 1000) > 30) {
+        this.animate = false;
+      }
+
+      if (this.animate) {
+        p.forEach((position, index) => {
+          try {
+            positions.push({ ...position, original: true });
+            if (index < p.length - 1) {
+              // const distance = window.turf.distance(window.turf.point([p[index].longitude, p[index].latitude]), window.turf.point([p[index + 1].longitude, p[index + 1].latitude]), { units: 'meters' });
+              const distance = parseInt(this.fastDistance([p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]), 10);
+              if (distance > 0) {
+                const steps = parseInt(distance / 2, 10);
+                let fillers = [];
+                for (let i = 0; i < steps; i += 1) {
+                  const point = window.turf.along(window.turf.lineString([[p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]]), ((i + 1) * 2), { units: 'meters' });
+                  fillers.push({ ...position, original: false, longitude: point?.geometry.coordinates[0], latitude: point?.geometry.coordinates[1] });
+                }
+                const fillerCourse = (fillers.reduce((acc, obj) => acc + parseFloat(obj.course ?? ''), 0) / fillers.length);
+                fillers = fillers.map((filler) => ({ ...filler, course: fillerCourse }));
+                positions.push(...fillers);
               }
-              const fillerCourse = (fillers.reduce((acc, obj) => acc + parseFloat(obj.course ?? ''), 0) / fillers.length);
-              fillers = fillers.map((filler) => ({ ...filler, course: fillerCourse }));
-              positions.push(...fillers);
             }
+          } catch (error) {
+            this.reset();
           }
-        } catch (error) {
-          this.reset();
-        }
-      });
-      this.positions.push(...positions);
+        });
+
+        this.positions.push(...positions);
+      } else {
+        this.positions.push(p);
+      }
+
       this.play();
     } catch (error) {
       this.reset();
     }
   }
 
-  async play() {
-    try {
-      if (this.positions.length < 2) {
-        this.stop();
-      }
-      clearInterval(this.interval);
-      this.interval = setInterval(async () => {
-        try {
-          requestAnimationFrame(async () => {
-            try {
-              this.show(this.positions[0]);
-              this.positions.shift();
-              if (this.positions.length <= 0) {
-                this.stop();
-              }
-            } catch (error) {
-              this.stop();
-            }
-          });
-        } catch (error) {
-          this.stop();
-        }
-      }, 25);
-    } catch (error) {
+  // async play() {
+  //   try {
+  //     if (this.positions.length < 2) {
+  //       this.stop();
+  //     }
+  //     clearInterval(this.interval);
+  //     this.interval = setInterval(async () => {
+  //       try {
+  //         requestAnimationFrame(async () => {
+  //           try {
+  //             this.show(this.positions[0]);
+  //             this.positions.shift();
+  //             if (this.positions.length <= 0) {
+  //               this.stop();
+  //             }
+  //           } catch (error) {
+  //             this.stop();
+  //           }
+  //         });
+  //       } catch (error) {
+  //         this.stop();
+  //       }
+  //     }, 25);
+  //   } catch (error) {
+  //     this.stop();
+  //   }
+  // }
+
+  play() {
+    this.animate = true;
+    if (this.positions.length <= 1) {
+      this.stop();
+      return;
+    }
+
+    this.show(this.positions[0]);
+    this.positions.shift();
+    if (this.positions.length <= 1) {
       this.stop();
     }
+
+    this.animationFrame = requestAnimationFrame(this.play.bind(this));
   }
 
   stop() {
     this.playing = false;
     clearInterval(this.interval);
+    cancelAnimationFrame(this.animationFrame);
+  }
+
+  pause(state = true) {
+    this.animate = !state;
+    this.pos.reset();
   }
 
   fastDistance(a, b) {
@@ -173,20 +208,6 @@ class RealTimeMovement {
     const dx = (a[0] - b[0]) * kx;
     const dy = (a[1] - b[1]) * 111.139;
     return Math.sqrt((dx * dx) + (dy * dy)) * 1000;
-  }
-
-  animate() {
-    if (this.positions.length < 2) {
-      this.stop();
-    }
-
-    this.show(this.positions[0]);
-    this.positions.shift();
-    if (this.positions.length <= 0) {
-      this.stop();
-    }
-
-    this.animationFrame = requestAnimationFrame(this.animate.bind(this));
   }
 }
 

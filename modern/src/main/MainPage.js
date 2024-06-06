@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
@@ -170,6 +171,14 @@ const MainPage = () => {
     window.openDrawer = openDrawer;
     window.closeDrawer = closeDrawer;
 
+    const checkScriptLoaded = () => {
+      if (typeof InternalTools !== 'undefined') {
+        window.internalTools = new InternalTools();
+      }
+    };
+
+    const intervalId = setInterval(checkScriptLoaded, 100);
+
     // Clean up the function when the component unmounts
     return () => {
       delete window.navigate;
@@ -185,15 +194,9 @@ const MainPage = () => {
       delete window.closeModal;
       delete window.openDrawer;
       delete window.closeDrawer;
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => { };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.internalTools?.destroy();
+      delete window.internalTools;
+      clearInterval(intervalId);
     };
   }, []);
 

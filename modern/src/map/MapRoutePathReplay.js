@@ -6,7 +6,6 @@ import { findFonts } from './core/mapUtil';
 import { attConverter } from '../common/util/utils';
 
 const MapRoutePath = ({ name, positions, coordinates, values }) => {
-  // console.log('Render MapRoutePath');
   const id = useId();
 
   const theme = useTheme();
@@ -22,7 +21,6 @@ const MapRoutePath = ({ name, positions, coordinates, values }) => {
         }
       }
     }
-    // console.log('Path color: ', `#${(`${Math.random().toString(16)}000000`).slice(2, 8)}`);
     return '#036104';
     // return `#${(`${Math.random().toString(16)}000000`).slice(2, 8)}`;
   });
@@ -92,9 +90,7 @@ const MapRoutePath = ({ name, positions, coordinates, values }) => {
         let speed = 0;
         try {
           speed = parseFloat((attConverter(position, 'speed') ?? (attConverter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -'))?.split(' ')[0]) || 0;
-        } catch (error) {
-          console.log(error);
-        }
+        } catch (error) { /* empty */ }
         if (currentType === 0 || currentType !== (speed < values[0] ? 1 : (speed < values[1] ? 2 : 3))) { // primer seccion o nueva seccion
           if (section.length > 0) {
             coordinatesColors.push(section);
