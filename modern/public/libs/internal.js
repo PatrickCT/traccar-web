@@ -250,8 +250,23 @@ class InternalTools {
   }
 
   startSocket() {
+    if (this.socket) {
+      console.log('Socket already exists. Skipping creation.');
+      return;
+    }
+
+    console.log('Creating new socket connection...');
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+
     this.socket = io(`${protocol}://t-urban.com.mx:3003`, { reconnectionDelayMax: 10000 });
+
+    // Optional: Add additional event listeners and socket setup here
+    this.socket.on('connect', () => {
+      console.log('Socket connected:', this.socket.id);
+    });
+    this.socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
     this.socket.io.on('error', (error) => {
       this.status.socket.events.error.push(`[${new Date().toLocaleString()}] ${error.message}`);
     });

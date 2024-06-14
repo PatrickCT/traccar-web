@@ -3,24 +3,14 @@
 import {
   React, memo, useEffect, useState,
 } from 'react';
-import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
-// import { useSelector } from 'react-redux';
-// eslint-disable-next-line import/no-extraneous-dependencies
-// import { Moment } from 'react-moment';
 import moment from 'moment';
 import 'moment-timezone';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { TextField } from '@mui/material';
 import DropdownComponents from '../../common/components/DropdownComponent';
 import { useEffectAsync } from '../../reactHelper';
 import '../../common/tickets.css';
 import { useTranslation } from '../../common/components/LocalizationProvider';
+import TimeUpdateBtn from './TimeUpdateBtn';
 
 const isEqual = require('react-fast-compare');
 
@@ -40,12 +30,9 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
   const [info, setInfo] = useState({});
   const [toDay, setDate] = useState(null);
   const [optionSelected, setOption] = useState(null);
-  const [visible, setVisible] = useState(false);
   const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [subroutes, setSubroutes] = useState([]);
-  const [hourSelected, setHour] = useState(dayjs(new Date().toISOString()));
-  const [passwordUser, setPasswordUser] = useState('');
   const [loading, setLoading] = useState(false);
   const geofences = useSelector((state) => state.geofences.items);
   const subusers = useSelector((state) => state.session.subusers);
@@ -95,12 +82,6 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
     },
   };
 
-  const handleChangePassword = (event) => {
-    setPasswordUser(event.target.value);
-  };
-
-  const passwordEquals = () => [...subusers.map((item) => item.pass)].includes(passwordUser);
-
   useEffect(() => {
     setDate(moment().format('YYYY-MM-D'));
   }, [toDay]);
@@ -111,28 +92,6 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
 
   const handleSelectedOption = (value) => {
     setOption(value);
-  };
-
-  const handleChangeHour = (newHour) => {
-    setHour(newHour);
-  };
-
-  const handleChangeTime = async () => {
-    const response = await fetch(`api/salidas/${info.salida.id}/adjustment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-      body: JSON.stringify({
-        time: moment(hourSelected.$d).utc().format('HH:mm'),
-        pass: passwordUser,
-      }),
-    });
-    if (response.ok) {
-      setInfo({});
-    } else {
-      throw Error(await response.text());
-    }
   };
 
   useEffect(() => {
@@ -169,37 +128,13 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
     return { backgroundColor, border, borderStyle: 'solid', borderWidth: '3px', marginBottom: '3px', borderRadius: '8px' };
   };
 
-  const footerContent = (
-    <div>
-      <Button
-        label={t('sharedNo')}
-        icon="pi pi-times"
-        onClick={() => {
-          setVisible(false);
-        }}
-        className="p-button-text"
-      />
-      <Button
-        label={t('sharedYes')}
-        icon="pi pi-check"
-        onClick={() => {
-          if (passwordEquals()) {
-            setVisible(false);
-            handleChangeTime();
-            setPasswordUser('');
-          }
-        }}
-        autoFocus
-      />
-    </div>
-  );
-
   return (
     <div>
       {btnChangeTime && (info?.salida?.modifiedBy === 0 || info?.salida?.modifiedBy === null) && (
-        <div className="btn-change">
-          <Button label={t('changeExitTime')} icon="pi pi-external-link" onClick={() => setVisible(true)} />
-        </div>
+        <TimeUpdateBtn
+          id={info.salida.id}
+          subusers={subusers}
+        />
       )}
       {dropDrivers && (
         <DropdownComponents
@@ -257,23 +192,6 @@ const TableExist = ({ deviceId, handleLoadInfo, topDirectory = '', btnChangeTime
           </div>
         </div>
       ))}
-      <div className="card flex justify-content-center">
-        <Dialog header={t('changeExitTime')} visible={visible} style={{ width: '16.5vw' }} breakpoints={{ '960px': '75vw', '641px': '100vw', '1500px': '35vm', '1200px': '50vm' }} onHide={() => setVisible(false)} footer={(passwordEquals() && passwordUser !== '') ? footerContent : <div />}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer
-              components={[
-                'DesktopTimePicker',
-              ]}
-            >
-              <DemoItem label="">
-                <TimePicker value={hourSelected} onChange={handleChangeHour} defaultValue="" ampm={false} className="picker" timeSteps={{ hours: 1, minutes: 1 }} />
-              </DemoItem>
-            </DemoContainer>
-          </LocalizationProvider>
-          <TextField type="password" className="passwordUser" style={{ height: '3rem', width: '100%' }} label="Contraseña" value={passwordUser} onChange={handleChangePassword} />
-          {(passwordUser !== '' && !passwordEquals()) && <span style={{ color: 'red' }}>{t('password_wrong')}</span>}
-        </Dialog>
-      </div>
     </div>
   );
 };

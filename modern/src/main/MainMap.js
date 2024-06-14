@@ -4,11 +4,11 @@
 /* eslint-disable no-floating-decimal */
 
 import React, {
-  memo, useCallback, useEffect, useMemo, useRef, useState,
+  memo, useCallback, useEffect, useState,
 } from 'react';
 import * as turf from '@turf/turf';
 import { Marker } from 'mapbox-gl';
-import { LngLat, Popup } from 'maplibre-gl';
+import { Popup } from 'maplibre-gl';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,8 +37,6 @@ import MapCoverage from '../map/coverage/MapCoverage';
 import { showCoberturaMap } from '../common/util/utils';
 import { useAdministrator } from '../common/util/permissions';
 import MapPromotions from '../map/promotions/MapPromotions';
-import PulsingIconButton from './components/PulsingIconButton';
-import NotificationsBanner from './components/NotificationBanner';
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -49,7 +47,6 @@ function sleep(ms) {
 }
 
 const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
-  const timerRef = useRef();
   const theme = useTheme();
   const dispatch = useDispatch();
 
@@ -58,16 +55,8 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const features = useFeatures();
   const admin = useAdministrator();
   const [showModalShareLocation, setShowModalShareLocation] = useState(false);
-  const [lastPosition, setLastPosition] = useState(null);
-  const [currentPosition, setCurrentPosition] = useState(null);
 
   // replay replica
-  const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(100);
-  const [positions, setPositions] = useState([]);
-  const memoPositions = useMemo(() => positions, [positions]);
-
   const onMarkerClick = useCallback((_, deviceId) => {
     dispatch(devicesActions.selectId(deviceId));
   }, [dispatch]);

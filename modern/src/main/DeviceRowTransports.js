@@ -109,7 +109,7 @@ const DeviceRowTransporte = ({ data, index }) => {
         onClick={() => {
           dispatch(devicesActions.selectId(item.id));
           window.device = (window.devices ?? {})[item.id] || null;
-          window.deviceName = ((window.devices ?? {})[item.id]).name || null;
+          window.deviceName = ((window.devices ?? {})[item.id])?.name || null;
 
           setIsOpen(!isOpened);
           if (!desktop && user.attributes.hasOwnProperty('Transporte')) {

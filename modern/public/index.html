@@ -9,37 +9,12 @@
   <meta name="description" content="Plataforma GPS Tracker MX" />
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-  <link rel="stylesheet" href="%PUBLIC_URL%/styles.css">
-  <!-- jspanel scripts -->
-  <link href="./styles/jspanel.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="./libs/extensions/dialog/jspanel.dialog.css">
-  <!-- end jspanel scripts -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="stylesheet" href="./styles/menu.css">
-  <link rel="stylesheet" href="./styles/driver.css" />
-  <link rel="stylesheet" href="./styles/tingle.min.css">
+  <link rel="stylesheet" href="%PUBLIC_URL%/styles.css" id="main-style" disabled>
 
-  <script src="./libs/jspanel.min.js"></script>
-  <script src="./libs/extensions/modal/jspanel.modal.js"></script>
-  <script src="./libs/extensions/dialog/jspanel.dialog.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js"
-    integrity="sha512-u3fPA7V8qQmhBPNT5quvaXVa1mnnLSXUep5PS1qo5NRzHwG19aHmNJnj1Q8hpA/nBWZtZD4r4AX6YOt5ynLN2g=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="./libs/driver.js.iife.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
-    integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js"
-    integrity="sha512-dUlSLLkxslGILhPdCkALwk4szPhp3xmZIKFtlUD+O9Lslq41Aksmdt5OGqpomDoT4FsCUH70jQU8ezZHI3v1RQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
-    integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
-    crossorigin="anonymous"></script>
-  <script src="./libs/heartbeat.min.js"></script>
-  <script src="./libs/internal.js"></script>
+  <link href="./styles/jspanel.min.css" rel="stylesheet" id="jspanel-style" disabled>
+  <link rel="stylesheet" href="./libs/extensions/dialog/jspanel.dialog.css" id="jsmodal-style" disabled>
+
+  <link rel="stylesheet" href="./styles/driver.css" id="driver-style" disabled />
 
   <title>GpsTracker</title>
 
@@ -48,6 +23,25 @@
 <body>
   <noscript>Enable JavaScript to use <a href="https://www.traccar.org/">Plataforma GPS Tracker MX</a>.</noscript>
   <div id="root" class="root"></div>
+  <script>
+    const stylize = () => {
+      let styleInterval = setInterval(() => {
+        console.log('styling');
+        const mainStyle = document.getElementById('main-style');
+        const jspanelStyle = document.getElementById('jspanel-style');
+        const jsmodalStyle = document.getElementById('jsmodal-style');
+
+        if (mainStyle.getAttribute('disabled') === 'disabled' || mainStyle.getAttribute('disabled') === '') {
+          if (mainStyle) mainStyle.removeAttribute('disabled');
+          if (jspanelStyle) jspanelStyle.removeAttribute('disabled');
+          if (jsmodalStyle) jsmodalStyle.removeAttribute('disabled');
+        } else {
+          clearInterval(styleInterval);
+        }
+      }, 1000);
+    };
+    stylize();
+  </script>
   <script>
     // Function to check if the user is accessing from a mobile device
     function isMobileDevice() {
@@ -122,7 +116,21 @@
       }
     }
   </script>
-
+  <script src="./libs/jspanel.min.js"></script>
+  <script src="./libs/extensions/modal/jspanel.modal.js"></script>
+  <script src="./libs/extensions/dialog/jspanel.dialog.js"></script>
+  <script src="./libs/driver.js.iife.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+    integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js"
+    integrity="sha512-dUlSLLkxslGILhPdCkALwk4szPhp3xmZIKFtlUD+O9Lslq41Aksmdt5OGqpomDoT4FsCUH70jQU8ezZHI3v1RQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+    integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+    crossorigin="anonymous"></script>
+  <script src="./libs/heartbeat.min.js"></script>
+  <script src="./libs/internal.js"></script>
 </body>
 
 </html>

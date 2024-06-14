@@ -212,7 +212,7 @@ const formatDateToCustomString = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-window.getUser = () => JSON.parse(atob(localStorage.getItem(btoa('user'))));
+window.getUser = () => JSON.parse(atob(localStorage.getItem(btoa('user')) || 'e30='));
 
 window.findServerName = (ip) => ({
   '173.255.203.21': 'Alba',

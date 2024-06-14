@@ -42,5 +42,13 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
     setFilteredPositions(filterMap
       ? filtered.map((device) => positions[device.id]).filter(Boolean)
       : Object.values(positions));
+
+    Object.keys(window.players || {}).forEach((player) => {
+      if (![...(filterMap
+        ? filtered.map((device) => positions[device.id]).filter(Boolean)
+        : Object.values(positions)).map((p) => p.deviceId)].includes(player)) {
+        window.players[player].reset();
+      }
+    });
   }, [keyword, filter, filterSort, filterMap, groups, devices, positions, setFilteredDevices, setFilteredPositions]);
 };

@@ -16,6 +16,8 @@ class PromotionsControl {
     this.button.style.width = '100%';
     this.button.innerText = 'Promociones';
     this.button.onclick = () => {
+      document.getElementById('jspanel-style').removeAttribute('disabled');
+      document.getElementById('jsmodal-style').removeAttribute('disabled');
       window.jsPanel.modal.create({
         theme: 'primary',
         content: `

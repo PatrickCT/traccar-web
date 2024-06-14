@@ -24,6 +24,7 @@ import {
   generateRoute, streetView,
 } from '../common/util/mapPopup';
 import { formatDate } from '../common/util/utils';
+import TimeUpdateBtn from '../main/components/TimeUpdateBtn';
 
 const TicketReportPage = () => {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ const TicketReportPage = () => {
   const tableBodyRef = useRef(null);
 
   const devices = useSelector((state) => state.devices.items);
+  const subusers = useSelector((state) => state.session.subusers);
+  console.log(subusers);
 
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -167,10 +170,10 @@ const TicketReportPage = () => {
         }
       };
 
-      tableBodyNode.addEventListener('scroll', handleScroll);
+      tableBodyNode.addEventListener('scroll', handleScroll, { passive: true });
 
       return () => {
-        tableBodyNode.removeEventListener('scroll', handleScroll);
+        tableBodyNode.removeEventListener('scroll', handleScroll, { passive: true });
       };
     }
     return () => null;
@@ -257,7 +260,18 @@ const TicketReportPage = () => {
                 // Create a row for each group
                 <React.Fragment key={salida}>
                   <TableRow>
-                    <TableCell colSpan={8}>{`Salida: ${salida}`}</TableCell>
+                    <TableCell colSpan={3}>{`Salida: ${salida}`}</TableCell>
+                    {(groups[salida]?.s?.modifiedBy !== 0 || groups[salida]?.s?.modifiedBy !== null) && (
+                      <TableCell colSpan={5}>{`La hora fue modificada por el sub-usuario: ${groups[salida][0].s.modifiedBy} - ${subusers.find((su) => su.id === groups[salida][0].s.modifiedBy)?.name} el dia: ${new Date(groups[salida][0].s.modifiedWhen).toLocaleString()}`}</TableCell>
+                    )}
+                    <TableCell colSpan={5}>
+                      {(groups[salida]?.s?.modifiedBy === 0 || groups[salida]?.s?.modifiedBy === null) && (
+                        <TimeUpdateBtn
+                          id={salida}
+                          subusers={subusers}
+                        />
+                      )}
+                    </TableCell>
                   </TableRow>
                   {groups[salida].map((item) => (
                     // Create rows for items within the group

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-undef */
 /* eslint-disable import/no-extraneous-dependencies */
 import React, { useState, useCallback, useEffect } from 'react';
@@ -157,6 +158,21 @@ const MainPage = () => {
   );
 
   useEffect(() => {
+    setTimeout(() => {
+      document.getElementById('main-style').removeAttribute('disabled');
+      document.getElementById('jspanel-style').removeAttribute('disabled');
+      document.getElementById('jsmodal-style').removeAttribute('disabled');
+    }, 0);
+    const intervalResize = setInterval(() => {
+      const canvas_h = Number(map.getCanvasContainer().firstChild.getAttribute('height'));
+      const screen_h = window.screen.height;
+
+      if (((canvas_h * 100) / screen_h) < 50) {
+        window.map.resize();
+      } else {
+        clearInterval(intervalResize);
+      }
+    }, 1000);
     // Attach the function to the global window object
     window.navigate = navigate;
     window.streetView = streetView;
@@ -173,7 +189,9 @@ const MainPage = () => {
 
     const checkScriptLoaded = () => {
       if (typeof InternalTools !== 'undefined') {
-        window.internalTools = new InternalTools();
+        if (!window.internalTools) {
+          window.internalTools = new InternalTools();
+        }
       }
     };
 
