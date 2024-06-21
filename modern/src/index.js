@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -10,11 +11,14 @@ import theme from './common/theme';
 import Navigation from './Navigation';
 import preloadImages from './map/core/preloadImages';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+// import tileCacheDb from './tileCacheDb';
 import NativeInterface from './common/components/NativeInterface';
 import ServerProvider from './ServerProvider';
 import ErrorBoundary from './ErrorBoundary';
 
-await preloadImages();
+setTimeout(async () => {
+  await preloadImages();
+}, 0);
 
 const root = createRoot(document.getElementById('root'));
 root.render(

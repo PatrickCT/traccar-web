@@ -1,8 +1,11 @@
+/* eslint-disable func-names */
 /* eslint-disable no-unreachable */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
+const addStats = (function () { const script = document.createElement('script'); script.onload = function () { const stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop); }); }; script.src = 'https://mrdoob.github.io/stats.js/build/stats.min.js'; document.head.appendChild(script); });
+
 class InternalFixedSizeArray {
   constructor(maxSize, onLimitReached) {
     this.maxSize = maxSize;
@@ -247,43 +250,5 @@ class InternalTools {
       this.startHearbeat();
     }, 3000);
     return false;
-  }
-
-  startSocket() {
-    if (this.socket) {
-      console.log('Socket already exists. Skipping creation.');
-      return;
-    }
-
-    console.log('Creating new socket connection...');
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-
-    this.socket = io(`${protocol}://t-urban.com.mx:3003`, { reconnectionDelayMax: 10000 });
-
-    // Optional: Add additional event listeners and socket setup here
-    this.socket.on('connect', () => {
-      console.log('Socket connected:', this.socket.id);
-    });
-    this.socket.on('disconnect', () => {
-      console.log('Socket disconnected');
-    });
-    this.socket.io.on('error', (error) => {
-      this.status.socket.events.error.push(`[${new Date().toLocaleString()}] ${error.message}`);
-    });
-    this.socket.io.on('ping', () => {
-      this.status.socket.events.ping.push(`[${new Date().toLocaleString()}] ping`);
-    });
-    this.socket.io.on('reconnect', (attempt) => {
-      this.status.socket.events.error.push(`[${new Date().toLocaleString()}] ${attempt} reconnection attempts`);
-    });
-    this.socket.io.on('reconnect_attepmt', (attempt) => {
-      this.status.socket.events.error.push(`[${new Date().toLocaleString()}] trying to connect for ${attempt} time`);
-    });
-    this.socket.io.on('reconnect_error', (error) => {
-      this.status.socket.events.error.push(`[${new Date().toLocaleString()}] error while reconnecting: ${error.message}`);
-    });
-    this.socket.io.on('reconnect_failed', () => {
-      this.status.socket.events.error.push(`[${new Date().toLocaleString()}] reconnection failed`);
-    });
   }
 }
