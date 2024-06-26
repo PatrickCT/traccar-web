@@ -116,7 +116,7 @@ const MapPositions = ({
     });
     const clusterId = features[0].properties.cluster_id;
     map.getSource(id).getClusterExpansionZoom(clusterId, (error, zoom) => {
-      if (!error && features[0] && features[0].hasOwnProperty('geometry')) {
+      if (!error && features[0] && features[0].geometry) {
         map.easeTo({
           center: features[0]?.geometry?.coordinates,
           zoom,
@@ -162,60 +162,6 @@ const MapPositions = ({
       },
     });
 
-    map.addSource('realTime', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-      cluster: mapCluster,
-      clusterMaxZoom: 14,
-      clusterRadius: 50,
-    });
-
-    map.addLayer({
-      id: 'realTime',
-      type: 'symbol',
-      source: 'realTime',
-      filter: ['!has', 'point_count'],
-      layout: {
-        'icon-image': `${(replay) ? 'replay-neutral' : '{category}-{color}'}`,
-        'icon-size': replay ? 0.08 : iconScale,
-        'icon-allow-overlap': true,
-        'text-field': `{${titleField || 'name'}}`,
-        'text-allow-overlap': true,
-        'text-anchor': 'bottom',
-        'text-offset': [0, -2 * iconScale],
-        'text-font': findFonts(map),
-        'text-size': 12,
-        'icon-rotate': replay ? ['get', 'rotation'] : ['case', ['==', ['get', 'rotate'], true], ['get', 'rotation'], 0],
-        // 'icon-rotate': ['get', 'rotation'],
-        'icon-rotation-alignment': 'map',
-      },
-      paint: {
-        'text-halo-color': 'white',
-        'text-halo-width': 1,
-      },
-    });
-
-    map.addLayer({
-      id: `${direction}2`,
-      type: 'symbol',
-      source: 'realTime',
-      filter: [
-        'all',
-        ['!has', 'point_count'],
-        ['==', 'direction', true],
-      ],
-      layout: {
-        'icon-image': 'direction',
-        'icon-size': iconScale,
-        'icon-allow-overlap': true,
-        'icon-rotate': ['get', 'rotation'],
-        'icon-rotation-alignment': 'map',
-      },
-    });
-
     map.addLayer({
       id: clusters,
       type: 'symbol',
@@ -247,159 +193,6 @@ const MapPositions = ({
         'icon-rotation-alignment': 'map',
       },
     });
-
-    if (replay && !main) {
-      map.addSource('stops', {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: [...stops.map((stop, index) => (
-            {
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: [stop.longitude, stop.latitude],
-              },
-              properties: {
-                index,
-              },
-            }
-          ))],
-        },
-        cluster: mapCluster,
-        clusterMaxZoom: 14,
-        clusterRadius: 50,
-      });
-      // map.addSource('stops', {
-      //   type: 'geojson',
-      //   data: {
-      //     type: 'FeatureCollection',
-      //     features: [...stops.map((stop, index) => {
-      //       new Popup()
-      //         .setMaxWidth('500px')
-      //         .setHTML(createPopUpSimple(stop))
-      //         .setLngLat([stop.longitude, stop.latitude])
-      //         .addTo(map);
-      //       return ({
-      //         type: 'Feature',
-      //         geometry: {
-      //           type: 'Point',
-      //           coordinates: [stop.longitude, stop.latitude],
-      //         },
-      //         properties: {
-      //           index,
-      //         },
-      //       });
-      //     })],
-      //   },
-      //   cluster: mapCluster,
-      //   clusterMaxZoom: 14,
-      //   clusterRadius: 50,
-      // });
-
-      map.addLayer({
-        id: 'stops-layer',
-        type: 'symbol',
-        source: 'stops',
-        filter: ['!has', 'point_count'],
-        layout: {
-          'icon-image': 'replay-stop',
-          'icon-size': iconScale,
-          'icon-allow-overlap': true,
-          'text-allow-overlap': true,
-          'text-anchor': 'bottom',
-          'text-offset': [0, -2 * iconScale],
-          'text-font': findFonts(map),
-          'text-size': 12,
-        },
-        paint: {
-          'text-halo-color': 'white',
-          'text-halo-width': 1,
-        },
-      });
-
-      if (positions?.length > 0) {
-        map.addSource('start', {
-          type: 'geojson',
-          data: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [positions[0].longitude, positions[0].latitude],
-                },
-              },
-            ],
-          },
-          cluster: mapCluster,
-          clusterMaxZoom: 14,
-          clusterRadius: 50,
-        });
-
-        map.addLayer({
-          id: 'start-layer',
-          type: 'symbol',
-          source: 'start',
-          filter: ['!has', 'point_count'],
-          layout: {
-            'icon-image': 'replay-start',
-            'icon-size': iconScale,
-            'icon-allow-overlap': true,
-            'text-allow-overlap': true,
-            'text-anchor': 'bottom',
-            'text-offset': [0, -2 * iconScale],
-            'text-font': findFonts(map),
-            'text-size': 12,
-          },
-          paint: {
-            'text-halo-color': 'white',
-            'text-halo-width': 1,
-          },
-        });
-
-        map.addSource('end', {
-          type: 'geojson',
-          data: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'Point',
-                  coordinates: [positions[positions.length - 1].longitude, positions[positions.length - 1].latitude],
-                },
-              },
-            ],
-          },
-          cluster: mapCluster,
-          clusterMaxZoom: 14,
-          clusterRadius: 50,
-        });
-
-        map.addLayer({
-          id: 'end-layer',
-          type: 'symbol',
-          source: 'end',
-          filter: ['!has', 'point_count'],
-          layout: {
-            'icon-image': 'replay-end',
-            'icon-size': iconScale,
-            'icon-allow-overlap': true,
-            'text-allow-overlap': true,
-            'text-anchor': 'bottom',
-            'text-offset': [0, -2 * iconScale],
-            'text-font': findFonts(map),
-            'text-size': 12,
-          },
-          paint: {
-            'text-halo-color': 'white',
-            'text-halo-width': 1,
-          },
-        });
-      }
-    }
 
     map.on('mouseenter', id, onMouseEnter);
     map.on('mouseleave', id, onMouseLeave);
@@ -469,3 +262,39 @@ const MapPositions = ({
 };
 
 export default memo(MapPositions);
+
+// map.addSource('realTime', {
+//   type: 'geojson',
+//   data: {
+//     type: 'FeatureCollection',
+//     features: [],
+//   },
+//   cluster: mapCluster,
+//   clusterMaxZoom: 14,
+//   clusterRadius: 50,
+// });
+
+// map.addLayer({
+//   id: 'realTime',
+//   type: 'symbol',
+//   source: 'realTime',
+//   filter: ['!has', 'point_count'],
+//   layout: {
+//     'icon-image': `${(replay) ? 'replay-neutral' : '{category}-{color}'}`,
+//     'icon-size': replay ? 0.08 : iconScale,
+//     'icon-allow-overlap': true,
+//     'text-field': `{${titleField || 'name'}}`,
+//     'text-allow-overlap': true,
+//     'text-anchor': 'bottom',
+//     'text-offset': [0, -2 * iconScale],
+//     'text-font': findFonts(map),
+//     'text-size': 12,
+//     'icon-rotate': replay ? ['get', 'rotation'] : ['case', ['==', ['get', 'rotate'], true], ['get', 'rotation'], 0],
+//     // 'icon-rotate': ['get', 'rotation'],
+//     'icon-rotation-alignment': 'map',
+//   },
+//   paint: {
+//     'text-halo-color': 'white',
+//     'text-halo-width': 1,
+//   },
+// });

@@ -68,7 +68,7 @@ self.addEventListener('controllerchange', () => {
 
 // Any other custom service worker logic can go here.
 function isAsset(url) {
-  return isNotApi(url) && isNotSocket(url) && !url.href.inclues('chunk');
+  return isNotApi(url) && isNotSocket(url) && !url.href?.includes('chunk');
 }
 
 function isNotApi(url) {
