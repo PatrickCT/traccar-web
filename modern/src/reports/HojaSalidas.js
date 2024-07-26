@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 // import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { json, useNavigate } from 'react-router-dom';
 import { Print } from '@mui/icons-material';
 import {
   Box,
@@ -27,7 +27,21 @@ const useStyles = makeStyles({
   },
 });
 // eslint-disable-next-line no-undef
-const print = () => html2pdf(document.getElementById('printable'));
+const print = () => html2pdf()
+  .from(document.getElementById('printable'))
+  .set({
+    filename: `Hoja de salidas consultada el ${(new Date()).toLocaleString()}.pdf`,
+    pagebreak: { mode: 'avoid-all' },
+    margin: [0, 0, 0, 0], // Set the margin as needed,
+    jsPDF: {
+      unit: 'px',
+
+      orientation: 'landscape',
+      hotfixes: ['px_scaling'],
+    },
+  })
+  .save();
+
 function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -109,13 +123,11 @@ const HojaSalidaReportPage = () => {
       });
       if (response.ok) {
         const result = await response.json();
-        let result2 = [...result];
-        for (let index = 0; index < Math.round(Math.random() * 10); index += 1) {
-          result2 = [...result2, { ...result[0], day: randomDate(new Date(from), new Date(to)) }];
-        }
+        const result2 = [...result];
 
         const r = [];
         setReport(result2);
+        console.log(result2);
         result2.forEach((item, index) => {
           const maxItems = Math.max(item.going.length, item.return.length);
 
@@ -186,6 +198,7 @@ const HojaSalidaReportPage = () => {
           }
         });
         setRows(r);
+        console.log(r);
       } else {
         throw Error(await response.text());
       }
@@ -296,83 +309,31 @@ const HojaSalidaReportPage = () => {
                         &nbsp;
                       </div>
                     </Box>
-                    <Box
-                      sx={{
-                        fontSize: 12,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between', // Align buttons to the extremes
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        borderRadius: 2,
-                        bgcolor: 'background.paper',
-                        color: 'text.secondary',
-                        padding: '0px', // Add padding for better appearance
-                      }}
-                    >
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        IDA
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        VUELTA
-                      </Button>
-                    </Box>
-                    <Box
-                      sx={{
-                        fontSize: 12,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center', // Center the content horizontally
-                        border: '1px solid',
-                        borderColor: 'divider', // black
-                        borderRadius: 0,
-                        bgcolor: 'background.paper',
-                        color: 'text.secondary',
-                        flex: 1, // Make the Box take the full width
-                      }}
-                    >
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        GEOCERCA
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        PROGRAMADA
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        REALIZADA
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        DIFERENCIA
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        CASTIGO
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        EXCUSA
-                      </Button>
-                      <Divider orientation="vertical" variant="middle" flexItem style={{ background: 'black' }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        GEOCERCA
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        PROGRAMADA
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        REALIZADA
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        DIFERENCIA
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        CASTIGO
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        EXCUSA
-                      </Button>
-                    </Box>
-                    {/* lista de horas */}
-                    {rows.filter((item) => item.item === reportIndex).map((item) => (
-                      item.rows.map((row, rowIndex) => (
-
+                    <Divider flexItem style={{ background: 'black' }} />
+                    {rows.map((row) => (
+                      <>
+                        {/* <p>{JSON.stringify(row)}</p> */}
+                        <Box
+                          sx={{
+                            fontSize: 12,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between', // Align buttons to the extremes
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            borderRadius: 2,
+                            bgcolor: 'background.paper',
+                            color: 'text.secondary',
+                            padding: '0px', // Add padding for better appearance
+                          }}
+                        >
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                            IDA
+                          </Button>
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                            VUELTA
+                          </Button>
+                        </Box>
                         <Box
                           sx={{
                             fontSize: 12,
@@ -388,110 +349,166 @@ const HojaSalidaReportPage = () => {
                           }}
                         >
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {geofences.find((geofence) => geofence.id === row.geofenceId_going).name || 'Sin nombre'}
+                            GEOCERCA
                           </Button>
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {moment(new Date(row.expectedTime_going)).format('HH:mm:ss')}
+                            PROGRAMADA
                           </Button>
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {moment(new Date(row.enterTime_going)).format('HH:mm:ss')}
+                            REALIZADA
                           </Button>
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {row.difference_going}
+                            DIFERENCIA
                           </Button>
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {row.excuse_going !== '' ? (
-                              <>
-                                <span style={{ textDecoration: 'line-through' }}>{row.punishment_going}</span>
-                                &nbsp;
-                                <span>0</span>
-                              </>
-                            ) : row.punishment_going}
+                            CASTIGO
                           </Button>
-                          <Button
-                            key={row.id_going}
-                            variant="text"
-                            style={{ color: 'black', flex: 1, fontSize: 12 }}
-                            onDoubleClick={() => {
-                              setTicket(row.id_going);
-                              setShowModal(true);
-                            }}
-                            disabled={rows.filter((item) => item.item === reportIndex).reduce((acc, obj) => acc + obj.rows.reduce((acc, obj) => acc + ((obj.excuse_going !== '' && obj.globalExcuse_going === false ? 1 : 0) + (obj.excuse_return !== '' && obj.globalExcuse_return === false ? 1 : 0)), 0), 0) >= 3}
-                          >
-                            {row.excuse_going || 'Sin excusa'}
-
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                            EXCUSA
                           </Button>
-
                           <Divider orientation="vertical" variant="middle" flexItem style={{ background: 'black' }} />
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {geofences.find((geofence) => geofence.id === row.geofenceId_return)?.name || 'Sin nombre'}
+                            GEOCERCA
                           </Button>
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {moment(new Date(row.expectedTime_return))?.format('HH:mm:ss') || 'Sin datos'}
+                            PROGRAMADA
                           </Button>
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {moment(new Date(row.enterTime_return))?.format('HH:mm:ss') || 'Sin datos'}
+                            REALIZADA
                           </Button>
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {row.difference_return}
+                            DIFERENCIA
                           </Button>
                           <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                            {row.excuse_return !== '' ? (
-                              <>
-                                <span style={{ textDecoration: 'line-through' }}>{row.punishment_return}</span>
-                                &nbsp;
-                                <span>0</span>
-                              </>
-                            ) : row.punishment_return}
+                            CASTIGO
                           </Button>
-                          <Button
-                            key={row.id_return}
-                            variant="text"
-                            style={{ color: 'black', flex: 1, fontSize: 12 }}
-                            onDoubleClick={() => {
-                              setTicket(row.id_return);
-                              setShowModal(true);
-                            }}
-                            disabled={rows.filter((item) => item.item === reportIndex).reduce((acc, obj) => acc + obj.rows.reduce((acc, obj) => acc + ((obj.excuse_going !== '' && obj.globalExcuse_going === false ? 1 : 0) + (obj.excuse_return !== '' && obj.globalExcuse_return === false ? 1 : 0)), 0), 0) >= 3}
-                          >
-                            {row.excuse_return || 'Sin excusa'}
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                            EXCUSA
                           </Button>
                         </Box>
+                        {row.rows.map((item, index) => (
+                          <>
+                            {/* <p>{JSON.stringify(item)}</p> */}
+                            <Box
+                              sx={{
+                                fontSize: 12,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center', // Center the content horizontally
+                                border: '1px solid',
+                                borderColor: 'divider', // black
+                                borderRadius: 0,
+                                bgcolor: 'background.paper',
+                                color: 'text.secondary',
+                                flex: 1, // Make the Box take the full width
+                              }}
+                            >
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {geofences.find((geofence) => geofence.id === item.geofenceId_going)?.name || 'Sin nombre'}
+                              </Button>
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {moment(new Date(item.expectedTime_going)).format('HH:mm:ss')}
+                              </Button>
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {moment(new Date(item.enterTime_going)).format('HH:mm:ss')}
+                              </Button>
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {item.difference_going}
+                              </Button>
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {item.excuse_going !== '' ? (
+                                  <>
+                                    <span style={{ textDecoration: 'line-through' }}>{item.punishment_going}</span>
+                                    &nbsp;
+                                    <span>0</span>
+                                  </>
+                                ) : item.punishment_going}
+                              </Button>
+                              <Button
+                                key={item.id_going}
+                                variant="text"
+                                style={{ color: 'black', flex: 1, fontSize: 12 }}
+                                onDoubleClick={() => {
+                                  setTicket(item.id_going);
+                                  setShowModal(true);
+                                }}
+                                disabled={rows.filter((i) => i.item === reportIndex).reduce((acc, obj) => acc + obj.rows.reduce((acc, obj) => acc + ((obj.excuse_going !== '' && obj.globalExcuse_going === false ? 1 : 0) + (obj.excuse_return !== '' && obj.globalExcuse_return === false ? 1 : 0)), 0), 0) >= 3}
+                              >
+                                {item.excuse_going || 'Sin excusa'}
+                              </Button>
+                              <Divider orientation="vertical" variant="middle" flexItem style={{ background: 'black' }} />
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {geofences.find((geofence) => geofence.id === item.geofenceId_return)?.name || 'Sin nombre'}
+                              </Button>
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {moment(new Date(item.expectedTime_return))?.format('HH:mm:ss') || 'Sin datos'}
+                              </Button>
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {moment(new Date(item.enterTime_return))?.format('HH:mm:ss') || 'Sin datos'}
+                              </Button>
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {item.difference_return}
+                              </Button>
+                              <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                                {item.excuse_return !== '' ? (
+                                  <>
+                                    <span style={{ textDecoration: 'line-through' }}>{item.punishment_return}</span>
+                                    &nbsp;
+                                    <span>0</span>
+                                  </>
+                                ) : item.punishment_return}
+                              </Button>
+                              <Button
+                                key={item.id_return}
+                                variant="text"
+                                style={{ color: 'black', flex: 1, fontSize: 12 }}
+                                onDoubleClick={() => {
+                                  setTicket(item.id_return);
+                                  setShowModal(true);
+                                }}
+                                disabled={rows.filter((i) => i.item === reportIndex).reduce((acc, obj) => acc + obj.rows.reduce((acc, obj) => acc + ((obj.excuse_going !== '' && obj.globalExcuse_going === false ? 1 : 0) + (obj.excuse_return !== '' && obj.globalExcuse_return === false ? 1 : 0)), 0), 0) >= 3}
+                              >
+                                {item.excuse_return || 'Sin excusa'}
+                              </Button>
+                            </Box>
+                            <Divider flexItem style={{ background: 'red' }} />
+                          </>
+                        ))}
+                        <Box
+                          sx={{
+                            fontSize: 12,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center', // Center the content horizontally
+                            border: '1px solid',
+                            borderColor: 'divider', // black
+                            borderRadius: 0,
+                            bgcolor: 'background.paper',
+                            color: 'text.secondary',
+                            flex: 1, // Make the Box take the full width
+                          }}
+                        >
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                          <Button />
 
-                      ))
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                            {'Subtotal: '}
+                          </Button>
+                          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
+                            {`${calculateSumOfPunishments([row])}`}
+                          </Button>
+                        </Box>
+                        <Divider flexItem style={{ background: 'black' }} />
+                      </>
                     ))}
-                    <Box
-                      sx={{
-                        fontSize: 12,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center', // Center the content horizontally
-                        border: '1px solid',
-                        borderColor: 'divider', // black
-                        borderRadius: 0,
-                        bgcolor: 'background.paper',
-                        color: 'text.secondary',
-                        flex: 1, // Make the Box take the full width
-                      }}
-                    >
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button />
-
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }} />
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        {'Subtotal: '}
-                      </Button>
-                      <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 12 }}>
-                        {`${calculateSumOfPunishments(rows.filter((item) => item.item === reportIndex))}`}
-                      </Button>
-                    </Box>
                   </>
                 ))}
                 <Box

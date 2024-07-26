@@ -1,5 +1,5 @@
 import {
-  React, useState,
+  React, memo, useState,
 } from 'react';
 import 'moment-timezone';
 import moment from 'moment';
@@ -96,4 +96,4 @@ const TimeUpdateBtn = ({
   );
 };
 
-export default TimeUpdateBtn;
+export default memo(TimeUpdateBtn);
