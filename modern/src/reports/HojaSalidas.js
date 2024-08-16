@@ -127,7 +127,6 @@ const HojaSalidaReportPage = () => {
 
         const r = [];
         setReport(result2);
-        console.log(result2);
         result2.forEach((item, index) => {
           const maxItems = Math.max(item.going.length, item.return.length);
 
@@ -198,7 +197,6 @@ const HojaSalidaReportPage = () => {
           }
         });
         setRows(r);
-        console.log(r);
       } else {
         throw Error(await response.text());
       }

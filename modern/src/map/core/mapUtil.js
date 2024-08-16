@@ -8,11 +8,11 @@ export const loadImage = (url) => new Promise((imageLoaded) => {
 });
 
 const canvasTintImage = (image, color) => {
-  const canvas = document.createElement('canvas');
+  const canvas = new OffscreenCanvas(100, 1);
   canvas.width = image.width * devicePixelRatio;
   canvas.height = image.height * devicePixelRatio;
-  canvas.style.width = `${image.width}px`;
-  canvas.style.height = `${image.height}px`;
+  // canvas.style.width = `${image.width}px`;
+  // canvas.style.height = `${image.height}px`;
 
   const context = canvas.getContext('2d');
 
@@ -29,11 +29,11 @@ const canvasTintImage = (image, color) => {
 };
 
 export const prepareIcon = (background, icon, color, degrees) => {
-  const canvas = document.createElement('canvas');
+  const canvas = new OffscreenCanvas(100, 1);
   canvas.width = background.width * devicePixelRatio;
   canvas.height = background.height * devicePixelRatio;
-  canvas.style.width = `${background.width}px`;
-  canvas.style.height = `${background.height}px`;
+  // canvas.style.width = `${background.width}px`;
+  // canvas.style.height = `${background.height}px`;
 
   const context = canvas.getContext('2d');
   if (background) {
@@ -56,11 +56,11 @@ export const prepareIcon = (background, icon, color, degrees) => {
 };
 
 export const rotateIcon = (icon, degrees) => {
-  const canvas = document.createElement('canvas');
+  const canvas = new OffscreenCanvas(100, 1);
   canvas.width = icon.width * devicePixelRatio;
   canvas.height = icon.height * devicePixelRatio;
-  canvas.style.width = `${icon.width}px`;
-  canvas.style.height = `${icon.height}px`;
+  // canvas.style.width = `${icon.width}px`;
+  // canvas.style.height = `${icon.height}px`;
 
   const context = canvas.getContext('2d');
 

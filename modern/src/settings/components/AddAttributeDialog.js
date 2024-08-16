@@ -79,6 +79,7 @@ const AddAttributeDialog = ({ open, onResult, definitions }) => {
             <MenuItem value="string">{t('sharedTypeString')}</MenuItem>
             <MenuItem value="number">{t('sharedTypeNumber')}</MenuItem>
             <MenuItem value="boolean">{t('sharedTypeBoolean')}</MenuItem>
+            <MenuItem value="color">{t('sharedTypeColor')}</MenuItem>
           </Select>
         </FormControl>
       </DialogContent>

@@ -1,3 +1,5 @@
+/* eslint-disable logical-assignment-operators */
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-string-refs */
 import React, { useEffect, useRef, useState } from 'react';
@@ -11,6 +13,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
 import moment from 'moment';
+import ClimbingBoxLoader from 'react-spinners/ClimbingBoxLoader';
 import ReportFilter from './components/ReportFilter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
@@ -23,8 +26,9 @@ import scheduleReport from './common/scheduleReport';
 import {
   generateRoute, streetView,
 } from '../common/util/mapPopup';
-import { formatDate } from '../common/util/utils';
+import { formatDate, isMobile } from '../common/util/utils';
 import TimeUpdateBtn from '../main/components/TimeUpdateBtn';
+import TableExitsReport from '../main/components/TableExitsReport';
 
 const TicketReportPage = () => {
   const navigate = useNavigate();
@@ -34,7 +38,6 @@ const TicketReportPage = () => {
 
   const devices = useSelector((state) => state.devices.items);
   const subusers = useSelector((state) => state.session.subusers);
-  console.log(subusers);
 
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -112,14 +115,14 @@ const TicketReportPage = () => {
         });
         if (response.ok) {
           const itemst = await response.json();
-          const groupedData = itemst.reduce((grouped, item) => {
-            const { salida } = item;
-            if (!grouped[salida]) {
-              grouped[salida] = [];
-            }
-            grouped[salida].push(item);
-            return grouped;
+
+          const groupedData = itemst.reduce((acc, obj) => {
+            acc[obj.salida] = acc[obj.salida] || { obj, ticket: [], s: obj.s, subroutes: [{ id: obj.s.subrouteId, groupId: obj.s.groupId, name: obj.subroute }] };
+            acc[obj.salida].ticket.push(obj);
+            return acc;
           }, {});
+
+          // groupedData.sort((a, b) => new Date(b.fixedTime) - new Date(a.fixedTime));
           setGroups(groupedData);
         } else {
           throw Error(await response.text());
@@ -158,7 +161,7 @@ const TicketReportPage = () => {
   useEffect(() => {
     let ticking = false;
 
-    const tableBodyNode = tableBodyRef.current.parentNode.parentNode;
+    const tableBodyNode = tableBodyRef.current?.parentNode?.parentNode;
     if (tableBodyNode) {
       const handleScroll = (_) => {
         if (!ticking) {
@@ -215,7 +218,7 @@ const TicketReportPage = () => {
               includeGroups
               unified
             >
-              <FormControl style={{ width: '10%' }}>
+              <FormControl style={{ width: '20vw' }}>
                 <InputLabel>%</InputLabel>
                 <Select
                   label="%"
@@ -237,83 +240,113 @@ const TicketReportPage = () => {
               </FormControl>
             </ReportFilter>
           </div>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell className={classes.columnAction} />
-                <TableCell>{t('sharedDevice')}</TableCell>
-                <TableCell>{t('sharedExits')}</TableCell>
-                <TableCell>{t('sharedGeofence')}</TableCell>
-                <TableCell>{t('groupParent')}</TableCell>
-                <TableCell>Hora programada</TableCell>
-                <TableCell>Hora de ingreso</TableCell>
-                <TableCell>Diferencia</TableCell>
-                <TableCell>Castigo</TableCell>
+          {(isMobile() === true) ? (
+            !loading ? Object.keys(groups).filter((salida) => calcValidity(groups[salida].ticket)).map((salida) => (
+              <>
+                <div style={{ marginBottom: '2vh' }} />
+                <TableExitsReport data={groups[salida]} />
+                <div style={{ marginBottom: '5vh' }} />
+              </>
+            )) : (
+              <div style={{
+                width: '100vw',
+                height: '100vh',
+                position: 'relative',
+              }}
+              >
+                <ClimbingBoxLoader
+                  style={{
+                    width: '50%',
+                    height: '50%',
+                    position: 'absolute',
+                    top: '0%',
+                    left: '30%',
+                    margin: '-25px 0 0 -25px',
+                  }}
+                  color="#000000"
+                  loading={loading}
+                  cssOverride={{}}
+                  size={10}
+                  aria-label="Cargando información"
+                  data-testid="loader"
+                />
+              </div>
+            )
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell className={classes.columnAction} />
+                  <TableCell>{t('sharedDevice')}</TableCell>
+                  <TableCell>{t('sharedGeofence')}</TableCell>
+                  <TableCell>{t('groupParent')}</TableCell>
+                  <TableCell>Hora programada</TableCell>
+                  <TableCell>Hora de ingreso</TableCell>
+                  <TableCell>Diferencia</TableCell>
+                  <TableCell>Castigo</TableCell>
+                </TableRow>
+              </TableHead>
 
-              </TableRow>
-            </TableHead>
-
-            <TableBody
-              ref={tableBodyRef}
-            >
-              {!loading ? Object.keys(groups).filter((salida) => calcValidity(groups[salida])).map((salida) => (
-                // Create a row for each group
-                <React.Fragment key={salida}>
-                  <TableRow>
-                    <TableCell colSpan={3}>{`Salida: ${salida}`}</TableCell>
-                    {(groups[salida]?.s?.modifiedBy !== 0 || groups[salida]?.s?.modifiedBy !== null) && (
-                      <TableCell colSpan={5}>{`La hora fue modificada por el sub-usuario: ${groups[salida][0].s.modifiedBy} - ${subusers.find((su) => su.id === groups[salida][0].s.modifiedBy)?.name} el dia: ${new Date(groups[salida][0].s.modifiedWhen).toLocaleString()}`}</TableCell>
-                    )}
-                    <TableCell colSpan={5}>
-                      {(groups[salida]?.s?.modifiedBy === 0 || groups[salida]?.s?.modifiedBy === null) && (
-                        <TimeUpdateBtn
-                          id={salida}
-                          subusers={subusers}
-                        />
+              <TableBody
+                ref={tableBodyRef}
+              >
+                {!loading ? Object.keys(groups).filter((salida) => calcValidity(groups[salida].ticket)).map((salida) => (
+                  // Create a row for each group
+                  <React.Fragment key={salida}>
+                    <TableRow>
+                      <TableCell colSpan={2}>{`Salida: ${salida}`}</TableCell>
+                      {(groups[salida]?.s?.modifiedBy !== 0 || groups[salida]?.s?.modifiedBy !== null) && (
+                        <TableCell colSpan={5}>{`La hora fue modificada por el sub-usuario: ${groups[salida].s.modifiedBy} - ${subusers.find((su) => su.id === groups[salida].s.modifiedBy)?.name} el dia: ${new Date(groups[salida].s.modifiedWhen).toLocaleString()}`}</TableCell>
                       )}
-                    </TableCell>
-                  </TableRow>
-                  {groups[salida].map((item) => (
-                    // Create rows for items within the group
-                    <TableRow style={calcDiffColor(item)} key={item.id}>
-                      <TableCell className={classes.columnAction} padding="none" />
-                      <TableCell>
-                        {devices[item.device]?.name}
-                      </TableCell>
-                      <TableCell>
-                        {item.salida}
-                      </TableCell>
-                      <TableCell>
-                        {item.geofence}
-                      </TableCell>
-                      <TableCell>
-                        {item.group}
-                      </TableCell>
-                      <TableCell>
-                        {item.expectedTime ? formatDate(new Date(item.expectedTime), 'yyyy-MM-dd HH:mm:ss') : 'Sin registro'}
-                      </TableCell>
-                      <TableCell>
-                        {item.enterTime ? formatDate(new Date(item.enterTime), 'yyyy-MM-dd HH:mm:ss') : 'Sin registro'}
-                      </TableCell>
-                      <TableCell>
-                        {item.difference}
-                      </TableCell>
-                      <TableCell>
-                        {item.punishment}
+                      <TableCell colSpan={3}>
+                        {(groups[salida]?.s?.modifiedBy === 0 || groups[salida]?.s?.modifiedBy === null) && (
+                          <TimeUpdateBtn
+                            id={salida}
+                            subusers={subusers}
+                          />
+                        )}
                       </TableCell>
                     </TableRow>
-                  ))}
-                  <TableRow>
-                    <TableCell>
-                      <br />
-                    </TableCell>
-                  </TableRow>
-                </React.Fragment>
-              )) : (
-                <TableShimmer columns={9} startAction />
-              )}
-            </TableBody>
-          </Table>
+                    {groups[salida].ticket.map((item) => (
+                      // Create rows for items within the group
+                      <TableRow style={calcDiffColor(item)} key={item.id}>
+                        <TableCell className={classes.columnAction} padding="none" />
+                        <TableCell>
+                          {devices[item.device]?.name}
+                        </TableCell>
+                        <TableCell>
+                          {item.geofence}
+                        </TableCell>
+                        <TableCell>
+                          {item.group}
+                        </TableCell>
+                        <TableCell>
+                          {item.expectedTime ? formatDate(new Date(item.expectedTime), 'yyyy-MM-dd HH:mm:ss') : 'Sin registro'}
+                        </TableCell>
+                        <TableCell>
+                          {item.enterTime ? formatDate(new Date(item.enterTime), 'yyyy-MM-dd HH:mm:ss') : 'Sin registro'}
+                        </TableCell>
+                        <TableCell>
+                          {item.difference}
+                        </TableCell>
+                        <TableCell>
+                          {item.punishment}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow>
+                      <TableCell>
+                        <br />
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
+                )) : (
+                  <TableShimmer columns={9} startAction />
+                )}
+              </TableBody>
+            </Table>
+          )}
+
         </div>
       </div>
     </PageLayout>

@@ -120,7 +120,7 @@ const LinkField = ({
     { field: 'name', headerName: 'Nombre', width: 130 },
   ];
 
-  useEffect(() => setActive(true));
+  useEffect(() => setActive(true), []);
 
   return (
     <>

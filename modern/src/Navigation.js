@@ -139,7 +139,7 @@ const Navigation = () => {
           <Route path="attribute" element={<Suspense fallback={<Loading type="08" />}><ComputedAttributePage /></Suspense>} />
           <Route path="devices" element={<Suspense fallback={<Loading type="08" />}><DevicesPage /></Suspense>} />
           <Route path="device/:id/connections" element={<Suspense fallback={<Loading type="08" />}><DeviceConnectionsPage /></Suspense>} />
-          <Route path="device/:id/groups" element={<Suspense fallback={<Loading type="08" />}><DeviceConnectionGroupPage /></Suspense>} />
+          <Route path="device/groups" element={<Suspense fallback={<Loading type="08" />}><DeviceConnectionGroupPage /></Suspense>} />
           <Route path="device/:id/command" element={<Suspense fallback={<Loading type="08" />}><CommandDevicePage /></Suspense>} />
           <Route path="device/:id" element={<Suspense fallback={<Loading type="08" />}><DevicePage /></Suspense>} />
           <Route path="device" element={<Suspense fallback={<Loading type="08" />}><DevicePage /></Suspense>} />

@@ -106,14 +106,12 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
         <MapAccuracy positions={filteredPositions} />
         <MapLiveRoutes />
         <MapPositions
-          // positions={(window.rtm?.positions.length > 0) ? filteredPositions.filter((p) => p.id !== selectedPosition.id) : filteredPositions}
-          // positions={filteredPositions}
           positions={filteredPositions}
           onClick={onMarkerClick}
           selectedPosition={selectedPosition}
+          titleField="name"
           showStatus
         />
-
         <MapDefaultCamera />
         <MapSelectedDevice />
         <PoiMap />

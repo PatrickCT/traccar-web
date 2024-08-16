@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable prefer-const */
 /* eslint-disable no-constant-binary-expression */
 /* eslint-disable no-use-before-define */
@@ -548,6 +549,90 @@ export const showCoberturaMap = () => {
     content: '<iframe src="./cobertura.html" style="width: 100%; height: 100%;"></iframe>',
   });
 };
+
+export const measureExecutionTime = (fn, ...args) => {
+  const functionName = fn.name || 'Anonymous function';
+
+  const startTime = performance.now(); // Start time in milliseconds
+
+  const result = fn(...args); // Execute the function with the provided arguments
+
+  const endTime = performance.now(); // End time in milliseconds
+
+  const timeTaken = endTime - startTime; // Calculate time taken in milliseconds
+
+  // eslint-disable-next-line no-console
+  console.log(`Execution time for ${functionName}: ${timeTaken.toFixed(4)} milliseconds`);
+
+  return result; // Return the result of the function execution
+};
+
+export const throttle = (func, limit) => {
+  let lastFunc;
+  let lastRan;
+  return function () {
+    const context = this;
+    // eslint-disable-next-line prefer-rest-params
+    const args = arguments;
+    if (!lastRan) {
+      func.apply(context, args);
+      lastRan = Date.now();
+    } else {
+      clearTimeout(lastFunc);
+      lastFunc = setTimeout(() => {
+        if ((Date.now() - lastRan) >= limit) {
+          func.apply(context, args);
+          lastRan = Date.now();
+        }
+      }, limit - (Date.now() - lastRan));
+    }
+  };
+};
+
+export const LayersManager = (function () {
+  // Private variables or functions
+  let instance;
+  let layerGroups = [];
+  let limit = 10;
+
+  // Private constructor
+  function LayersManagerSingleton() {
+    return { layerGroups, addLayer, addDevice };
+  }
+
+  function addLayer(id, configs) {
+    let l_id = `${id}-${layerGroups.length + 1}`;
+    window.map?.addSource(l_id, configs.dataSourceConfig);
+    window.map?.addLayer({ ...configs.backgroundConfig, id: `${configs.backgroundConfig.id}-${l_id}}`, source: l_id });
+    window.map?.addLayer({ ...configs.iconConfig, id: `${configs.iconConfig.id}-${l_id}}`, source: l_id });
+    window.map?.addLayer({ ...configs.directionConfig, id: `${configs.directionConfig.id}-${l_id}}`, source: l_id });
+    window.map?.addLayer({ ...configs.clusterConfig, id: `${configs.clusterConfig.id}-${l_id}}`, source: l_id });
+
+    let layer = { id: l_id, devices: [], layers: [`${configs.backgroundConfig.id}-${l_id}}`, `${configs.iconConfig.id}-${l_id}}`, `${configs.directionConfig.id}-${l_id}}`, `${configs.clusterConfig.id}-${l_id}}`] };
+    layerGroups.push(layer);
+
+    return layer;
+  }
+
+  function addDevice(device, id, configs) {
+    let layer = layerGroups.find((item) => item.devices.length < limit);
+    if (!layer) layer = addLayer(id, configs);
+
+    layer.devices.push(device);
+    return layer.id;
+  }
+
+  // Public API
+  return {
+    // Public method to get the singleton instance
+    getInstance() {
+      if (!instance) {
+        instance = new LayersManagerSingleton();
+      }
+      return instance;
+    },
+  };
+}());
 
 window.createMenuItem = (iconClass, text, isSubmenu = false, callback = () => { }) => {
   if (document.querySelector('.menu') === null) window.generateMenu();

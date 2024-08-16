@@ -1,7 +1,13 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-undef */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-unused-vars */
+
+const { isInCluster } = require('../../common/util/geospatial');
+const { measureExecutionTime } = require('../../common/util/utils');
+
 const handler = {
   get(target, key) {
     if (typeof target[key] === 'object' && target[key] !== null) {
@@ -47,15 +53,30 @@ class FixedSizeArray {
 }
 
 class RealTimeMovement {
-  constructor() {
+  constructor(device, id, configs) {
+    // this.layer = window.layerManager.addDevice(device, id, configs);
     this.kRad = Math.PI / 180;
     this.playing = false;
     this.positions = [];
     this.interval = null;
-    this.device = null;
+    this.device = device;
     this.pos = new FixedSizeArray(2, () => { this.generatePositions(); });
-    this.reset();
+    this.reset('instanciation');
     this.animate = true;
+    this.lock = false;
+    this.callCounters = {
+      positionsShift: 0,
+    };
+
+    this.trackDispatch = (actionType) => {
+      this.callCounters[actionType]++;
+    };
+
+    setInterval(() => {
+      // console.log(`Dispatch positions shift per second: (${this.device})`, this.callCounters);
+      // Reset the counters
+      this.callCounters.positionsShift = 0;
+    }, 1000);
     // this._app = new Proxy({ positions: new FixedSizeArray(2, () => { this.generatePositions(); }) }, handler);
   }
 
@@ -64,13 +85,17 @@ class RealTimeMovement {
     this.stop();
     this.device = p.deviceId;
     this.pos.push(p);
+
     if (this.pos.array.length === 1) {
       this.pos.push(p);
     }
     this.show(p);
   }
 
-  reset() {
+  reset(from = '') {
+    // eslint-disable-next-line no-console
+    console.log('called reset from ', from);
+
     this.pos.reset();
     this.device = null;
     this.playing = false;
@@ -81,9 +106,11 @@ class RealTimeMovement {
 
   show(position) {
     if (!position) return;
+
     const newFeature = window.dataGenerator([position], window.devices).features[0];
 
     const data = window.map?.getSource(window.id)?._data;
+    if (!data) return;
     data.features = data.features.filter((value, index, self) => index === self.findIndex((item) => item.properties.deviceId === value.properties.deviceId));
     const index = data.features.findIndex((f) => f?.properties?.deviceId === this.device);
     if (index !== -1) {
@@ -112,6 +139,8 @@ class RealTimeMovement {
       if (Math.abs((new Date(p[0].serverTime) - new Date(p[1].serverTime)) / 1000) > 30) {
         this.animate = false;
       }
+      // if (measureExecutionTime(isInCluster, (this.device || 0))) this.animate = false;
+      if (isInCluster(this.device || 0)) this.animate = false;
 
       if (this.animate) {
         p.forEach((position, index) => {
@@ -120,6 +149,7 @@ class RealTimeMovement {
             if (index < p.length - 1) {
               // const distance = window.turf.distance(window.turf.point([p[index].longitude, p[index].latitude]), window.turf.point([p[index + 1].longitude, p[index + 1].latitude]), { units: 'meters' });
               const distance = parseInt(this.fastDistance([p[index].longitude, p[index].latitude], [p[index + 1].longitude, p[index + 1].latitude]), 10);
+
               if (distance > 0) {
                 const steps = parseInt(distance / 2, 10);
                 let fillers = [];
@@ -133,7 +163,7 @@ class RealTimeMovement {
               }
             }
           } catch (error) {
-            this.reset();
+            this.reset('calc');
           }
         });
 
@@ -144,39 +174,12 @@ class RealTimeMovement {
 
       this.play();
     } catch (error) {
-      this.reset();
+      this.reset('play');
     }
   }
 
-  // async play() {
-  //   try {
-  //     if (this.positions.length < 2) {
-  //       this.stop();
-  //     }
-  //     clearInterval(this.interval);
-  //     this.interval = setInterval(async () => {
-  //       try {
-  //         requestAnimationFrame(async () => {
-  //           try {
-  //             this.show(this.positions[0]);
-  //             this.positions.shift();
-  //             if (this.positions.length <= 0) {
-  //               this.stop();
-  //             }
-  //           } catch (error) {
-  //             this.stop();
-  //           }
-  //         });
-  //       } catch (error) {
-  //         this.stop();
-  //       }
-  //     }, 25);
-  //   } catch (error) {
-  //     this.stop();
-  //   }
-  // }
-
   play() {
+    if (this.lock) return;
     this.animate = true;
     if (this.positions.length <= 1) {
       this.stop();
@@ -198,9 +201,10 @@ class RealTimeMovement {
     cancelAnimationFrame(this.animationFrame);
   }
 
-  pause(state = true) {
-    this.animate = !state;
-    this.pos.reset();
+  pause(state) {
+    this.lock = state;
+    if (state) this.stop();
+    else this.play();
   }
 
   fastDistance(a, b) {

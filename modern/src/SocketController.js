@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-plusplus */
 /* eslint-disable no-underscore-dangle */
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector, connect } from 'react-redux';
@@ -69,6 +71,42 @@ const SocketController = () => {
     const socket = new WebSocket(`${protocol}//${window.location.host}/api/socket`);
     socketRef.current = socket;
     window.traccarSocket = socket;
+
+    const callCounters = {
+      updateDevices: 0,
+      updatePositions: 0,
+      addEvents: 0,
+    };
+
+    const trackDispatch = (actionType) => {
+      callCounters[actionType]++;
+    };
+
+    setInterval(() => {
+      // console.log('Dispatch Call Counts per second:', callCounters);
+      // Reset the counters
+      callCounters.updateDevices = 0;
+      callCounters.updatePositions = 0;
+      callCounters.addEvents = 0;
+    }, 1000);
+
+    const positionQueue = [];
+
+    // Add data to the queue
+    const queuePositions = (positions) => {
+      positionQueue.push(...positions);
+    };
+
+    // Process the queue every second
+    setInterval(() => {
+      if (positionQueue.length > 0) {
+        trackDispatch('updatePositions');
+        dispatch(sessionActions.updatePositions(positionQueue));
+        // Clear the queue
+        positionQueue.length = 0;
+      }
+    }, 1000);
+
     socket.onopen = () => {
       dispatch(sessionActions.updateSocket(true));
     };
@@ -99,15 +137,18 @@ const SocketController = () => {
       if (document.hidden) return;
       const data = JSON.parse(event.data);
       if (data.devices) {
+        trackDispatch('updateDevices');
         dispatch(devicesActions.update(data.devices));
       }
       if (data.positions) {
         if (!document.hidden) {
-          dispatch(sessionActions.updatePositions(data.positions));
+          // dispatch(sessionActions.updatePositions(data.positions));
+          queuePositions(data.positions);
         }
       }
       if (data.events) {
         if (!features.disableEvents) {
+          trackDispatch('addEvents');
           dispatch(eventsActions.add(data.events));
         }
         setEvents(data.events);

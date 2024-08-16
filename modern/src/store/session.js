@@ -22,7 +22,7 @@ const { reducer, actions } = createSlice({
       state.socket = action.payload;
     },
     updatePositions(state, action) {
-      const liveRoutes = state.user.attributes.mapLiveRoutes || state.server.attributes.mapLiveRoutes || 'none';
+      const liveRoutes = state?.user?.attributes?.mapLiveRoutes || state?.server?.attributes?.mapLiveRoutes || 'none';
       const liveRoutesLimit = state.user.attributes['web.liveRouteLength'] || state.user.attributes['web.liveRouteLength'] || 10;
 
       action.payload.forEach((position) => {

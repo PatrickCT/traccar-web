@@ -128,8 +128,8 @@ const ReportFilter = ({
               onChange={(e) => dispatch(reportsActions.updateGroupIds(e.target.value))}
               multiple
             >
-              {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).filter((group) => group.groupId === 0).map((group) => (
-                <MenuItem key={group.id} value={group.id}>{group.name}</MenuItem>
+              {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).filter((group) => group.groupId !== 0).map((group) => (
+                <MenuItem key={group.id} value={group.groupId}>{group.name}</MenuItem>
               ))}
             </Select>
           </FormControl>

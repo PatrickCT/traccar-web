@@ -42,10 +42,10 @@ const initMap = async () => {
     Object.entries(mapImages).forEach(([key, value]) => {
       map.addImage(key, value, {
         pixelRatio: window.devicePixelRatio,
+        ...(key === 'background' ? ({ sdf: true }) : ({})),
       });
     });
   }
-  updateReadyValue(true);
   map.loadImage('../images/arrow.png', (err, image) => {
     if (err) {
       return;
@@ -95,6 +95,8 @@ const initMap = async () => {
     }
     map.addImage('replay-stop', image);
   });
+
+  updateReadyValue(true);
 };
 
 map.addControl(new maplibregl.NavigationControl());

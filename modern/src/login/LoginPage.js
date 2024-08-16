@@ -128,7 +128,7 @@ const LoginPage = () => {
         setTimeout(async () => {
           document.getElementById('jspanel-style').removeAttribute('disabled');
           document.getElementById('jsmodal-style').removeAttribute('disabled');
-          fetch('https://t-urban.com.mx:3003/api/external/promotions/list').then((response) => response.json()).then((result) => {
+          fetch('https://crmgpstracker.mx:4040/api/external/promotions/list').then((response) => response.json()).then((result) => {
             if (result.data.length > 0) {
               window.jsPanel.modal.create({
                 theme: 'primary',

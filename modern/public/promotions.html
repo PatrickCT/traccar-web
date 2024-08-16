@@ -159,7 +159,7 @@
         }
 
         window.onload = () => {
-            fetch('https://t-urban.com.mx:3003/api/external/promotions/list').then((response) => response.json()).then((data) => {
+            fetch('https://crmgpstracker.mx:4040/api/external/promotions/list').then((response) => response.json()).then((data) => {
                 for (const item of data.data) {
                     addPromotion(mobileCheck() ? item.image_mobile : item.image, item.desc);
                 }
@@ -176,7 +176,7 @@
 
             let promo_li = document.createElement('li');
             let promo_img = document.createElement('img');
-            promo_img.src = `https://t-urban.com.mx:3003${image}`;
+            promo_img.src = `https://crmgpstracker.mx:4040${image}`;
             promo_li.appendChild(promo_img);
             if (info) {
                 let promo_info = document.createElement('div');

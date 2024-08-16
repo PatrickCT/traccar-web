@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { useState } from 'react';
 import {
   Button,
@@ -26,6 +27,7 @@ import {
 } from '../../common/util/converter';
 import useFeatures from '../../common/util/useFeatures';
 import SelectField from '../../common/components/SelectField';
+import PopOverColorPicker from './PopoverColorPicker';
 
 const useStyles = makeStyles((theme) => ({
   removeButton: {
@@ -206,15 +208,17 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
               </Grid>
             );
           }
-          if (key === 'turbanRoute') {
+          if (key === 'colorChange') {
             return (
               <Grid container direction="row" justifyContent="space-between" key={key}>
-                <SelectField
-                  fullWidth
-                  endpoint="http://localhost:4050/api/t-urban/traccar/rutas"
-                  onChange={(e) => updateAttribute(key, e.target.value, 'number', 'number')}
+                <FormControlLabel
+                  control={(
+                    <PopOverColorPicker
+                      color={value || '#163b61'}
+                      onChange={(color) => updateAttribute(key, color, 'string', 'string')}
+                    />
+                  )}
                   label={getAttributeName(key, subtype)}
-                  value={getDisplayValue(value, subtype)}
                 />
                 <IconButton size="small" className={classes.removeButton} onClick={() => deleteAttribute(key)}>
                   <CloseIcon fontSize="small" />
@@ -222,6 +226,22 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
               </Grid>
             );
           }
+          // if (key === 'turbanRoute') {
+          //   return (
+          //     <Grid container direction="row" justifyContent="space-between" key={key}>
+          //       <SelectField
+          //         fullWidth
+          //         endpoint="http://localhost:4050/api/t-urban/traccar/rutas"
+          //         onChange={(e) => updateAttribute(key, e.target.value, 'number', 'number')}
+          //         label={getAttributeName(key, subtype)}
+          //         value={getDisplayValue(value, subtype)}
+          //       />
+          //       <IconButton size="small" className={classes.removeButton} onClick={() => deleteAttribute(key)}>
+          //         <CloseIcon fontSize="small" />
+          //       </IconButton>
+          //     </Grid>
+          //   );
+          // }
           return (
             <FormControl key={key}>
               <InputLabel>{getAttributeName(key, subtype)}</InputLabel>

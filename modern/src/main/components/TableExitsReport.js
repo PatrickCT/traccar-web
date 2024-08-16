@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable import/no-extraneous-dependencies */
 
 import {
@@ -6,79 +7,20 @@ import {
 import { useSelector } from 'react-redux';
 import moment from 'moment';
 import 'moment-timezone';
-import DropdownComponents from '../../common/components/DropdownComponent';
 import { useEffectAsync } from '../../reactHelper';
 import '../../common/tickets.css';
 import { useTranslation } from '../../common/components/LocalizationProvider';
-import TimeUpdateBtn from './TimeUpdateBtn';
 
-const isEqual = require('react-fast-compare');
-
-window.isEqual = isEqual;
-
-// const propPrint = (prop) => {
-//   switch (typeof prop) {
-//     case 'object': return JSON.stringify(prop);
-//     case 'undefined': return 'NULL';
-//     default: return prop;
-//   }
-// };
-
-const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDrivers = false }) => {
+const TableExistReport = ({ data }) => {
   const t = useTranslation();
 
-  const [info, setInfo] = useState({});
+  const [info, setInfo] = useState(data);
   const [toDay, setDate] = useState(null);
-  const [optionSelected, setOption] = useState(null);
-  const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
-  const [subroutes, setSubroutes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const geofences = useSelector((state) => state.geofences.items);
-  const subusers = useSelector((state) => state.session.subusers);
-  // const user = useSelector((state) => state.session.user);
-  const loadInfoTable = async () => {
-    if (loading) return;
-    setLoading(false);
-    const response = await fetch(`${topDirectory}api/devices/${deviceId}/ticket`);
-    if (response.ok) {
-      const information = await response.json();
-      setInfo(information);
-      setConductores((information.choferes ?? []).map((e) => {
-        setOption(e.id);
-        return ({
-          label: e.name,
-          value: e.id,
-        });
-      }));
-      setTickets((information.ticket ?? []));
-      setSubroutes((information.subroutes ?? []));
-      setLoading(false);
-    } else {
-      setLoading(false);
-      throw Error(await response.text());
-    }
-  };
+  const devices = useSelector((state) => state.devices.items);
 
-  const handler = {
-    get(target, key) {
-      if (typeof target[key] === 'object' && target[key] !== null) {
-        return new Proxy(target[key], handler);
-      }
-      return target[key];
-    },
-    set(target, prop, value) {
-      const equal = isEqual(target[prop], value);
-      // console.log(`changed ${prop} from ${propPrint(target[prop])} to ${propPrint(value)}`);
-      if (!equal) {
-        target[prop] = value;
-        if (deviceId === target.id) {
-          loadInfoTable();
-        }
-      }
-      target.changed = !equal;
-      return true;
-    },
+  const loadInfoTable = async () => {
+    setTickets((info.ticket ?? []));
   };
 
   useEffect(() => {
@@ -87,20 +29,6 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
 
   useEffectAsync(async () => {
     await loadInfoTable();
-  }, []);
-
-  const handleSelectedOption = (value) => {
-    setOption(value);
-  };
-
-  useEffect(() => {
-    const intervalId = setInterval(async () => {
-      await loadInfoTable();
-    }, 1 * 15 * 1000);
-
-    return () => {
-      clearInterval(intervalId);
-    }; // Clear interval on component unmount
   }, []);
 
   const calcDiffColor = (ticket) => {
@@ -129,25 +57,12 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
 
   return (
     <div>
-      {btnChangeTime && (info?.salida?.modifiedBy === 0 || info?.salida?.modifiedBy === null) && (
-        <TimeUpdateBtn
-          id={info.salida.id}
-          subusers={subusers}
-        />
-      )}
-      {dropDrivers && (
-        <DropdownComponents
-          key={`dd-${deviceId}`}
-          setOption={handleSelectedOption}
-          selectOption={optionSelected}
-          label=""
-          options={conductores}
-        />
-      )}
       <div>
         <div className="nameChecker">
+          {devices[info.obj.device].name}
+          &nbsp;|&nbsp;
           Ruta:&nbsp;
-          {subroutes.find((item) => item.id === info?.salida?.subrouteId)?.name || ''}
+          {info.subroutes[0].name}
         </div>
       </div>
       <div className="headerExitst">
@@ -164,10 +79,9 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
         </div>
       </div>
       {tickets.map((ticket) => (
-
         <div style={calcDiffColor(ticket)} key={`t-${ticket.id}`} className="bodyExitst">
           <div className="columns bodyCol1">
-            {geofences[ticket.geofenceId] !== undefined ? `${geofences[ticket.geofenceId].name}` : `${t('geofence')} - ${ticket.geofenceId}`}
+            {ticket.geofence !== null ? `${ticket.geofence}` : `${t('geofence')} - ${ticket.s.geofenceId}`}
           </div>
           <div className="columns bodyCol2">
             {('expectedTime' in ticket) ? `${t('expectedTime')}: ${moment(ticket.expectedTime).tz('America/Mexico_City').format('HH:mm:ss')}` : `${t('no-data')}`}
@@ -183,4 +97,4 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
   );
 };
 
-export default memo(TableExist);
+export default memo(TableExistReport);

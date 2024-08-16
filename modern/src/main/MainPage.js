@@ -41,6 +41,7 @@ import DebtModal from '../common/components/DebtModal';
 import PositionDrawer from './PositionInfoDrawer';
 import { useAdministrator } from '../common/util/permissions';
 import BroadcastAlert from './components/BroadcastAlert';
+import { LayersManager } from '../common/util/utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -122,7 +123,6 @@ const MainPage = () => {
   const [devicesOpen, setDevicesOpen] = useState(desktop);
   const [eventsOpen, setEventsOpen] = useState(false);
   const groups = useSelector((state) => state.groups.items);
-  // console.log('main groups', JSON.stringify(groups));
 
   const [showModalRevision, setShowModalRevision] = useState(false);
 
@@ -186,6 +186,7 @@ const MainPage = () => {
     window.closeModal = closeModal;
     window.openDrawer = openDrawer;
     window.closeDrawer = closeDrawer;
+    window.layerManager = LayersManager.getInstance(20);
 
     const checkScriptLoaded = () => {
       if (typeof InternalTools !== 'undefined') {
@@ -210,7 +211,7 @@ const MainPage = () => {
       window.localStorage.removeItem('showMapPopup');
       delete window.openModal;
       delete window.closeModal;
-      delete window.openDrawer;
+      // delete window.openDrawer;
       delete window.closeDrawer;
       window.internalTools?.destroy();
       delete window.internalTools;

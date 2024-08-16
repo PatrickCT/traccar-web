@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-rest-params */
 /* eslint-disable react/no-this-in-sfc */
@@ -247,7 +248,7 @@ const ReplaySideBar = ({
               <ArrowBackIcon style={{ color: 'white' }} />
             </IconButton>
           )}
-          {!desktop && (
+          {!desktop && !location.href.includes('replay') && (
             <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => window.openDrawer(true)}>
               <MenuIcon style={{ color: 'white' }} />
             </IconButton>

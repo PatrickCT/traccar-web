@@ -19,4 +19,8 @@ export default (t) => useMemo(() => ({
     name: t('attributeGroupChangeFlag'),
     type: 'geofence',
   },
+  colorChange: {
+    name: t('attributeColorChangeFlag'),
+    type: 'color',
+  },
 }), [t]);

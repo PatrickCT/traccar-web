@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -165,12 +166,12 @@ const MainToolbar = ({
               <MenuItem value="lastUpdate">{t('deviceLastUpdate')}</MenuItem>
             </Select>
           </FormControl>
-          <FormGroup>
+          {/* <FormGroup>
             <FormControlLabel
               control={<Checkbox checked={filterMap} onChange={(e) => setFilterMap(e.target.checked)} />}
               label={t('sharedFilterMap')}
             />
-          </FormGroup>
+          </FormGroup> */}
           <FormGroup>
             <Button
               onClick={() => {

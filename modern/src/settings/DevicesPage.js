@@ -56,7 +56,7 @@ const DevicesPage = () => {
     key: 'groups',
     title: t('settingsGroups'),
     icon: <LinearScaleIcon fontSize="small" />,
-    handler: (deviceId) => navigate(`/settings/device/${deviceId}/groups`),
+    handler: () => navigate('/settings/device/groups'),
   };
 
   const simTypes = [{ id: 0, name: 'Tipo no asignado' }, { id: 1, name: 'Plan Telcel' }, { id: 2, name: 'Recarga Telcel' }, { id: 3, name: 'Oxio' }];

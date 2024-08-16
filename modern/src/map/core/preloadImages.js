@@ -66,7 +66,7 @@ export const mapImages = {};
 export default async () => {
   const background = await loadImage(backgroundSvg);
   const altBackground = await loadImage(altbackgroundSvg);
-  mapImages.background = await prepareIcon(background);
+  mapImages.background = prepareIcon(background);
   const cluster = await loadImage(clusterSvg);
   mapImages.cluster = await prepareIcon(cluster);
   mapImages.direction = await prepareIcon(await loadImage(directionSvg));
@@ -80,7 +80,7 @@ export default async () => {
         if (category === 'carDirection') {
           mapImages[`${category}-${color}`] = prepareIcon(altBackground, icon, palette.colors[color]);
         } else {
-          mapImages[`${category}-${color}`] = prepareIcon(background, icon, palette.colors[color]);
+          mapImages[`${category}-${color}`] = prepareIcon(altBackground, icon, palette.colors[color]);
         }
 
         // eslint-disable-next-line no-unused-vars

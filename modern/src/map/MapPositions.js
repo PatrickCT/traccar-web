@@ -4,7 +4,6 @@ import {
   useId, useCallback, useEffect, memo, useState,
   useRef,
 } from 'react';
-// import { Popup } from 'mapbox-gl';
 import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/styles';
@@ -13,8 +12,8 @@ import { formatTime, getStatusColor } from '../common/util/formatter';
 import { mapIconKey } from './core/preloadImages';
 import { findFonts } from './core/mapUtil';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
-import { hasPassedTime } from '../common/util/utils';
 import RealTimeMovement from '../main/components/RealTimeMarker';
+import { checkClusters } from '../common/util/geospatial';
 
 const isEqual = require('react-fast-compare');
 
@@ -26,14 +25,40 @@ const propPrint = (prop) => {
   }
 };
 
+function throttle(func, limit) {
+  let lastFunc;
+  let lastRan;
+  // eslint-disable-next-line func-names
+  return function () {
+    const context = this;
+    // eslint-disable-next-line prefer-rest-params
+    const args = arguments;
+    if (!lastRan) {
+      func.apply(context, args);
+      lastRan = Date.now();
+    } else {
+      clearTimeout(lastFunc);
+      lastFunc = setTimeout(() => {
+        if ((Date.now() - lastRan) >= limit) {
+          func.apply(context, args);
+          lastRan = Date.now();
+        }
+      }, limit - (Date.now() - lastRan));
+    }
+  };
+}
+
 const MapPositions = ({
   positions, onClick, titleField, selectedPosition, stops, showStatus = true, index, replay = false, main = false,
 }) => {
   const id = useId();
   window.id = id;
   window.map = map;
-  const clusters = `${id}-clusters`;
-  const direction = `${id}-direction`;
+
+  const icons = `icons-${id}`;
+  const backgrounds = `backgrounds--${id}`;
+  const clusters = `clusters-${id}`;
+  const directions = `directions-${id}`;
 
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
@@ -49,7 +74,7 @@ const MapPositions = ({
   const [recalculate, setRecalculate] = useState(new Date());
 
   const createFeature = (devices, position, selectedPositionId) => {
-    const device = (devices || window.devices || {})[position.deviceId];
+    const device = (devices || window.devices || {})[position?.deviceId];
 
     let showDirection;
     switch (directionType) {
@@ -60,21 +85,22 @@ const MapPositions = ({
         showDirection = true;
         break;
       default:
-        showDirection = selectedPositionId === position.id;
+        showDirection = selectedPositionId === position?.id;
         break;
     }
     return {
-      id: position.id,
-      deviceId: position.deviceId,
-      name: device?.name || '',
-      fixTime: formatTime(position.fixTime, 'seconds', hours12),
+      id: position?.id,
+      deviceId: position?.deviceId,
+      name: device?.name || 'xdxdxd',
+      fixTime: formatTime(position?.fixTime, 'seconds', hours12),
       category: mapIconKey(device?.category),
       // category: getStatusColor(device.status) === 'positive' ? mapIconKey(device.category) : mapIconKey('cross'),
       // category: ((hasPassedTime(new Date(device.lastUpdate), 40) || hasPassedTime(new Date(position.fixTime), 40)) ? mapIconKey('cross') : (hasPassedTime(new Date(position.fixTime), 10) ? mapIconKey('stop') : mapIconKey(device.category))),
-      color: showStatus ? (position.attributes.color || getStatusColor(device?.status)) : 'neutral',
-      rotation: position.course,
+      color: showStatus ? (position?.attributes.color || getStatusColor(device?.status)) : 'neutral',
+      rotation: position?.course,
       direction: true,
       rotate: device?.category === 'carDirection',
+      background: device?.attributes?.background || '#163b61',
     };
   };
 
@@ -135,16 +161,35 @@ const MapPositions = ({
       cluster: mapCluster,
       clusterMaxZoom: 14,
       clusterRadius: 50,
+      // generateId: true,
     });
 
     map.addLayer({
-      id,
+      id: backgrounds,
+      type: 'symbol',
+      source: id,
+      filter: ['!has', 'point_count'],
+      layout: {
+        'icon-image': `${(replay) ? 'altBackground' : 'background'}`,
+        'icon-size': iconScale,
+        'icon-allow-overlap': true,
+      },
+      paint: {
+        'icon-color': ['get', 'background'],
+        // 'icon-halo-color': '#fff',
+        // 'icon-halo-width': 2,
+      },
+    });
+    console.log({ 'text-field': `{${titleField || 'name'} } ` });
+
+    map.addLayer({
+      id: icons,
       type: 'symbol',
       source: id,
       filter: ['!has', 'point_count'],
       layout: {
         'icon-image': `${(replay) ? 'replay-neutral' : '{category}-{color}'}`,
-        'icon-size': replay ? 0.08 : iconScale,
+        'icon-size': replay ? 0.08 : iconScale / 2,
         'icon-allow-overlap': true,
         'text-field': `{${titleField || 'name'}}`,
         'text-allow-overlap': true,
@@ -159,6 +204,27 @@ const MapPositions = ({
       paint: {
         'text-halo-color': 'white',
         'text-halo-width': 1,
+        // 'icon-color': '#00ff001a',
+        // 'icon-halo-color': '#fff',
+        // 'icon-halo-width': 2,
+      },
+    });
+
+    map.addLayer({
+      id: directions,
+      type: 'symbol',
+      source: id,
+      filter: [
+        'all',
+        ['!has', 'point_count'],
+        ['==', 'direction', true],
+      ],
+      layout: {
+        'icon-image': 'direction',
+        'icon-size': iconScale,
+        'icon-allow-overlap': true,
+        'icon-rotate': ['get', 'rotation'],
+        'icon-rotation-alignment': 'map',
       },
     });
 
@@ -176,33 +242,19 @@ const MapPositions = ({
       },
     });
 
-    map.addLayer({
-      id: direction,
-      type: 'symbol',
-      source: id,
-      filter: [
-        'all',
-        ['!has', 'point_count'],
-        ['==', 'direction', true],
-      ],
-      layout: {
-        'icon-image': 'direction',
-        'icon-size': iconScale,
-        'icon-allow-overlap': true,
-        'icon-rotate': ['get', 'rotation'],
-        'icon-rotation-alignment': 'map',
-      },
-    });
-
-    map.on('mouseenter', id, onMouseEnter);
-    map.on('mouseleave', id, onMouseLeave);
+    map.on('mouseenter', icons, onMouseEnter);
+    map.on('mouseleave', icons, onMouseLeave);
     map.on('mouseenter', clusters, onMouseEnter);
     map.on('mouseleave', clusters, onMouseLeave);
-    map.on('click', id, onMarkerClick);
+    map.on('click', icons, onMarkerClick);
     map.on('click', clusters, onClusterClick);
     map.on('click', onMapClick);
-    map.on('moveend', () => setRecalculate(new Date()));
-    map.on('zoom', () => setRecalculate(new Date()));
+    // map.on('movestart', () => throttle(() => Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(true))));
+    // map.on('moveend', () => setTimeout(() => {
+    //   throttle(() => Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(true)));
+    // }, 3000));
+    // map.on('dragstart', () => Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(true)));
+    // map.on('dragend', () => Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(false)));
 
     window.createFeature = createFeature;
     window.dataGenerator = dataGenerator;
@@ -221,80 +273,36 @@ const MapPositions = ({
       map.off('click', id, onMarkerClick);
       map.off('click', clusters, onClusterClick);
       map.off('click', onMapClick);
-      map.off('moveend', id, () => setRecalculate(new Date()));
-      map.off('zoom', id, () => setRecalculate(new Date()));
 
-      [clusters, direction, 'stops-layer', 'start-layer', 'end-layer', id, `${direction}2`, 'realTime'].forEach((layer) => {
+      console.log('removing old layers');
+
+      [icons, backgrounds, clusters, directions, id].forEach((layer) => {
+        console.log(`removing: ${layer}`);
+
         if (map.getLayer(layer)) map.removeLayer(layer);
         if (map.getSource(layer)) map.removeSource(layer);
       });
-      Object.keys(window.players ?? {}).forEach((id) => window.players[id].reset());
+
+      Object.keys(window.players ?? {}).forEach((id) => window.players[id].reset('unmount'));
     };
   }, []);
 
   useEffect(() => {
     if (!positions || positions.length <= 0) return;
-    // map.getSource(id)?.setData(dataGenerator(visiblePositions));
-
-    // const nonVisiblePositions = positions.filter((position) => {
-    //   const coordinates = [position.longitude, position.latitude];
-    //   const bounds = map.getBounds();
-
-    //   return (
-    //     coordinates[0] <= bounds._sw.lng &&
-    //     coordinates[0] >= bounds._ne.lng &&
-    //     coordinates[1] <= bounds._sw.lat &&
-    //     coordinates[1] >= bounds._ne.lat
-    //   );
-    // });
 
     positions?.forEach((position) => {
       if (window.players) {
         if (!window.players?.hasOwnProperty(position.deviceId)) {
-          window.players[position.deviceId] = new RealTimeMovement();
+          window.players[position.deviceId] = new RealTimeMovement(position.deviceId, id, {});
         }
         window.players[position.deviceId].updateSelectedPosition(position);
       }
     });
+    // measureExecutionTime(checkClusters, positions);
+    checkClusters(positions);
   }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index, recalculate]);
 
   return true;
 };
 
 export default memo(MapPositions);
-
-// map.addSource('realTime', {
-//   type: 'geojson',
-//   data: {
-//     type: 'FeatureCollection',
-//     features: [],
-//   },
-//   cluster: mapCluster,
-//   clusterMaxZoom: 14,
-//   clusterRadius: 50,
-// });
-
-// map.addLayer({
-//   id: 'realTime',
-//   type: 'symbol',
-//   source: 'realTime',
-//   filter: ['!has', 'point_count'],
-//   layout: {
-//     'icon-image': `${(replay) ? 'replay-neutral' : '{category}-{color}'}`,
-//     'icon-size': replay ? 0.08 : iconScale,
-//     'icon-allow-overlap': true,
-//     'text-field': `{${titleField || 'name'}}`,
-//     'text-allow-overlap': true,
-//     'text-anchor': 'bottom',
-//     'text-offset': [0, -2 * iconScale],
-//     'text-font': findFonts(map),
-//     'text-size': 12,
-//     'icon-rotate': replay ? ['get', 'rotation'] : ['case', ['==', ['get', 'rotate'], true], ['get', 'rotation'], 0],
-//     // 'icon-rotate': ['get', 'rotation'],
-//     'icon-rotation-alignment': 'map',
-//   },
-//   paint: {
-//     'text-halo-color': 'white',
-//     'text-halo-width': 1,
-//   },
-// });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IconButton, TextField, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { SearchOutlined } from '@mui/icons-material';
@@ -22,6 +22,17 @@ const SearchHeader = ({ keyword, setKeyword }) => {
   const classes = useStyles();
   const t = useTranslation();
   const [search, setSearch] = useState(keyword);
+  const [debounceSearch, setDebounceSearch] = useState(keyword);
+
+  const handleInputChange = (event) => setSearch(event.target.value);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => setDebounceSearch(search), 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [search, 500]);
+
+  useEffect(() => setKeyword(debounceSearch), [debounceSearch]);
 
   return (
     <div className={classes.header}>
@@ -29,7 +40,7 @@ const SearchHeader = ({ keyword, setKeyword }) => {
         variant="outlined"
         placeholder={t('sharedSearch')}
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={handleInputChange}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             setKeyword(search);
