@@ -160,8 +160,8 @@ const MainPage = () => {
   useEffect(() => {
     setTimeout(() => {
       document.getElementById('main-style').removeAttribute('disabled');
-      document.getElementById('jspanel-style').removeAttribute('disabled');
-      document.getElementById('jsmodal-style').removeAttribute('disabled');
+      // document.getElementById('jspanel-style').removeAttribute('disabled');
+      // document.getElementById('jsmodal-style').removeAttribute('disabled');
     }, 0);
     const intervalResize = setInterval(() => {
       const canvas_h = Number(map.getCanvasContainer().firstChild.getAttribute('height'));

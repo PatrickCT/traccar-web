@@ -1,3 +1,4 @@
+/* eslint-disable func-names */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-const */
 /* eslint-disable no-constant-binary-expression */

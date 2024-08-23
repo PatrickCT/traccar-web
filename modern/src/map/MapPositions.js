@@ -180,7 +180,6 @@ const MapPositions = ({
         // 'icon-halo-width': 2,
       },
     });
-    console.log({ 'text-field': `{${titleField || 'name'} } ` });
 
     map.addLayer({
       id: icons,
@@ -274,11 +273,7 @@ const MapPositions = ({
       map.off('click', clusters, onClusterClick);
       map.off('click', onMapClick);
 
-      console.log('removing old layers');
-
       [icons, backgrounds, clusters, directions, id].forEach((layer) => {
-        console.log(`removing: ${layer}`);
-
         if (map.getLayer(layer)) map.removeLayer(layer);
         if (map.getSource(layer)) map.removeSource(layer);
       });

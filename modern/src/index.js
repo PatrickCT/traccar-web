@@ -1,9 +1,12 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { CssBaseline, ThemeProvider, StyledEngineProvider } from '@mui/material';
+import Notiflix from 'notiflix';
+import { driver } from 'driver.js';
 import store from './store';
 import { LocalizationProvider } from './common/components/LocalizationProvider';
 import ErrorHandler from './common/components/ErrorHandler';
@@ -16,7 +19,24 @@ import NativeInterface from './common/components/NativeInterface';
 import ServerProvider from './ServerProvider';
 import ErrorBoundary from './ErrorBoundary';
 
+// styles
+import './resources/libs/jsPanel/jspanel.min.css';
+import './resources/libs/jsPanel/extensions/dialog/jspanel.dialog.min.css';
+
+// libs
+import { jsPanel } from './resources/libs/jsPanel/jspanel.min';
+import { loadModal } from './resources/libs/jsPanel/extensions/modal/jspanel.modal';
+import { loadDialog } from './resources/libs/jsPanel/extensions/dialog/jspanel.dialog';
+import InternalTools from './resources/libs/self/internal';
+import './resources/libs/self/heartbeat.min';
+
 setTimeout(async () => {
+  window.jsPanel = jsPanel;
+  window.Notiflix = Notiflix;
+  window.InternalTools = InternalTools;
+  window.driver = driver;
+  loadModal();
+  loadDialog();
   await preloadImages();
 }, 0);
 
