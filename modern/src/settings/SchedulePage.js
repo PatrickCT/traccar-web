@@ -225,7 +225,7 @@ const SchedulePage = () => {
       valueOptions: geofences.map((geofence) => ({ value: geofence.id, label: geofence?.name })),
       value: (params) => {
         const geofence = geofences.find((g) => g.id === params.value);
-        return geofence ? geofence?.name : ''; // Return the name of the geofence based on the provided value
+        return geofence ? (geofence?.name || 'Sin nombre') : ''; // Return the name of the geofence based on the provided value
       },
     },
     {

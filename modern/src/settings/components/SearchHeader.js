@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { useEffect, useState } from 'react';
 import { IconButton, TextField, Tooltip } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
@@ -27,7 +29,7 @@ const SearchHeader = ({ keyword, setKeyword }) => {
   const handleInputChange = (event) => setSearch(event.target.value);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => setDebounceSearch(search), 1000);
+    const timeoutId = setTimeout(() => setDebounceSearch(search), 500);
 
     return () => clearTimeout(timeoutId);
   }, [search, 500]);

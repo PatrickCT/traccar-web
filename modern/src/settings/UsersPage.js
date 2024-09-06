@@ -1,9 +1,12 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid } from '@mui/x-data-grid';
 
 import LoginIcon from '@mui/icons-material/Login';
 import LinkIcon from '@mui/icons-material/Link';
+import Fuse from 'fuse.js';
 import { useCatch, useEffectAsync } from '../reactHelper';
 import { formatBoolean, formatTime } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -39,6 +42,20 @@ const UsersPage = () => {
     }
   });
 
+  const isMatch = (obj, searchValue) => {
+    if (!searchValue || searchValue === '') return true;
+    if (!obj) return false;
+    const fuse = new Fuse([obj], {
+      includeScore: true,
+      keys: [
+        // {name: 'name', getFn: (item) => item.name}
+        'name', 'email',
+      ],
+    });
+    const result = fuse.search(searchValue);
+    return (result.length > 0 && result[0].score <= 0.2);
+  };
+
   const actionLogin = {
     key: 'login',
     title: t('loginLogin'),
@@ -58,7 +75,8 @@ const UsersPage = () => {
     try {
       const response = await fetch('/api/users');
       if (response.ok) {
-        setItems(await response.json());
+        const users = await response.json();
+        setItems(users);
       } else {
         throw Error(await response.text());
       }
@@ -130,7 +148,7 @@ const UsersPage = () => {
       <div style={{ height: '80%', width: '100%' }}>
         <LoadingComponent isLoading={loading}>
           <DataGrid
-            rows={items.filter(filterByKeyword(searchKeyword))}
+            rows={items.filter((item) => (searchKeyword === '' ? true : isMatch(item, searchKeyword)))}
             columns={columns}
             initialState={{
               pagination: {

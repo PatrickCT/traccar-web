@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import makeStyles from '@mui/styles/makeStyles';
 import {
   Divider, List, ListItemButton, ListItemText,
+  Tooltip,
 } from '@mui/material';
 
 import { geofencesActions } from '../store';
@@ -42,6 +43,7 @@ const GeofencesList = ({ onGeofenceSelected }) => {
         <Fragment key={item.id}>
           <ListItemButton key={item.id} onClick={() => onGeofenceSelected(item.id)}>
             <ListItemText primary={`${item.id} - ${item.name}`} />
+            {item.attributes.groupChange && (<Tooltip title="Cambio de grupo"><span style={{ color: 'red', fontSize: '20px' }}>&#8633;</span></Tooltip>)}
             <CollectionActions itemId={item.id} editPath="/settings/geofence" endpoint="geofences" setTimestamp={refreshGeofences} />
           </ListItemButton>
           {index < list.length - 1 ? <Divider /> : null}
