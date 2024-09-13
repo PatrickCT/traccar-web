@@ -1,6 +1,6 @@
 export const logintour = () => { };
 export const loginTour = () => {
-  const driverObj = window.driver.js.driver({
+  const driverObj = window.driver({
     overlayColor: '#163b61',
     showProgress: true,
     allowClose: false,

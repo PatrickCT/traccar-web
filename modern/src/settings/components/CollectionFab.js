@@ -8,8 +8,8 @@ import { useRestriction } from '../../common/util/permissions';
 const useStyles = makeStyles((theme) => ({
   fab: {
     position: 'fixed',
-    bottom: theme.spacing(2),
-    right: theme.spacing(2),
+    bottom: theme.spacing(8),
+    right: theme.spacing(4),
     [theme.breakpoints.down('md')]: {
       bottom: `calc(${theme.dimensions.bottomBarHeight}px + ${theme.spacing(2)})`,
     },

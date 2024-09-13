@@ -29,6 +29,7 @@ import { loadModal } from './resources/libs/jsPanel/extensions/modal/jspanel.mod
 import { loadDialog } from './resources/libs/jsPanel/extensions/dialog/jspanel.dialog';
 import InternalTools from './resources/libs/self/internal';
 import './resources/libs/self/heartbeat.min';
+import 'driver.js/dist/driver.css';
 
 setTimeout(async () => {
   window.jsPanel = jsPanel;

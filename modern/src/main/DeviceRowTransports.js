@@ -79,7 +79,7 @@ const DeviceRowTransporte = ({ data, index }) => {
         {' • '}
         <span style={{ fontSize: '12px' }}>{`${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
         {' • '}
-        <span style={{ fontSize: '12px' }}>{`${groups[item.groupId]?.name || t('groupNoGroup')}`}</span>
+        <span style={{ fontSize: '12px' }}>{`${Object.values(groups).find((g) => g.groupId === item.groupId)?.name || t('groupNoGroup')}`}</span>
       </>
     );
   };
