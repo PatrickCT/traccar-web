@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@mui/material';
 
-const Modal = ({ isOpen, onClose, children, style = {} }) => {
+const Modal = ({ isOpen, onClose, children, zIndex = 1000, style = {} }) => {
   const modalStyle = {
     display: isOpen ? 'block' : 'none',
     position: 'fixed',
@@ -10,7 +10,7 @@ const Modal = ({ isOpen, onClose, children, style = {} }) => {
     transform: 'translate(-50%, -50%)',
     backgroundColor: 'white',
     padding: '20px',
-    zIndex: 1000,
+    zIndex,
     borderRadius: '5px',
     boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.5)',
     width: '60%',
@@ -26,7 +26,7 @@ const Modal = ({ isOpen, onClose, children, style = {} }) => {
     width: '100%',
     height: '100%',
     backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent black background
-    zIndex: 999, // A lower zIndex than the modal
+    zIndex: 200, // A lower zIndex than the modal
   };
 
   // Apply wider width on mobile devices

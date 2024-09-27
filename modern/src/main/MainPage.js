@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable react/no-children-prop */
 /* eslint-disable camelcase */
 /* eslint-disable no-undef */
 /* eslint-disable import/no-extraneous-dependencies */
@@ -40,8 +42,9 @@ import ConnectionStatus from '../common/components/ConnectionStatus';
 import DebtModal from '../common/components/DebtModal';
 import PositionDrawer from './PositionInfoDrawer';
 import { useAdministrator } from '../common/util/permissions';
-import BroadcastAlert from './components/BroadcastAlert';
 import { LayersManager } from '../common/util/utils';
+import Banner from './components/Banner';
+import { toast } from '../common/util/toasts';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -134,6 +137,9 @@ const MainPage = () => {
   const [infoDrawer, setInfoDrawer] = useState(true);
   const admin = useAdministrator();
 
+  // banner
+  const [bannerText, setBannerText] = useState('');
+
   // Function to open the modal
   const openModal = () => {
     setShowModalRevision(true);
@@ -173,6 +179,26 @@ const MainPage = () => {
         clearInterval(intervalResize);
       }
     }, 1000);
+
+    setInterval(() => {
+      fetch('https://crmgpstracker.mx:4040/api/external/notifications/traccar/banner', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ origin: location.hostname }) })
+        .then((response) => response.json())
+        .then((data) => {
+          try {
+            setTimeout(() => {
+              setBannerText('');
+            }, 1000 * 60 * 1);
+            if (data.data.length > 0) {
+              setBannerText(data.join(' * '));
+            } else {
+              setBannerText('');
+            }
+          } catch (err) {
+            toast.toast(err.message);
+          }
+        });
+    }, 1000 * 60 * 5);
+
     // Attach the function to the global window object
     window.navigate = navigate;
     window.streetView = streetView;
@@ -316,7 +342,9 @@ const MainPage = () => {
       {selectedPosition && admin && (
         <PositionDrawer onClose={() => setInfoDrawer(false)} open={infoDrawer} />
       )}
-      <BroadcastAlert notifications={[]} />
+      <Banner
+        children={bannerText}
+      />
     </div>
   );
 };

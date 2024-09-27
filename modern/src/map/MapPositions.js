@@ -91,7 +91,7 @@ const MapPositions = ({
     return {
       id: position?.id,
       deviceId: position?.deviceId,
-      name: device?.name || 'xdxdxd',
+      name: device?.name || '',
       fixTime: formatTime(position?.fixTime, 'seconds', hours12),
       category: mapIconKey(device?.category),
       // category: getStatusColor(device.status) === 'positive' ? mapIconKey(device.category) : mapIconKey('cross'),

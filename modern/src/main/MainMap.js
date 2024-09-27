@@ -4,7 +4,7 @@
 /* eslint-disable no-floating-decimal */
 
 import React, {
-  memo, useCallback, useEffect, useState,
+  memo, useCallback, useEffect, useRef, useState,
 } from 'react';
 import * as turf from '@turf/turf';
 import { Marker } from 'mapbox-gl';

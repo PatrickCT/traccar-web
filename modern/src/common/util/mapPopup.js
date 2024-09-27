@@ -133,7 +133,7 @@ function openInNewTab(url) {
 }
 export const generateRoute = () => {
   let url = '';
-  url = `http://www.google.com/maps/place/${window.position.latitude},${window.position.longitude}`;
+  url = `https://www.google.com/maps/place/${window.position.latitude},${window.position.longitude}`;
   openInNewTab(url);
 };
 

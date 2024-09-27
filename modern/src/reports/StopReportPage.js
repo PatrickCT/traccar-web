@@ -16,7 +16,7 @@ import ColumnSelect from './components/ColumnSelect';
 import usePersistedState from '../common/util/usePersistedState';
 import { useCatch } from '../reactHelper';
 import useReportStyles from './common/useReportStyles';
-import MapPositions from '../map/MapPositions';
+import MapPositions from '../map/MapPositionsOriginal';
 import MapView from '../map/core/MapView';
 import MapCamera from '../map/MapCamera';
 import AddressValue from '../common/components/AddressValue';
@@ -45,7 +45,7 @@ const StopReportPage = () => {
   const hours12 = usePreference('twelveHourFormat');
   const fontSize = 14;
 
-  const [columns, setColumns] = usePersistedState('stopColumns', ['startTime', 'endTime', 'startOdometer', 'address']);
+  const [columns, setColumns] = usePersistedState('stopColumns', ['startTime', 'endTime', 'startOdometer', 'address', 'duration']);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -116,12 +116,12 @@ const StopReportPage = () => {
             <MapView>
               <MapGeofence />
               <MapPositions
-                positions={[{
-                  deviceId: selectedItem.deviceId,
-                  fixTime: selectedItem.startTime,
-                  latitude: selectedItem.latitude,
-                  longitude: selectedItem.longitude,
-                }]}
+                positions={[...items.map((i) => ({
+                  deviceId: i.deviceId,
+                  fixTime: i.startTime,
+                  latitude: i.latitude,
+                  longitude: i.longitude,
+                }))]}
                 titleField="fixTime"
               />
             </MapView>

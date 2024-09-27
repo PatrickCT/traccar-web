@@ -720,3 +720,57 @@ window.generateMenu = () => {
 
   document.addEventListener('contextmenu', onContextMenu, false);
 };
+
+export const openModalPromociones = () => {
+  window.jsPanel.modal.create({
+    theme: 'dark',
+    content: `
+        <iframe title="Promociones" src="./promotions.html" frameBorder="0" width="100%" height="99%" />
+        `, // Set the font size to 20px
+    position: 'center', // 80% width, 30% height, centered
+    draggable: { containment: 'viewport' }, // Make it draggable within the viewport
+    contentSize: { width: '80%', height: '90%' }, // Responsive sizing
+    borderRadius: 10, // Remove rounded corners for a more square appearance
+    closeOnEscape: false, // Disable closing on ESC key
+    closeOnOutsideClick: false, // Disable closing on outside click
+    header: true, // Remove the header
+    footer: false, // Remove the footer
+    controls: { maximize: 'remove', minimize: 'remove' }, // Remove all controls
+    closeOnBackdrop: true,
+    backdrop: true,
+    headerTitle: 'Promociones',
+  });
+};
+
+export const confirmDialog = (callBackYes, callBackNo = (() => { })) => {
+  const html = `
+    <div class="simple-confirm dialog-sm" style="display:block">
+    <p>Estas segur@?</p>
+    <div class="buttonbar">
+        <button name='yes' class="..." data-dismiss value="YES">Si</button>
+        <button name='no' class="..." data-dismiss data-cancel value="No">No</button>
+
+    </div>
+    </div>
+    `;
+  window.jsPanel.dialog.modal(html, {
+    theme: '#163b61',
+    border: '1px solid gray',
+    borderRadius: '.5rem',
+    headerTitle: 'Reactivar',
+    headerControls: {
+      minimize: 'remove',
+      smallify: 'remove',
+      maximize: 'remove',
+    },
+    onclick_yes: async () => {
+      callBackYes();
+    },
+    onclick_no: () => {
+      callBackNo();
+    },
+    // onclick_cancel: (panel, elmts, event) => {
+    //   console.log(panel, elmts, event);
+    // },
+  });
+};

@@ -2,9 +2,9 @@ import React from 'react';
 import { CircularProgress } from '@mui/material';
 
 const LoadingComponent = ({ isLoading, children }) => (
-  <div style={{ height: '100vh' }}>
+  <div style={{ height: '100%' }}>
     {isLoading ? (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
         <CircularProgress />
       </div>
     ) : (

@@ -11,7 +11,7 @@ import { devicesActions } from './store';
 import App from './App';
 
 const CombinedReportPage = lazy(() => import('./reports/CombinedReportPage'));
-const RouteReportPage = lazy(() => import('./reports/NewRouteReportPage'));
+const RouteReportPage = lazy(() => import('./reports/RouteReportPage'));
 const ServerPage = lazy(() => import('./settings/ServerPage'));
 const UsersPage = lazy(() => import('./settings/UsersPage'));
 const DevicePage = lazy(() => import('./settings/DevicePage'));

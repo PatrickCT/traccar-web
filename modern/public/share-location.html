@@ -188,7 +188,7 @@
         }
 
         const validateLink = async (_code) => {
-            var r = await fetch('./api/links/positions', {
+            var r = await fetch('./api/links/validate', {
                 method: 'POST', // or 'PUT'
                 body: JSON.stringify({ code: _code }), // data can be `string` or {object}!
                 headers: {

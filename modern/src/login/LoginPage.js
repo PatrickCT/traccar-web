@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/no-this-in-sfc */
 
@@ -24,6 +25,7 @@ import { useCatch } from '../reactHelper';
 import { loginTour } from './login_tour';
 import VideoPlayer from '../common/components/VideoPlayer';
 import ctheme from '../common/theme';
+import { openModalPromociones } from '../common/util/utils';
 
 const useStyles = makeStyles((theme) => ({
   options: {
@@ -125,31 +127,16 @@ const LoginPage = () => {
         generateLoginToken();
         dispatch(sessionActions.updateUser(user));
         navigate('/');
-        setTimeout(async () => {
-          // document.getElementById('jspanel-style').removeAttribute('disabled');
-          // document.getElementById('jsmodal-style').removeAttribute('disabled');
+        const promosTimeout = setTimeout(() => {
           fetch('https://crmgpstracker.mx:4040/api/external/promotions/list').then((response) => response.json()).then((result) => {
             if (result.data.length > 0) {
-              window.jsPanel.modal.create({
-                theme: 'primary',
-                content: `
-                    <iframe title="Promociones" src="./promotions.html" frameBorder="0" width="100%" height="99%" />
-                    `, // Set the font size to 20px
-                position: 'center', // 80% width, 30% height, centered
-                draggable: { containment: 'viewport' }, // Make it draggable within the viewport
-                contentSize: { width: '80%', height: '90%' }, // Responsive sizing
-                borderRadius: 25, // Remove rounded corners for a more square appearance
-                closeOnEscape: false, // Disable closing on ESC key
-                closeOnOutsideClick: false, // Disable closing on outside click
-                header: false, // Remove the header
-                footer: false, // Remove the footer
-                controls: { maximize: 'remove', minimize: 'remove', close: 'remove' }, // Remove all controls
-                closeOnBackdrop: true,
-                backdrop: true,
-              });
+              openModalPromociones();
             }
           });
         }, 3000);
+        window.navigation.addEventListener('navigate', (_) => {
+          clearTimeout(promosTimeout);
+        });
       } else {
         throw Error(await response.text());
       }
