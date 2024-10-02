@@ -127,7 +127,7 @@ const MapView = ({ children }) => {
 
   const mapStyles = useMapStyles();
   const activeMapStyles = useAttributePreference('activeMapStyles', 'locationIqStreets,osm,carto,googleRoad,googleSatellite,googleTraffic');
-  const [defaultMapStyle] = usePersistedState('selectedMapStyle', usePreference('map', 'googleTraffic'));
+  const [defaultMapStyle] = usePersistedState('selectedMapStyle', usePreference('map', 'googleRoad'));
   const mapboxAccessToken = useAttributePreference('mapboxAccessToken');
   const maxZoom = useAttributePreference('web.maxZoom');
 

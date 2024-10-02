@@ -3,6 +3,8 @@ import {
   hasPassedTime,
   isMobile,
   valueParser,
+  isAdmin,
+  createBaseURL,
 } from './utils';
 
 window.extraDiv = 'none';
@@ -225,72 +227,23 @@ const popupBtns = () => {
   return html;
 };
 
-const popupRevision = () => {
+// const popupRevision = () => {
+//   let html = '';
+//   if (window.localStorage.getItem(btoa('isRevisor')) === 'true') {
+//     html += `
+//     <button
+//       type="button"
+//       onClick="openModal()"
+//       style="background-color: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); transition: background-color 0.3s;"
+//     >
+//       Revision
+//     </button>
+//     `;
+//   }
+//   return html;
+// };
+const createPopUpData = (position) => {
   let html = '';
-  if (window.localStorage.getItem(btoa('isRevisor')) === 'true') {
-    html += `
-    <button
-      type="button"
-      onClick="openModal()"
-      style="background-color: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); transition: background-color 0.3s;"
-    >
-      Revision
-    </button>
-    `;
-  }
-  return html;
-};
-
-export const createPopUp = (position) => {
-  let html = '';
-  let today = new Date();
-  today.setHours(today.getHours() - 1);
-  today = new Date(today);
-  if (hasPassedTime(new Date(position.fixTime || today), 40)) {
-    html += '<div style="width: 250px;">';
-    if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
-      html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
-      html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
-      html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>`;
-      html += ` <a class="link-google-maps" onclick="(function(){navigate('/position/${position.id}');}());" ><img src="./././images/botones-popup/position.svg" width="14" height="14" /></a>`;
-
-      html += `<h3><b>${attConverter(position, 'name')}</b>`;
-      html += '</h3></div>';
-    }
-
-    html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attConverter(position, 'name')}, no esta reportando, usuario: ${window.getUser()?.name}, servidor: ${window.findServerName(window.location.hostname)}" style="left: 40%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
-
-    html += '<br />';
-    if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
-      html += valueParser(position, 'protocol');
-      html += '<br />';
-      html += valueParser(window.device, 'phone');
-      html += '<br />';
-      html += valueParser(window.device, 'imei');
-      html += '<br />';
-      html += valueParser(window.device, 'simType');
-      html += '<br />';
-      html += valueParser(window.device, 'simKey');
-    }
-    html += '<br />';
-    html += popupBtns();
-    html += '</div>';
-    html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
-    html += popupRevision();
-    return html;
-  }
-  html += '<div>';
-  html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
-
-  html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());" ><img src="./././images/botones-popup/connection.svg" width="14" height="14" /></a>`;
-  html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
-  if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
-    html += window.localStorage.getItem(btoa('isAdmin')) === 'true' ? ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>` : '';
-    html += ` <a class="link-google-maps" onclick="(function(){navigate('/position/${position.id}');}());" ><img src="./././images/botones-popup/position.svg" width="14" height="14" /></a>`;
-    html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/accumulators/${position.deviceId}');}());" ><img src="./././images/botones-popup/accumulator.svg" width="14" height="14" /></a>`;
-  }
-  html += `<h3><b>${valueParser(position, 'name')}</b>`;
-  html += '</h3></div>';
   html += '<div style="text-align: center;">';
   html += `${valueParser(position, 'ignition')}  -  `;
   html += valueParser(position, 'motion');
@@ -322,16 +275,16 @@ export const createPopUp = (position) => {
   html += valueParser(position, 'lastAlarm');
   html += '<br />';
 
-  if (window.localStorage.getItem(btoa('isAdmin')) === 'true') {
+  if (isAdmin()) {
     html += valueParser(position, 'protocol');
     html += '<br />';
-    html += valueParser(window.device, 'phone');
+    html += valueParser(window.devices[position.deviceId], 'phone');
     html += '<br />';
-    html += valueParser(window.device, 'imei');
+    html += valueParser(window.devices[position.deviceId], 'imei');
     html += '<br />';
-    html += valueParser(window.device, 'simType');
+    html += valueParser(window.devices[position.deviceId], 'simType');
     html += '<br />';
-    html += valueParser(window.device, 'simKey');
+    html += valueParser(window.devices[position.deviceId], 'simKey');
   }
 
   html += '<br />';
@@ -340,8 +293,8 @@ export const createPopUp = (position) => {
   html += '<br />';
 
   html += `<div id="extra" style="display: ${window.extraDiv};">`;
-  if (window.device?.attributes?.deviceImage) {
-    html += `<img style="width: -webkit-fill-available; height: auto;" src="/api/media/${window.device.uniqueId}/${window.device.attributes?.deviceImage}" />`;
+  if (window.devices[position.deviceId]?.attributes?.deviceImage) {
+    html += `<img style="width: -webkit-fill-available; height: auto;" src="/api/media/${window.devices[position.deviceId].uniqueId}/${window.devices[position.deviceId].attributes?.deviceImage}" />`;
   }
 
   html += '<br />';
@@ -353,11 +306,88 @@ export const createPopUp = (position) => {
   html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
 
   html += '<br />';
-  html += popupBtns();
-  html += popupRevision();
-  html += '</div>';
+
   return html;
 };
+
+const createPopUpDataError = (position) => {
+  let html = '<div style="width: 250px;">';
+  if (isAdmin()) {
+    html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
+    html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
+    html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>`;
+    html += ` <a class="link-google-maps" onclick="(function(){navigate('/position/${position.id}');}());" ><img src="./././images/botones-popup/position.svg" width="14" height="14" /></a>`;
+
+    html += `<h3><b>${attConverter(position, 'name')}</b>`;
+    html += '</h3></div>';
+  }
+
+  html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attConverter(position, 'name')}, no esta reportando, usuario: ${window.getUser()?.name}, servidor: ${window.findServerName(window.location.hostname)}" style="left: 40%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
+
+  html += '<br />';
+  if (isAdmin()) {
+    html += valueParser(position, 'protocol');
+    html += '<br />';
+    html += valueParser(window.device, 'phone');
+    html += '<br />';
+    html += valueParser(window.device, 'imei');
+    html += '<br />';
+    html += valueParser(window.device, 'simType');
+    html += '<br />';
+    html += valueParser(window.device, 'simKey');
+  }
+  html += '<br />';
+  html += popupBtns();
+  html += '</div>';
+  html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
+  return html;
+};
+
+const headerButton = (icon, onclick, restrictions = []) => {
+  if (restrictions.some((value) => value)) return '';
+  const baseUrlIcon = `${createBaseURL()}${icon}`;
+  return `
+  <a
+    onclick="((${onclick})());"
+  >
+    <img src="${baseUrlIcon}" width="14" height="14" />
+  </a>`;
+};
+
+const createPopUpHeadersButtons = (position) => `
+  <div align='center' style='text-align: center;'>
+    ${headerButton('/images/botones-popup/connection.svg', (() => window.navigate(`/settings/device/${position.deviceId}/connections`)))}
+    ${headerButton('/images/botones-popup/edit.svg', (() => window.navigate(`/settings/device/${position.deviceId}`)))}
+    ${headerButton('/images/botones-popup/command.svg', (() => window.navigate(`/settings/device/${position.deviceId}/command`)), [!isAdmin()])}
+    ${headerButton('/images/botones-popup/position.svg', (() => window.navigate(`/position/${position.id}`)), [!isAdmin()])}
+    ${headerButton('/images/botones-popup/accumulator.svg', (() => window.navigate(`/settings/accumulators/${position.deviceId}`)), [!isAdmin()])}
+  </div>`;
+
+const createPopUpContent = (position, showHeaderButtons = true, showFooterButtons = true) => {
+  // sections
+  let html = '';
+  if (hasPassedTime(new Date(position.fixTime || new Date()), 40)) {
+    return createPopUpDataError();
+  }
+  html += '<div align="center" style="text-align: center !important;text-transform: uppercase !important;">';
+  // header buttons
+  if (showHeaderButtons) {
+    html += createPopUpHeadersButtons(position);
+  }
+  // name
+  html += `<h3><b>${valueParser(position, 'name')}</b></h3>`;
+  html += '</div>';
+  // stats
+  html += createPopUpData(position);
+  // policy
+  // footer bottons
+  if (showFooterButtons) {
+    html += popupBtns();
+  }
+  return html;
+};
+
+export const createPopUp = (position, showHeaderButtons = true, showFooterButtons = true) => createPopUpContent(position, showHeaderButtons, showFooterButtons);
 
 window.createPopUp = createPopUp;
 

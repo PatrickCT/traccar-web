@@ -757,7 +757,8 @@ export const confirmDialog = (callBackYes, callBackNo = (() => { })) => {
     theme: '#163b61',
     border: '1px solid gray',
     borderRadius: '.5rem',
-    headerTitle: 'Reactivar',
+    headerTitle: '',
+    position: { my: 'center-bottom', at: 'center-center', offsetY: 0 },
     headerControls: {
       minimize: 'remove',
       smallify: 'remove',
@@ -774,3 +775,6 @@ export const confirmDialog = (callBackYes, callBackNo = (() => { })) => {
     // },
   });
 };
+
+export const isAdmin = () => ((getUser())?.administrator || false);
+export const createBaseURL = () => `${location.protocol}//${location.hostname}${location.port !== '' ? `:${location.port}` : ''}`;

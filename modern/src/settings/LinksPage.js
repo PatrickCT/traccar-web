@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable import/no-extraneous-dependencies */
-import React, { memo, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import ClipboardJS from 'clipboard';
 import { Wizard, useWizard } from 'react-use-wizard';
 import {
@@ -33,6 +33,7 @@ import './customDatePicker.css';
 import { toast } from '../common/util/toasts';
 import LinkDevices from './components/LinkDevices';
 import { confirmDialog } from '../common/util/utils';
+import CreateLink from './components/CreateLink';
 
 const useStyles = makeStyles((theme) => ({
   columnAction: {
@@ -76,6 +77,8 @@ const LinksPage = () => {
     }
   }, [showModal, reload]);
 
+  useEffect(() => console.log(selectedItem), [selectedItem]);
+
   const saveLink = async () => {
     const { isNew } = selectedItem;
     delete selectedItem.isNew;
@@ -88,7 +91,7 @@ const LinksPage = () => {
       .then((data) => {
         setSelectedItem(data);
         setReload(true);
-      });
+      }).catch((err) => toast.toast(err.message));
   };
 
   const updateLink = async (link) => {
@@ -141,49 +144,56 @@ const LinksPage = () => {
     setSelectedItem({});
   };
 
-  const CreateLink = () => {
-    const { handleStep, nextStep } = useWizard();
-    handleStep(() => {
-    });
+  // const CreateLink = () => {
+  //   const { handleStep, nextStep } = useWizard();
+  //   handleStep(() => {
+  //   });
 
-    return (
-      <>
-        <h4>{`${selectedItem.id ? 'Editar' : 'Crear'} enlace`}</h4>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            format="DD/MM/YYYY"
-            value={dayjs(selectedItem.limitDate || '')}
-            onChange={(newValue) => {
-              setSelectedItem({ ...selectedItem, limitDate: moment.utc(newValue.toDate()) });
-            }}
-            className="customDatePickerWidth"
-            label="Vigencia"
-          />
-        </LocalizationProvider>
-        <div style={{ marginBottom: '20px' }} />
-        <TextField
-          fullWidth
-          value={selectedItem.pass || ''}
-          onChange={(event) => { setSelectedItem({ ...selectedItem, pass: event.target.value }); }}
-          label={`${t('userPassword')} (Opcional)`}
-        />
-        <div style={{ marginBottom: '20px' }} />
-        <Button
-          disabled={selectedItem.limitDate == null}
-          style={{ position: 'fixed', bottom: '0px', right: '0px' }}
-          onClick={() => {
-            if (!selectedItem.id) {
-              saveLink();
-            }
-            nextStep();
-            setActiveStep(1);
-          }}
-        >
-          Siguiente
-        </Button>
-      </>
-    );
-  };
+  //   return (
+  //     <>
+  //       <h4>{`${selectedItem.id ? 'Editar' : 'Crear'} enlace`}</h4>
+  //       <LocalizationProvider dateAdapter={AdapterDayjs}>
+  //         <DatePicker
+  //           format="DD/MM/YYYY"
+  //           value={dayjs(selectedItem.limitDate || '')}
+  //           onChange={(newValue) => {
+  //             setSelectedItem({ ...selectedItem, limitDate: moment.utc(newValue.toDate()) });
+  //           }}
+  //           className="customDatePickerWidth"
+  //           label="Vigencia"
+  //         />
+  //       </LocalizationProvider>
+  //       <div style={{ marginBottom: '20px' }} />
+  //       <TextField
+  //         fullWidth
+  //         value={selectedItem.pass || ''}
+  //         onChange={(event) => { setSelectedItem({ ...selectedItem, pass: event.target.value }); }}
+  //         label={`${t('userPassword')} (Opcional)`}
+  //       />
+  //       <div style={{ marginBottom: '20px' }} />
+  //       <TextField
+  //         fullWidth
+  //         value={selectedItem.name || ''}
+  //         onChange={(event) => { setSelectedItem({ ...selectedItem, name: event.target.value }); event.target.focus(); }}
+  //         label={`${t('sharedName')}`}
+  //       />
+  //       <div style={{ marginBottom: '20px' }} />
+  //       <Button
+  //         disabled={selectedItem.limitDate == null || selectedItem.name == null}
+  //         style={{ position: 'fixed', bottom: '0px', right: '0px' }}
+  //         onClick={() => {
+  //           if (!selectedItem.id) {
+  //             saveLink();
+  //           }
+  //           nextStep();
+  //           setActiveStep(1);
+  //         }}
+  //       >
+  //         Siguiente
+  //       </Button>
+  //     </>
+  //   );
+  // };
 
   const AssignUnits = () => {
     const { handleStep, nextStep } = useWizard();
@@ -323,7 +333,19 @@ const LinksPage = () => {
           })}
         </Stepper>
         <Wizard>
-          <CreateLink />
+          <CreateLink
+            selectedItem={selectedItem}
+            setSelectedItem={setSelectedItem}
+            onClick={(() => {
+              if (!selectedItem.id) {
+                saveLink();
+              }
+              if (selectedItem.id) {
+                updateLink(selectedItem);
+              }
+              setActiveStep(1);
+            })}
+          />
           <AssignUnits />
           <ShareLink />
         </Wizard>

@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid } from '@mui/x-data-grid';
-
+import { Box } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import LinkIcon from '@mui/icons-material/Link';
 import Fuse from 'fuse.js';
@@ -98,8 +99,6 @@ const UsersPage = () => {
         </span>
       ),
       width: 200,
-      sortable: true,
-
     },
     {
       field: 'main',
@@ -142,23 +141,68 @@ const UsersPage = () => {
     },
   ];
 
+  const [columnWidths, setColumnWidths] = useState(
+    columns.reduce((acc, col) => {
+      acc[col.field] = col.width;
+      return acc;
+    }, {}),
+  );
+
+  const handleColumnResize = (field, newWidth) => {
+    setColumnWidths((prevWidths) => ({
+      ...prevWidths,
+      [field]: newWidth,
+    }));
+  };
+
+  const startColumnResize = (e, field) => {
+    const startX = e.clientX;
+    const startWidth = columnWidths[field];
+
+    const onMouseMove = (e) => {
+      const newWidth = Math.max(50, startWidth + (e.clientX - startX)); // Minimum width of 50px
+      handleColumnResize(field, newWidth);
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
+  const resizableColumns = columns.map((col) => ({
+    ...col,
+    width: columnWidths[col.field], // Set the column width dynamically
+    renderHeader: (params) => (
+      <div
+        style={{ display: 'flex', alignItems: 'center' }}
+        onMouseDown={(e) => startColumnResize(e, col.field)}
+      >
+        {params.colDef.headerName}
+      </div>
+    ),
+  }));
+
   return (
     <PageLayout menu={<SettingsMenu />} breadcrumbs={['settingsTitle', 'settingsUsers']}>
       <SearchHeader keyword={searchKeyword} setKeyword={setSearchKeyword} />
-      <div style={{ height: '80%', width: '100%' }}>
+      <Box sx={{ height: '80%', width: '100%' }}>
         <LoadingComponent isLoading={loading}>
           <DataGrid
             rows={items.filter((item) => (searchKeyword === '' ? true : isMatch(item, searchKeyword)))}
-            columns={columns}
+            columns={resizableColumns}
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 12 },
               },
             }}
-            pageSizeOptions={[15, 20, 50, 100]}
+            pageSizeOptions={[12, 20, 50, 100]}
           />
         </LoadingComponent>
-      </div>
+      </Box>
 
       <CollectionFab editPath="/settings/user" />
     </PageLayout>
