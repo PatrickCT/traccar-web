@@ -77,8 +77,6 @@ const LinksPage = () => {
     }
   }, [showModal, reload]);
 
-  useEffect(() => console.log(selectedItem), [selectedItem]);
-
   const saveLink = async () => {
     const { isNew } = selectedItem;
     delete selectedItem.isNew;
@@ -144,57 +142,6 @@ const LinksPage = () => {
     setSelectedItem({});
   };
 
-  // const CreateLink = () => {
-  //   const { handleStep, nextStep } = useWizard();
-  //   handleStep(() => {
-  //   });
-
-  //   return (
-  //     <>
-  //       <h4>{`${selectedItem.id ? 'Editar' : 'Crear'} enlace`}</h4>
-  //       <LocalizationProvider dateAdapter={AdapterDayjs}>
-  //         <DatePicker
-  //           format="DD/MM/YYYY"
-  //           value={dayjs(selectedItem.limitDate || '')}
-  //           onChange={(newValue) => {
-  //             setSelectedItem({ ...selectedItem, limitDate: moment.utc(newValue.toDate()) });
-  //           }}
-  //           className="customDatePickerWidth"
-  //           label="Vigencia"
-  //         />
-  //       </LocalizationProvider>
-  //       <div style={{ marginBottom: '20px' }} />
-  //       <TextField
-  //         fullWidth
-  //         value={selectedItem.pass || ''}
-  //         onChange={(event) => { setSelectedItem({ ...selectedItem, pass: event.target.value }); }}
-  //         label={`${t('userPassword')} (Opcional)`}
-  //       />
-  //       <div style={{ marginBottom: '20px' }} />
-  //       <TextField
-  //         fullWidth
-  //         value={selectedItem.name || ''}
-  //         onChange={(event) => { setSelectedItem({ ...selectedItem, name: event.target.value }); event.target.focus(); }}
-  //         label={`${t('sharedName')}`}
-  //       />
-  //       <div style={{ marginBottom: '20px' }} />
-  //       <Button
-  //         disabled={selectedItem.limitDate == null || selectedItem.name == null}
-  //         style={{ position: 'fixed', bottom: '0px', right: '0px' }}
-  //         onClick={() => {
-  //           if (!selectedItem.id) {
-  //             saveLink();
-  //           }
-  //           nextStep();
-  //           setActiveStep(1);
-  //         }}
-  //       >
-  //         Siguiente
-  //       </Button>
-  //     </>
-  //   );
-  // };
-
   const AssignUnits = () => {
     const { handleStep, nextStep } = useWizard();
     handleStep(() => { });
@@ -229,7 +176,7 @@ const LinksPage = () => {
             label: 'Copiar link',
             onClik: (() => {
               toast.toast('Enlace copiado');
-              ClipboardJS.copy(`https://t-urban.com.mx/share-location.html?code=${selectedItem?.code || ''}`);
+              ClipboardJS.copy(`${window.location.protocol}//${window.location.host}/share-location.html?code=${selectedItem?.code || ''}`);
             }),
           }].map((value) => {
             const labelId = `checkbox-list-label-${value}`;
@@ -384,7 +331,7 @@ const LinksPage = () => {
           style={{ position: 'fixed', bottom: '0px', right: '100px' }}
           onClick={() => {
             toast.toast('Enlace copiado');
-            ClipboardJS.copy(`https://t-urban.com.mx/share-location.html?code=${selectedItem?.code || ''}`);
+            ClipboardJS.copy(`${window.location.protocol}//${window.location.host}/share-location.html?code=${selectedItem?.code || ''}`);
           }}
         >
           Copiar enlace

@@ -30,12 +30,21 @@ import { loadDialog } from './resources/libs/jsPanel/extensions/dialog/jspanel.d
 import InternalTools from './resources/libs/self/internal';
 import './resources/libs/self/heartbeat.min';
 import 'driver.js/dist/driver.css';
+import alertify from './resources/libs/alertify/alertify.min';
+import './resources/libs/alertify/css/alertify.css';
+import './resources/libs/alertify/css/themes/default.min.css';
 
 setTimeout(async () => {
+  jsPanel.ziBase = (() => {
+    let val = jsPanel.ziBase + 1000000; // here use the value you wish
+    // eslint-disable-next-line no-plusplus
+    return val++;
+  })();
   window.jsPanel = jsPanel;
   window.Notiflix = Notiflix;
   window.InternalTools = InternalTools;
   window.driver = driver;
+  window.alertify = alertify;
   loadModal();
   loadDialog();
   await preloadImages();

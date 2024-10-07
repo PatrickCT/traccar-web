@@ -9,7 +9,7 @@ module.exports = {
     'serviceWorkerRegistration.js',
     'switcher.js',
     'theme.js',
-    'src/resources/libs/*'
+    'src/resources/libs/**',
   ],
   rules: {
     'max-len': [0],

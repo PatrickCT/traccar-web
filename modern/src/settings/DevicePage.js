@@ -84,7 +84,7 @@ const DevicePage = () => {
                 onChange={(event) => setItem({ ...item, name: event.target.value })}
                 label={t('sharedName')}
               />
-              {!user.deviceReadonly &&
+              {admin &&
                 (
                   <TextField
                     value={item.uniqueId || ''}
@@ -110,16 +110,6 @@ const DevicePage = () => {
                     endpoint="/api/groups"
                     label={t('groupParent')}
                   />
-                  <TextField
-                    value={item.phone || ''}
-                    onChange={(event) => setItem({ ...item, phone: event.target.value })}
-                    label={t('sharedPhone')}
-                  />
-                  <TextField
-                    value={item.contact || ''}
-                    onChange={(event) => setItem({ ...item, contact: event.target.value })}
-                    label={t('deviceContact')}
-                  />
                   <SelectField
                     value={item.category || 'default'}
                     emptyValue={null}
@@ -130,18 +120,51 @@ const DevicePage = () => {
                     }))}
                     label={t('deviceCategory')}
                   />
-                  <TextField
-                    label={t('userExpirationTime')}
-                    type="date"
-                    value={(item.expirationTime && moment(item.expirationTime).locale('en').format(moment.HTML5_FMT.DATE)) || '2099-01-01'}
-                    onChange={(e) => setItem({ ...item, expirationTime: moment(e.target.value, moment.HTML5_FMT.DATE).locale('en').format() })}
-                    disabled={!admin}
-                  />
-                  <FormControlLabel
-                    control={<Checkbox checked={item.disabled} onChange={(event) => setItem({ ...item, disabled: event.target.checked })} />}
-                    label={t('sharedDisabled')}
-                    disabled={!admin}
-                  />
+                  {admin && (
+                    <>
+                      <TextField
+                        value={item.phone || ''}
+                        onChange={(event) => setItem({ ...item, phone: event.target.value })}
+                        label={t('sharedPhone')}
+                      />
+                      <TextField
+                        value={item.contact || ''}
+                        onChange={(event) => setItem({ ...item, contact: event.target.value })}
+                        label={t('deviceContact')}
+                      />
+                      <TextField
+                        label={t('userExpirationTime')}
+                        type="date"
+                        value={(item.expirationTime && moment(item.expirationTime).locale('en').format(moment.HTML5_FMT.DATE)) || '2099-01-01'}
+                        onChange={(e) => setItem({ ...item, expirationTime: moment(e.target.value, moment.HTML5_FMT.DATE).locale('en').format() })}
+                        disabled={!admin}
+                      />
+                      <FormControlLabel
+                        control={<Checkbox checked={item.disabled} onChange={(event) => setItem({ ...item, disabled: event.target.checked })} />}
+                        label={t('sharedDisabled')}
+                        disabled={!admin}
+                      />
+                      <TextField
+                        value={item.maker || ''}
+                        onChange={(event) => setItem({ ...item, maker: event.target.value })}
+                        label={t('deviceMaker')}
+                      />
+                      <SelectField
+                        data={[{ id: 1, name: 'PT ' }, { id: 2, name: 'RT ' }, { id: 3, name: 'Ox' }]}
+                        onChange={(event) => setItem({ ...item, simType: event.target.value })}
+                        value={item.simType || null}
+                      />
+                      {
+                        item.simType && item.simType === 2 && (
+                          <TextField
+                            value={item.simKey || ''}
+                            onChange={(event) => setItem({ ...item, simKey: event.target.value })}
+                            label={t('deviceKey')}
+                          />
+                        )
+                      }
+                    </>
+                  )}
 
                   <TextField
                     value={item.carPlate || ''}
@@ -162,31 +185,12 @@ const DevicePage = () => {
                     emptyValue={t('deviceYear')}
                     value={item.year || '1991'}
                   />
-                  <TextField
-                    value={item.maker || ''}
-                    onChange={(event) => setItem({ ...item, maker: event.target.value })}
-                    label={t('deviceMaker')}
-                  />
+
                   <TextField
                     value={item.model || ''}
                     onChange={(event) => setItem({ ...item, model: event.target.value })}
                     label={t('deviceModel')}
                   />
-
-                  <SelectField
-                    data={[{ id: 1, name: 'PT ' }, { id: 2, name: 'RT ' }, { id: 3, name: 'Ox' }]}
-                    onChange={(event) => setItem({ ...item, simType: event.target.value })}
-                    value={item.simType || null}
-                  />
-                  {
-                    item.simType && item.simType === 2 && (
-                      <TextField
-                        value={item.simKey || ''}
-                        onChange={(event) => setItem({ ...item, simKey: event.target.value })}
-                        label={t('deviceKey')}
-                      />
-                    )
-                  }
 
                 </AccordionDetails>
               </Accordion>
@@ -198,6 +202,7 @@ const DevicePage = () => {
               </Typography>
             </AccordionSummary>
             <AccordionDetails className={classes.details}>
+              {/* TODO add company */}
               <TextField
                 value={item.policy || ''}
                 onChange={(event) => setItem({ ...item, policy: event.target.value })}
@@ -232,9 +237,10 @@ const DevicePage = () => {
           )}
           {!user.deviceReadonly && (
             <EditAttributesAccordion
-              attributes={item.attributes}
+              attributes={{ speedLimit: 0, rendimiento: 0, ...item.attributes }}
               setAttributes={(attributes) => setItem({ ...item, attributes })}
               definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
+              canAdd={admin}
             />
           )}
         </>

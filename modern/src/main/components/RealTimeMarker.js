@@ -94,7 +94,7 @@ class RealTimeMovement {
 
   reset(from = '') {
     // eslint-disable-next-line no-console
-    console.log('called reset from ', from);
+    // console.log('called reset from ', from, this.device);
 
     this.pos.reset();
     this.device = null;

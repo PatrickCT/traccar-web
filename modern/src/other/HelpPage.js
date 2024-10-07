@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import VideoModal from '../common/components/VideoModal';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { snackBarDurationLongMs } from '../common/util/duration';
+import { isMobile } from '../common/util/utils';
 
 // const videoData = [
 //   {
@@ -34,10 +35,11 @@ const HelpPage = () => {
   };
 
   useEffect(() => {
+    const mode = !isMobile() ? 'desktop' : 'mobile';
     // Fetch the data from the JSON file
     fetch('/help/videos.json')
       .then((response) => response.json())
-      .then((data) => setVideoData(data))
+      .then((data) => setVideoData(data.filter((d) => (d.viewOn ?? mode) === mode)))
       .catch((error) => setNotifications([{
         id: 1,
         show: true,

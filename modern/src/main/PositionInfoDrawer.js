@@ -18,12 +18,13 @@ const useStyles = makeStyles(() => ({
   drawerMobile: {
   },
   toolbar: {
-    width: isMobile() ? '96%' : '100%',
+    width: isMobile() ? '100%' : '100%',
     minHeight: '30px',
   },
   title: {
     flexGrow: 1,
     color: 'white',
+
   },
   tableRow: {
     height: '10px', // Adjust the height of each row
@@ -44,7 +45,7 @@ const PositionDrawer = ({ open, onClose }) => {
     if (position) {
       const device = state.devices.items[position.deviceId];
       if (device) {
-        return device.name;
+        return device.name.substr(0, 80);
       }
     }
     return null;
@@ -57,7 +58,7 @@ const PositionDrawer = ({ open, onClose }) => {
       onClose={onClose}
       variant={isMobile() ? 'temporary' : 'permanent'}
       sx={{
-        flexShrink: 0,
+        flexShrink: 1,
         '& .MuiDrawer-paper': isMobile() ? {
           boxSizing: 'border-box',
         } : {
@@ -77,6 +78,7 @@ const PositionDrawer = ({ open, onClose }) => {
           Unidad:
           &nbsp;
           {deviceName}
+
         </Typography>
       </Toolbar>
       <div className={classes.content}>

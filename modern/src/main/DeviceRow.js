@@ -68,7 +68,7 @@ const DeviceRow = ({ data, index, style }) => {
 
   const formatProperty = (key) => {
     let status;
-    if (item.status === 'online' || !item.lastUpdate) {
+    if ((position && !hasPassedTime(new Date(position?.fixTime || new Date()), 40))) {
       status = 'Reportando';
     } else {
       status = 'Sin reportar';
@@ -93,36 +93,23 @@ const DeviceRow = ({ data, index, style }) => {
             <span style={{ fontSize: '14px' }}>{`Posición: ${moment(position.fixTime).format('YYYY-MM-D HH:mm:ss')}`}</span>
           </>
         ) : (
-          <span style={{ fontSize: '14px' }}>Mas de 3 meses sin reportar, comuníquese con soporte</span>
+          <span style={{ fontSize: '14px' }} />
         )}
       </>
     );
   };
 
-  // const secondaryText = () => {
-  //   let status;
-  //   if (item.status === 'online' || !item.lastUpdate) {
-  //     status = formatStatus(item.status, t);
-  //   } else {
-  //     status = moment(item.lastUpdate).fromNow();
-  //   }
-  //   return (
-  //     <>
-  //       {`${item.uniqueId} • `}
-  //       <span className={classes[getStatusColor(item.status)]}>{status}</span>
-  //     </>
-  //   );
-  // };
-
   return (
     <div style={style}>
       <ListItemButton
-        style={{ backgroundColor: item.status === 'online' ? '#99d2f0' : '#F4757B44', marginTop: '2px', marginBottom: '4px', lineHeight: '1px', padding: '2px' }}
+        style={{ backgroundColor: (!position || !position.fixTime || hasPassedTime(new Date(position?.fixTime || new Date()), 40)) ? '#F4757B44' : '#99d2f0', marginTop: '2px', marginBottom: '4px', lineHeight: '1px', padding: '2px' }}
         key={item.id}
         onClick={() => {
+          Object.keys(window.players ?? {}).forEach((id) => window.players[id].reset('unmount'));
+          dispatch(devicesActions.selectId(0));
           dispatch(devicesActions.selectId(item.id));
           window.device = (window.devices ?? {})[item.id] || null;
-          window.deviceName = ((window.devices ?? {})[item.id]).name || null;
+          window.deviceName = ((window.devices ?? {})[item.id])?.name || null;
           if (!desktop) { window.showDevicesList(false); }
           if (position) {
             map.flyTo({ center: [position.longitude, position.latitude], zoom: 18, duration: 1000 });

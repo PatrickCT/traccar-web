@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definitions, focusAttribute }) => {
+const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definitions, focusAttribute, canAdd = true }) => {
   const classes = useStyles();
   const t = useTranslation();
 
@@ -242,6 +242,7 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
           //     </Grid>
           //   );
           // }
+
           return (
             <FormControl key={key}>
               <InputLabel>{getAttributeName(key, subtype)}</InputLabel>
@@ -253,23 +254,27 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
                 autoFocus={focusAttribute === key}
                 endAdornment={(
                   <InputAdornment position="end">
-                    <IconButton size="small" edge="end" onClick={() => deleteAttribute(key)}>
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
+                    {key !== 'speedLimit' && key !== 'rendimiento' && (
+                      <IconButton size="small" edge="end" onClick={() => deleteAttribute(key)}>
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    )}
                   </InputAdornment>
                 )}
               />
             </FormControl>
           );
         })}
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => setAddDialogShown(true)}
-          startIcon={<AddIcon />}
-        >
-          {t('sharedAdd')}
-        </Button>
+        {canAdd && (
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => setAddDialogShown(true)}
+            startIcon={<AddIcon />}
+          >
+            {t('sharedAdd')}
+          </Button>
+        )}
         <AddAttributeDialog
           open={addDialogShown}
           onResult={handleAddResult}

@@ -4,6 +4,10 @@
 /* eslint-disable no-constant-binary-expression */
 /* eslint-disable no-use-before-define */
 /* eslint-disable dot-notation */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-useless-escape */
+/* eslint-disable no-undef */
+/* eslint-disable no-restricted-globals */
 const requestCache = {};
 const alarmTranslator = (alarm) => {
   switch (alarm.toUpperCase()) {
@@ -421,9 +425,10 @@ let attVariantsEvaluator = (obj, attribute) => attsGetter(obj, attVariants(attri
 
 let attVariants = (att) => {
   switch (att) {
-    case 'temperature': return ['deviceTemp', 'temp1', 'bleeTemperature', 'temp2'];
+    case 'temperature': return ['deviceTemp', 'temp1', 'bleeTemperature', 'temp2', 'bleTemp2'];
     case 'motion': return ['motion', 'io173'];
     case 'group': return ['group', 'groupName'];
+    case 'imei': return ['uniqueId'];
     default: return [att];
   }
 };
@@ -547,7 +552,7 @@ export const showCoberturaMap = () => {
       height: window.innerHeight * 0.8,
     },
     contentOverflow: 'hidden',
-    content: '<iframe src="./cobertura.html" style="width: 100%; height: 100%;"></iframe>',
+    content: `<iframe src="./cobertura.html?${window.position ? `lat=${window.position.latitude}&lng=${window.position.longitude}` : ''}" style="width: 100%; height: 100%;"></iframe>`,
   });
 };
 
@@ -776,5 +781,43 @@ export const confirmDialog = (callBackYes, callBackNo = (() => { })) => {
   });
 };
 
-export const isAdmin = () => ((getUser())?.administrator || false);
-export const createBaseURL = () => `${location.protocol}//${location.hostname}${location.port !== '' ? `:${location.port}` : ''}`;
+export const isAdmin = () => ((window.getUser())?.administrator || false);
+export const createBaseURL = () => `${window.location.protocol}//${window.location.hostname}${window.location.port !== '' ? `:${window.location.port}` : ''}`;
+
+export class TreeWalker {
+  constructor(obj) {
+    this.obj = obj;
+  }
+
+  // Helper function to split path into keys and handle array indexing
+  splitPath(path) {
+    return path.split('.').flatMap((key) => key.split(/[\[\]]/).filter(Boolean));
+  }
+
+  // Function to check if a key or its variants exist in the object
+  keyExists(path, variants = {}) {
+    const keys = this.splitPath(path);
+    return this.traverse(this.obj, keys, variants) !== undefined;
+  }
+
+  // Function to get the value of a key or its variants from the object
+  getValue(path, variants = {}) {
+    const keys = this.splitPath(path);
+    return this.traverse(this.obj, keys, variants);
+  }
+
+  // Core traversal function that works with variants
+  traverse(obj, keys, variants) {
+    return keys.reduce((acc, key) => {
+      if (acc === undefined) return undefined;
+
+      // Get the variant list for the current key if it exists, otherwise use the key itself
+      const variantKeys = variants[key] ? [key, ...variants[key]] : [key];
+
+      // Find the first key that exists in the object, either the original key or a variant
+      const foundKey = variantKeys.find((k) => acc.hasOwnProperty(k));
+
+      return foundKey !== undefined ? acc[foundKey] : undefined;
+    }, obj);
+  }
+}

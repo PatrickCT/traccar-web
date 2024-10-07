@@ -31,8 +31,11 @@ import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
 import scheduleReport from './common/scheduleReport';
 import {
-  createPopUpReportRoute, generateRoute, streetView,
+  createPopUp,
+  generateRoute,
+  streetView,
 } from '../common/util/mapPopup';
+import { TreeWalker } from '../common/util/utils';
 
 const VirtuosoTableComponents = {
   Scroller: React.forwardRef((props, ref) => (
@@ -63,12 +66,12 @@ const RouteReportPage = () => {
   const fontSize = 14;
 
   const onMapPointClick = useCallback((positionId) => {
-    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+    Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item.remove());
     setSelectedItem(items.find((it) => it.id === positionId));
     new Popup()
       .setMaxWidth('400px')
       .setOffset(30)
-      .setHTML(createPopUpReportRoute(items.find((it) => it.id === positionId)))
+      .setHTML(createPopUp(items.find((it) => it.id === positionId)))
       .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
       .addTo(map);
     window.position = items.find((it) => it.id === positionId);
@@ -144,30 +147,33 @@ const RouteReportPage = () => {
     </TableRow>
   );
   const showPU = (positionId) => {
-    Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+    Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item.remove());
     setSelectedItem(items.find((it) => it.id === positionId));
     new Popup()
       .setMaxWidth('400px')
       .setOffset(30)
-      .setHTML(createPopUpReportRoute(items.find((it) => it.id === positionId)))
+      .setHTML(createPopUp(items.find((it) => it.id === positionId)))
       .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
       .addTo(map);
     window.position = items.find((it) => it.id === positionId);
   };
-  const rowContent = (_index, item) => (
-    <>
-      <TableCell onClick={() => showPU(item.id)} style={{ fontSize, lineHeight: '1', padding: '4px', backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }}>{devices[item.deviceId].name}</TableCell>
-      {columns.map((key) => (
-        <TableCell onClick={() => showPU(item.id)} style={{ fontSize, lineHeight: '1', padding: '4px', backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }} key={key}>
-          <PositionValue
-            position={item}
-            property={item.hasOwnProperty(key) ? key : null}
-            attribute={item.hasOwnProperty(key) ? null : key}
-          />
-        </TableCell>
-      ))}
-    </>
-  );
+  const rowContent = (_index, item) => {
+    const walker = new TreeWalker(item);
+    return (
+      <>
+        <TableCell onClick={() => showPU(item.id)} style={{ fontSize, lineHeight: '1', padding: '4px', backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }}>{devices[item.deviceId].name}</TableCell>
+        {columns.map((key) => (
+          <TableCell onClick={() => showPU(item.id)} style={{ fontSize, lineHeight: '1', padding: '4px', backgroundColor: (selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent') }} key={key}>
+            <PositionValue
+              position={item}
+              property={walker.keyExists(key) ? key : null}
+              attribute={item.hasOwnProperty(key) ? null : key}
+            />
+          </TableCell>
+        ))}
+      </>
+    );
+  };
 
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportRoute']}>
@@ -198,7 +204,7 @@ const RouteReportPage = () => {
                 setColumns={setColumns}
                 columnsObject={Object.fromEntries(
                   Object.entries(positionAttributes)
-                    .filter(([key]) => ['speed', 'altitude', 'deviceTime', 'odometer', 'hours', 'fuel', 'fuelConsumption'].includes(key)),
+                    .filter(([key]) => ['speed', 'altitude', 'deviceTime', 'odometer', 'hours', 'fuel', 'fuelConsumption', 'temp'].includes(key)),
                 )}
               />
             </ReportFilter>

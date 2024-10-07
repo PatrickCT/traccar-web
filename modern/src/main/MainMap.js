@@ -4,7 +4,7 @@
 /* eslint-disable no-floating-decimal */
 
 import React, {
-  memo, useCallback, useEffect, useRef, useState,
+  memo, useCallback, useEffect, useState,
 } from 'react';
 import * as turf from '@turf/turf';
 import { Marker } from 'mapbox-gl';
@@ -12,7 +12,6 @@ import { Popup } from 'maplibre-gl';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
-import Modal from './components/BasicModal';
 import MapView, { map } from '../map/core/MapView';
 import MapSelectedDevice from '../map/main/MapSelectedDevice';
 import MapAccuracy from '../map/main/MapAccuracy';
@@ -30,13 +29,6 @@ import MapScale from '../map/MapScale';
 import MapNotification from '../map/notification/MapNotification';
 import useFeatures from '../common/util/useFeatures';
 import { createPopUp } from '../common/util/mapPopup';
-import MapPopup from '../map/showpopup/MapPopup';
-import MapShare from '../map/share/MapShare';
-import LinksPage from '../settings/LinksPage';
-import MapCoverage from '../map/coverage/MapCoverage';
-import { showCoberturaMap } from '../common/util/utils';
-import { useAdministrator } from '../common/util/permissions';
-import MapPromotions from '../map/promotions/MapPromotions';
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -53,8 +45,6 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const eventsAvailable = useSelector((state) => !!state.events.items.length);
   const features = useFeatures();
-  const admin = useAdministrator();
-  const [showModalShareLocation, setShowModalShareLocation] = useState(false);
 
   // replay replica
   const onMarkerClick = useCallback((_, deviceId) => {
@@ -80,7 +70,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
       if (position === undefined || position === null || window.position === null || window.localStorage.getItem('showMapPopup') === 'false') {
         return;
       }
-      Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item.remove());
+      Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item.remove());
       const p = new Popup()
         .setMaxWidth('400px')
         .setOffset(40)
@@ -89,8 +79,12 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
         .addTo(map);
       p.getElement().id = position.deviceId;
       window.marker = p;
-      window.marker._content.classList.add(`mapboxgl-popup-content-${'#06376A'}`);
+      window.marker._content.style = '--custom_color: #06376A';
+      window.marker._content.classList.add('mapboxgl-popup-content-custom');
     };
+
+    dispatch(devicesActions.selectPosition(null));
+    dispatch(devicesActions.selectId(0));
 
     return () => {
       window.players = null;
@@ -125,19 +119,6 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
       {desktop && (
         <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)} />
       )}
-      <MapPopup />
-      <MapShare onClick={() => setShowModalShareLocation(true)} />
-      {admin && (
-        <MapCoverage onClick={() => showCoberturaMap()} />
-      )}
-      <MapPromotions />
-      <Modal
-        isOpen={showModalShareLocation}
-        onClose={() => setShowModalShareLocation(false)} // Close modal when the overlay is clicked or Esc is pressed
-        contentLabel="Links"
-      >
-        <LinksPage />
-      </Modal>
     </>
   );
 };

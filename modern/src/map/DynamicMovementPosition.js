@@ -169,7 +169,7 @@ const DynamicMovementPosition = ({ pos }) => {
 
   useEffect(() => {
     if (positions && positions.length > 0) {
-      Array.from(document.getElementsByClassName('mapboxgl-popup')).filter((popup) => popup.id !== '').map((item) => item.remove());
+      Array.from(document.getElementsByClassName('maplibregl-popup')).filter((popup) => popup.id !== '').map((item) => item.remove());
       const speed = parseFloat((attsGetter(positions[index], 'speed') ?? (attsGetter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -')).split(' ')[0]) || 0;
       const currentType = (speed < value[0] ? 1 : (speed < value[1] ? 2 : 3));
       const color = (currentType === 1 ? 'green' : (currentType === 2 ? 'orange' : 'red'));
@@ -183,7 +183,8 @@ const DynamicMovementPosition = ({ pos }) => {
             .addTo(map);
           p.getElement().id = positions[index].deviceId;
           window.marker = p;
-          window.marker._content.classList.add(`mapboxgl-popup-content-${color}`);
+          window.marker._content.style = `--custom_color: ${color}`;
+          window.marker._content.classList.add(`mapboxgl-popup-content-custom`);
         });
       } else {
         const p = new Popup()

@@ -37,7 +37,8 @@ export const prepareIcon = (background, icon, color, degrees) => {
 
   const context = canvas.getContext('2d');
   if (background) {
-    context.drawImage(background, 0, 0, canvas.width, canvas.height);
+    const bgLimit = 1.0;
+    context.drawImage(background, 0, 0, canvas.width / bgLimit, canvas.height / bgLimit);
   }
 
   if (icon) {

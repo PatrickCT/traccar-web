@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import {
+  memo, useEffect, useMemo, useState,
+} from 'react';
 import { map } from '../core/MapView';
 import './showpopup.css';
 
@@ -32,8 +34,8 @@ class PopUpControl {
   }
 }
 
-const MapPopup = () => {
-  const [enabled, setEnabled] = useState(() => window.localStorage.getItem('showMapPopup') === 'true');
+const MapPopup = memo(() => {
+  const [enabled, setEnabled] = useState((window.localStorage.getItem('showMapPopup') === 'true'));
 
   const onClick = () => {
     const newEnabled = !enabled;
@@ -49,6 +51,6 @@ const MapPopup = () => {
   }, [control]);
 
   return null;
-};
+});
 
 export default MapPopup;

@@ -13,7 +13,7 @@
     <meta name="csrf-token" content="kz9hiSXyq9vauvpKuHTq5ppCkVPwE6WK3c2e6J8R">
     <title>cobertura</title>
     <!-- Scripts -->
-    <script src="https://giscomercial.altanredes.com/js/app.js" defer></script>
+    <script src="./cobertura_app.js" defer></script>
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -749,6 +749,19 @@
             }]
         }];
         var g_user_can_see_integration_check = 0;
+
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            let lat = urlParams.get('lat');
+            let lng = urlParams.get('lng');
+            console.log(lat, lng);
+
+            if (lat, lng) {
+                let marker = new L.Marker([lat, lng]);
+                marker.addTo(map);
+                map.setView([lat, lng], 15);
+            }
+        }
     </script>
 </body>
 

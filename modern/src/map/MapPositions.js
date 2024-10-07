@@ -25,31 +25,8 @@ const propPrint = (prop) => {
   }
 };
 
-function throttle(func, limit) {
-  let lastFunc;
-  let lastRan;
-  // eslint-disable-next-line func-names
-  return function () {
-    const context = this;
-    // eslint-disable-next-line prefer-rest-params
-    const args = arguments;
-    if (!lastRan) {
-      func.apply(context, args);
-      lastRan = Date.now();
-    } else {
-      clearTimeout(lastFunc);
-      lastFunc = setTimeout(() => {
-        if ((Date.now() - lastRan) >= limit) {
-          func.apply(context, args);
-          lastRan = Date.now();
-        }
-      }, limit - (Date.now() - lastRan));
-    }
-  };
-}
-
 const MapPositions = ({
-  positions, onClick, titleField, selectedPosition, stops, showStatus = true, index, replay = false, main = false,
+  positions, onClick, titleField, selectedPosition, showStatus = true, index, replay = false,
 }) => {
   const id = useId();
   window.id = id;

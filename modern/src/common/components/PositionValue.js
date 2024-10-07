@@ -9,16 +9,17 @@ import { useAttributePreference, usePreference } from '../util/preferences';
 import { useTranslation } from './LocalizationProvider';
 import { useAdministrator } from '../util/permissions';
 import AddressValue from './AddressValue';
+import { TreeWalker } from '../util/utils';
 
 const PositionValue = ({ position, property, attribute }) => {
   const t = useTranslation();
-
+  const walker = new TreeWalker(position);
   const admin = useAdministrator();
 
   const device = useSelector((state) => state.devices.items[position.deviceId]);
 
   const key = property || attribute;
-  const value = property ? position[property] : position.attributes[attribute];
+  const value = property ? walker.getValue(key) : walker.getValue(`attributes.${key}`, { temp: ['temp', 'temperature', 'bleTemp', 'bleTemp2'] }); // position[property] : position.attributes[attribute];
 
   const distanceUnit = useAttributePreference('distanceUnit');
   const altitudeUnit = useAttributePreference('altitudeUnit');
@@ -52,6 +53,8 @@ const PositionValue = ({ position, property, attribute }) => {
         return value != null ? formatDistance(value, distanceUnit, t) : '';
       case 'hours':
         return value != null ? formatNumericHours(value, t) : '';
+      case 'temp':
+        return value != null ? `${value.toFixed(1)}°F | ${((value * 1.8) + 32).toFixed(1)}°C` : '';
       default:
         if (typeof value === 'number') {
           return formatNumber(value);

@@ -4,10 +4,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid } from '@mui/x-data-grid';
-import { Box } from '@mui/material';
+import { Box, Drawer } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import LinkIcon from '@mui/icons-material/Link';
+import { GarageOutlined } from '@mui/icons-material';
 import Fuse from 'fuse.js';
+import { encode } from 'base-64';
+import { useDispatch } from 'react-redux';
 import { useCatch, useEffectAsync } from '../reactHelper';
 import { formatBoolean, formatTime } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
@@ -19,6 +22,8 @@ import { useManager, useSupport } from '../common/util/permissions';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import { usePreference } from '../common/util/preferences';
 import LoadingComponent from './components/LoadingComponent';
+import { sessionActions } from '../store';
+import UserDevicesPage from './UserDevicesPage';
 
 const UsersPage = () => {
   const navigate = useNavigate();
@@ -26,6 +31,7 @@ const UsersPage = () => {
 
   const manager = useManager();
   const support = useSupport();
+  const dispatch = useDispatch();
 
   const hours12 = usePreference('twelveHourFormat');
 
@@ -33,10 +39,17 @@ const UsersPage = () => {
   const [items, setItems] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [state, setState] = useState({
+    right: false,
+    client: null,
+  });
 
   const handleLogin = useCatch(async (userId) => {
     const response = await fetch(`/api/session/${userId}`);
     if (response.ok) {
+      const user = await response.json();
+      localStorage.setItem('dXNlcg==', encode(JSON.stringify(user)));
+      dispatch(sessionActions.updateUser(user));
       window.location.replace('/');
     } else {
       throw Error(await response.text());
@@ -71,6 +84,21 @@ const UsersPage = () => {
     handler: (userId) => navigate(`/settings/user/${userId}/connections`),
   };
 
+  const actionDevices = {
+    key: 'devices',
+    title: t('deviceTitle'),
+    icon: <GarageOutlined fontSize="small" />,
+    handler: (userId) => setState({ ...state, client: userId, right: true }),
+  };
+
+  const toggleDrawer = (anchor, open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+
+    setState({ ...state, [anchor]: open });
+  };
+
   useEffectAsync(async () => {
     setLoading(true);
     try {
@@ -92,10 +120,10 @@ const UsersPage = () => {
     {
       field: 'admin',
       headerName: `${t('userAdmin')}`,
-      valueGetter: (params) => params.row.administrator,
+      valueGetter: (_, params) => params.administrator,
       renderCell: (params) => (
         <span>
-          {formatBoolean(params.row.administrator, t)}
+          {formatBoolean(params.administrator, t)}
         </span>
       ),
       width: 200,
@@ -103,31 +131,25 @@ const UsersPage = () => {
     {
       field: 'main',
       headerName: `${t('sharedMain')}`,
-      valueGetter: (params) => `${formatBoolean(params.row.main, t)}`,
+      valueGetter: (_, params) => `${formatBoolean(params.main, t)}`,
       width: 200,
     },
     {
       field: 'disabled',
       headerName: `${t('sharedDisabled')}`,
-      valueGetter: (params) => `${formatBoolean(params.row.disabled, t)}`,
-      width: 200,
-    },
-    {
-      field: 'expirationTime',
-      headerName: `${t('userExpirationTime')}`,
-      valueGetter: (params) => `${formatTime(params.row.expirationTime, 'date', hours12)}`,
+      valueGetter: (_, params) => `${formatBoolean(params.disabled, t)}`,
       width: 200,
     },
     {
       field: 'total_devices',
       headerName: 'Unidades',
-      valueGetter: (params) => `${params.row.attributes?.total_devices || 0}`,
+      valueGetter: (_, params) => `${params.attributes?.total_devices || 0}`,
     },
     {
       field: 'actions',
       type: 'actions',
       headerName: 'Opciones',
-      width: 100,
+      width: 200,
       cellClassName: 'actions',
       getActions: ({ id }) => [
         <CollectionActions
@@ -135,56 +157,11 @@ const UsersPage = () => {
           editPath="/settings/user"
           endpoint="users"
           setTimestamp={setTimestamp}
-          customActions={(manager && !support) ? [actionLogin, actionConnections] : [actionConnections]}
+          customActions={(manager && !support) ? [actionLogin, actionConnections, actionDevices] : [actionConnections]}
         />,
       ],
     },
   ];
-
-  const [columnWidths, setColumnWidths] = useState(
-    columns.reduce((acc, col) => {
-      acc[col.field] = col.width;
-      return acc;
-    }, {}),
-  );
-
-  const handleColumnResize = (field, newWidth) => {
-    setColumnWidths((prevWidths) => ({
-      ...prevWidths,
-      [field]: newWidth,
-    }));
-  };
-
-  const startColumnResize = (e, field) => {
-    const startX = e.clientX;
-    const startWidth = columnWidths[field];
-
-    const onMouseMove = (e) => {
-      const newWidth = Math.max(50, startWidth + (e.clientX - startX)); // Minimum width of 50px
-      handleColumnResize(field, newWidth);
-    };
-
-    const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  };
-
-  const resizableColumns = columns.map((col) => ({
-    ...col,
-    width: columnWidths[col.field], // Set the column width dynamically
-    renderHeader: (params) => (
-      <div
-        style={{ display: 'flex', alignItems: 'center' }}
-        onMouseDown={(e) => startColumnResize(e, col.field)}
-      >
-        {params.colDef.headerName}
-      </div>
-    ),
-  }));
 
   return (
     <PageLayout menu={<SettingsMenu />} breadcrumbs={['settingsTitle', 'settingsUsers']}>
@@ -193,7 +170,7 @@ const UsersPage = () => {
         <LoadingComponent isLoading={loading}>
           <DataGrid
             rows={items.filter((item) => (searchKeyword === '' ? true : isMatch(item, searchKeyword)))}
-            columns={resizableColumns}
+            columns={columns}
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 12 },
@@ -203,8 +180,14 @@ const UsersPage = () => {
           />
         </LoadingComponent>
       </Box>
-
       <CollectionFab editPath="/settings/user" />
+      <Drawer
+        anchor="right"
+        open={state.right}
+        onClose={toggleDrawer('right', false)}
+      >
+        <UserDevicesPage id={state.client} />
+      </Drawer>
     </PageLayout>
   );
 };

@@ -1,0 +1,30 @@
+.custom-marker {
+    position: relative;
+    width: 48px;
+    height: 48px;
+}
+
+.marker-background {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    /* Ensure the background covers the entire marker */
+}
+
+.marker-icon {
+    position: absolute;
+    width: 70%;
+    height: 70%;
+    top: 15%;
+    /* Adjust as needed */
+    left: 15%;
+}
+
+.marker-arrow {
+    position: absolute;
+    width: 20%;
+    height: 20%;
+    top: 0;
+    left: 50%;
+    transform-origin: 50% 100%;
+}

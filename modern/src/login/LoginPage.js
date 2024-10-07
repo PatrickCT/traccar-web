@@ -222,10 +222,9 @@ const LoginPage = () => {
             autoFocus={!email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyUp={handleSpecialKey}
-            helperText={failed && 'Invalid username or password'}
+            helperText={failed && 'Usuario o Contraseña invalidos'}
             id="user"
-            InputLabelProps={{ style: { color: desktop ? '#000000' : '#fff' } }}
-            inputProps={{ style: { color: desktop ? '#000000' : '#ffffff', backgroundColor: desktop ? '#ffffff' : '#163b61' } }}
+          // inputLabelProps={{ style: { color: desktop ? '#000000' : '#fff', backgroundColor: desktop ? '#ffffff' : '#163b61' } }}
           />
           <TextField
             required
@@ -239,16 +238,16 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             onKeyUp={handleSpecialKey}
             id="pass"
-            InputLabelProps={{ style: { color: desktop ? '#000000' : '#fff' } }}
-            inputProps={{
-              style: {
-                color: desktop ? '#000000' : '#ffffff',
-                backgroundColor: desktop ? '#ffffff' : '#163b61',
-                WebkitBoxShadow: desktop
-                  ? '0 0 0 1000px #ffffff inset' // Set the background color even for autofilled input
-                  : '0 0 0 1000px #163b61 inset', // Set the background color for autofilled input
-              },
-            }}
+          // inputLabelProps={{
+          //   style: {
+          //     color: desktop ? '#000000' : '#ffffff',
+          //     backgroundColor: desktop ? '#ffffff' : '#163b61',
+          //     WebkitBoxShadow: desktop
+          //       ? '0 0 0 1000px #ffffff inset' // Set the background color even for autofilled input
+          //       : '0 0 0 1000px #163b61 inset', // Set the background color for autofilled input
+          //   },
+          // }}
+
           />
           <Button
             onClick={handlePasswordLogin}
@@ -285,7 +284,6 @@ const LoginPage = () => {
                   label={t('loginLanguage')}
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  InputLabelProps={{ style: { color: desktop ? '#000000' : '#fff' } }}
                   style={{ color: desktop ? '#000' : '#fff', backgroundColor: desktop ? '#fff' : '#163b61' }}
                 >
                   {languageList.map((it) => <MenuItem key={it.code} value={it.code}>{it.name}</MenuItem>)}

@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import {
   attConverter,
   hasPassedTime,
@@ -51,6 +52,7 @@ window.engineLock = () => {
       smallify: 'remove',
       maximize: 'remove',
     },
+    position: { my: 'center-bottom', at: 'center-center', offsetY: 0 },
     callback: (panel) => {
       document.getElementById('myButton').addEventListener('click', async () => {
         window.confirmDialog(1);
@@ -74,6 +76,7 @@ window.engineReactivate = () => {
       smallify: 'remove',
       maximize: 'remove',
     },
+    position: { my: 'center-bottom', at: 'center-center', offsetY: 0 },
     callback: (panel) => {
       document.getElementById('myButton').addEventListener('click', async () => {
         window.confirmDialog(2);
@@ -84,49 +87,37 @@ window.engineReactivate = () => {
 };
 
 window.confirmDialog = (type) => {
-  const html = `
-    <div class="simple-confirm dialog-sm" style="display:block">
-    <p>Estas segur@?</p>
-    <div class="buttonbar">
-        <button name='yes' class="..." data-dismiss value="YES">Si</button>
-        <button name='no' class="..." data-dismiss data-cancel value="No">No</button>
+  window.alertify.confirm('Confirmar', 'Estas segur@', (async () => {
+    if (type === 1) {
+      await window.makeRequest('./api/commands/send', 'POST', {
+        type: 'engineStop',
+        attributes: {},
+        deviceId: window.position.deviceId,
+      });
+    } else if (type === 2) {
+      await window.makeRequest('./api/commands/send', 'POST', {
+        id: 0,
+        attributes: {},
+        deviceId: window.position.deviceId,
+        type: 'engineResume',
+        textChannel: false,
+        description: null,
+      });
+    }
+  }), (() => {
 
-    </div>
-    </div>
-    `;
-  window.jsPanel.dialog.modal(html, {
-    theme: '#163b61',
-    border: '1px solid gray',
-    borderRadius: '.5rem',
-    headerTitle: 'Reactivar',
-    headerControls: {
-      minimize: 'remove',
-      smallify: 'remove',
-      maximize: 'remove',
+  })).set({
+    closableByDimmer: false,
+    modal: true,
+    labels: {
+      // dialogs default title
+      title: 'Confirmar',
+      // ok button text
+      ok: 'SI',
+      // cancel button text
+      cancel: 'No',
     },
-    onclick_yes: async () => {
-      if (type === 1) {
-        await window.makeRequest('./api/commands/send', 'POST', {
-          type: 'engineStop',
-          attributes: {},
-          deviceId: window.position.deviceId,
-        });
-      } else if (type === 2) {
-        await window.makeRequest('./api/commands/send', 'POST', {
-          id: 0,
-          attributes: {},
-          deviceId: window.position.deviceId,
-          type: 'engineResume',
-          textChannel: false,
-          description: null,
-        });
-      }
-    },
-    onclick_no: () => { },
-    // onclick_cancel: (panel, elmts, event) => {
-    //   console.log(panel, elmts, event);
-    // },
-  });
+  }).show();
 };
 
 function openInNewTab(url) {
@@ -138,61 +129,6 @@ export const generateRoute = () => {
   url = `https://www.google.com/maps/place/${window.position.latitude},${window.position.longitude}`;
   openInNewTab(url);
 };
-
-export const test = () => `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  .collapsible {
-    cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    text-align: left;
-    border: none;
-    outline: none;
-    background-color: #f1f1f1;
-    transition: background-color 0.3s;
-  }
-
-  .content {
-    display: none;
-    padding: 10px;
-  }
-
-  .active {
-    background-color: #ddd;
-  }
-
-  .image {
-    max-width: 100%;
-    height: auto;
-  }
-</style>
-</head>
-<body>
-
-<button class="collapsible">Click to Expand</button>
-<div class="content">
-  <img class="image" src="https://picsum.photos/200/300" alt="Sample Image">
-</div>
-
-<script>
-  const collapsible = document.querySelector('.collapsible');
-  const content = document.querySelector('.content');
-
-  collapsible.addEventListener('click', function() {
-    this.classList.toggle('active');
-    content.style.display = content.style.display === 'block' ? 'none' : 'block';
-  });
-</script>
-
-</body>
-</html>
-
-`;
 
 const popupBtns = () => {
   let html = '';
@@ -227,21 +163,6 @@ const popupBtns = () => {
   return html;
 };
 
-// const popupRevision = () => {
-//   let html = '';
-//   if (window.localStorage.getItem(btoa('isRevisor')) === 'true') {
-//     html += `
-//     <button
-//       type="button"
-//       onClick="openModal()"
-//       style="background-color: #2196F3; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2); transition: background-color 0.3s;"
-//     >
-//       Revision
-//     </button>
-//     `;
-//   }
-//   return html;
-// };
 const createPopUpData = (position) => {
   let html = '';
   html += '<div style="text-align: center;">';
@@ -328,13 +249,13 @@ const createPopUpDataError = (position) => {
   if (isAdmin()) {
     html += valueParser(position, 'protocol');
     html += '<br />';
-    html += valueParser(window.device, 'phone');
+    html += valueParser(window.devices[position.deviceId], 'phone');
     html += '<br />';
-    html += valueParser(window.device, 'imei');
+    html += valueParser(window.devices[position.deviceId], 'imei');
     html += '<br />';
-    html += valueParser(window.device, 'simType');
+    html += valueParser(window.devices[position.deviceId], 'simType');
     html += '<br />';
-    html += valueParser(window.device, 'simKey');
+    html += valueParser(window.devices[position.deviceId], 'simKey');
   }
   html += '<br />';
   html += popupBtns();
@@ -343,48 +264,64 @@ const createPopUpDataError = (position) => {
   return html;
 };
 
-const headerButton = (icon, onclick, restrictions = []) => {
+const popupButton = (icon, onclick, restrictions = [], overrides = { w: 14, h: 14 }) => {
   if (restrictions.some((value) => value)) return '';
   const baseUrlIcon = `${createBaseURL()}${icon}`;
   return `
-  <a
-    onclick="((${onclick})());"
-  >
-    <img src="${baseUrlIcon}" width="14" height="14" />
-  </a>`;
+    <a
+      onclick="((${onclick})());"
+    >
+      <img src="${baseUrlIcon}" width="${overrides.w}" height="${overrides.h}" />
+    </a>`;
 };
 
 const createPopUpHeadersButtons = (position) => `
   <div align='center' style='text-align: center;'>
-    ${headerButton('/images/botones-popup/connection.svg', (() => window.navigate(`/settings/device/${position.deviceId}/connections`)))}
-    ${headerButton('/images/botones-popup/edit.svg', (() => window.navigate(`/settings/device/${position.deviceId}`)))}
-    ${headerButton('/images/botones-popup/command.svg', (() => window.navigate(`/settings/device/${position.deviceId}/command`)), [!isAdmin()])}
-    ${headerButton('/images/botones-popup/position.svg', (() => window.navigate(`/position/${position.id}`)), [!isAdmin()])}
-    ${headerButton('/images/botones-popup/accumulator.svg', (() => window.navigate(`/settings/accumulators/${position.deviceId}`)), [!isAdmin()])}
+    ${popupButton('/images/botones-popup/connection.svg', (() => window.navigate(`/settings/device/${position.deviceId}/connections`)))}
+    ${popupButton('/images/botones-popup/edit.svg', (() => window.navigate(`/settings/device/${position.deviceId}`)))}
+    ${popupButton('/images/botones-popup/command.svg', (() => window.navigate(`/settings/device/${position.deviceId}/command`)), [!isAdmin()])}
+    ${popupButton('/images/botones-popup/position.svg', (() => window.navigate(`/position/${position.id}`)), [!isAdmin()])}
+    ${popupButton('/images/botones-popup/accumulator.svg', (() => window.navigate(`/settings/accumulators/${position.deviceId}`)))}
   </div>`;
 
+const createPopUpFooterButtons = () => `
+    <div align='center' style='text-align: center;'>
+    ${popupButton('/images/botones-popup/apagar.svg', (() => { window.engineLock(); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/encender.svg', (() => { window.engineReactivate(); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/calle.svg', (() => { window.streetView(); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/maps.svg', (() => { window.generateRoute(); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/recorrido.svg', (() => { window.navigate('/reports/route'); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/replay.svg', (() => { window.navigate('/replay'); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
+    </div>`;
+
 const createPopUpContent = (position, showHeaderButtons = true, showFooterButtons = true) => {
-  // sections
-  let html = '';
-  if (hasPassedTime(new Date(position.fixTime || new Date()), 40)) {
-    return createPopUpDataError();
+  try {
+    const user = window.getUser();
+    // sections
+    let html = '';
+    if (hasPassedTime(new Date(position.fixTime || new Date()), 40)) {
+      return createPopUpDataError(position);
+    }
+    html += '<div align="center" style="text-align: center !important;text-transform: uppercase !important;">';
+    // header buttons
+    if (showHeaderButtons && !user.deviceReadonly) {
+      html += createPopUpHeadersButtons(position);
+    }
+    // name
+    html += `<h3><b>${valueParser(position, 'name')}</b></h3>`;
+    html += '</div>';
+    // stats
+    html += createPopUpData(position);
+    // policy
+    // footer bottons
+    if (showFooterButtons && !user.deviceReadonly) {
+      html += createPopUpFooterButtons();
+    }
+    return html;
+  } catch (_) {
   }
-  html += '<div align="center" style="text-align: center !important;text-transform: uppercase !important;">';
-  // header buttons
-  if (showHeaderButtons) {
-    html += createPopUpHeadersButtons(position);
-  }
-  // name
-  html += `<h3><b>${valueParser(position, 'name')}</b></h3>`;
-  html += '</div>';
-  // stats
-  html += createPopUpData(position);
-  // policy
-  // footer bottons
-  if (showFooterButtons) {
-    html += popupBtns();
-  }
-  return html;
+
+  return '';
 };
 
 export const createPopUp = (position, showHeaderButtons = true, showFooterButtons = true) => createPopUpContent(position, showHeaderButtons, showFooterButtons);

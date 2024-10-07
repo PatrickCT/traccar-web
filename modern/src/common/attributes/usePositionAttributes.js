@@ -286,6 +286,10 @@ export default (t) => useMemo(() => ({
     name: t('positionDeviceTemp'),
     type: 'number',
   },
+  temp: {
+    name: `${t('positionTemp')}`,
+    type: 'number',
+  },
   temp1: {
     name: `${t('positionTemp')} 1`,
     type: 'number',
