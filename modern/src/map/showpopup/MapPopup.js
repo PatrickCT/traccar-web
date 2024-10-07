@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { map } from '../core/MapView';
 import './showpopup.css';
+import { controls } from '../../map-leaflet/core/MapView';
 
 const statusClass = (status) => `maplibregl-ctrl-icon maplibre-ctrl-showpopup maplibre-ctrl-showpopup-${status}`;
 
@@ -44,8 +44,8 @@ const MapPopup = () => {
   const control = useMemo(() => new PopUpControl(enabled, onClick), [enabled]);
 
   useEffect(() => {
-    map.addControl(control);
-    return () => map.removeControl(control);
+    controls.push(control);
+    return () => controls;
   }, [control]);
 
   return null;

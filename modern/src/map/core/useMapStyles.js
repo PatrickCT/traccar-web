@@ -43,6 +43,7 @@ export default () => {
       title: t('mapLocationIqStreets'),
       style: `https://tiles.locationiq.com/v3/streets/vector.json?key=${locationIqKey || 'pk.0f147952a41c555a5b70614039fd148b'}`,
       available: true,
+      url: `https://tiles.locationiq.com/v3/streets/vector.json?key=${locationIqKey || 'pk.0f147952a41c555a5b70614039fd148b'}`,
     },
     {
       id: 'osm',
@@ -53,6 +54,7 @@ export default () => {
         attribution: '© <a target="_top" rel="noopener" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }),
       available: true,
+      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     },
     {
       id: 'openTopoMap',
@@ -62,6 +64,7 @@ export default () => {
         maxZoom: 17,
       }),
       available: true,
+      url: `https://${'a'}.tile.opentopomap.org/{z}/{x}/{y}.png`,
     },
     {
       id: 'carto',
@@ -72,6 +75,7 @@ export default () => {
         attribution: '© <a target="_top" rel="noopener" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a target="_top" rel="noopener" href="https://carto.com/attribution">CARTO</a>',
       }),
       available: true,
+      url: `https://${'a'}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png`,
     },
     {
       id: 'googleRoad',

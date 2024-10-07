@@ -3,6 +3,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-undef */
 /* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable no-unused-vars */
 import React, { useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +28,7 @@ import usePersistedState from '../common/util/usePersistedState';
 import EventsDrawer from './EventsDrawer';
 import useFilter from './useFilter';
 import MainToolbar from './MainToolbar';
-import MainMap from './MainMap';
+// import MainMap from './MainMap';
 // import { useAttributePreference } from '../common/util/preferences';
 import {
   // createPopUp,
@@ -45,6 +46,7 @@ import { useAdministrator } from '../common/util/permissions';
 import { LayersManager } from '../common/util/utils';
 import Banner from './components/Banner';
 import { toast } from '../common/util/toasts';
+import MainMapLeafet from './MainMapLeafet';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -262,11 +264,12 @@ const MainPage = () => {
         <Counter />
       )}
       {desktop && (
-        <MainMap
-          filteredPositions={filteredPositions}
-          selectedPosition={selectedPosition}
-          onEventsClick={onEventsClick}
-        />
+        // <MainMap
+        //   filteredPositions={filteredPositions}
+        //   selectedPosition={selectedPosition}
+        //   onEventsClick={onEventsClick}
+        // />
+        <MainMapLeafet />
       )}
       <div className={classes.sidebar}>
         <Paper square elevation={3} className={classes.header}>
@@ -288,11 +291,12 @@ const MainPage = () => {
         <div className={classes.middle}>
           {!desktop && (
             <div className={classes.contentMap}>
-              <MainMap
+              {/* <MainMap
                 filteredPositions={filteredPositions}
                 selectedPosition={selectedPosition}
                 onEventsClick={onEventsClick}
-              />
+              /> */}
+              <MainMapLeafet />
             </div>
           )}
           <Paper
