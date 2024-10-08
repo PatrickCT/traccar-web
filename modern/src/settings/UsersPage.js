@@ -61,13 +61,18 @@ const UsersPage = () => {
     if (!obj) return false;
     const fuse = new Fuse([obj], {
       includeScore: true,
+      shouldSort: true,
+      isCaseSensitive: false,
+      includeMatches: true,
+      ignoreLocation: true,
       keys: [
         // {name: 'name', getFn: (item) => item.name}
         'name', 'email',
       ],
     });
     const result = fuse.search(searchValue);
-    return (result.length > 0 && result[0].score <= 0.2);
+
+    return (result.length > 0 && result[0].score <= 0.11);
   };
 
   const actionLogin = {

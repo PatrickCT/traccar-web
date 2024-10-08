@@ -23,7 +23,7 @@ const UserDevicesPage = ({ id }) => {
   useEffectAsync(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/devices?userId=${id}`);
+      const response = await fetch(`/api/devices/user/${id}`);
       if (response.ok) {
         setItems(await response.json());
       } else {

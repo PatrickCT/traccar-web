@@ -68,7 +68,7 @@ const DeviceRow = ({ data, index, style }) => {
 
   const formatProperty = (key) => {
     let status;
-    if ((position && !hasPassedTime(new Date(position?.fixTime || new Date()), 40))) {
+    if (item.status === 'online') {
       status = 'Reportando';
     } else {
       status = 'Sin reportar';
@@ -105,7 +105,6 @@ const DeviceRow = ({ data, index, style }) => {
         style={{ backgroundColor: (!position || !position.fixTime || hasPassedTime(new Date(position?.fixTime || new Date()), 40)) ? '#F4757B44' : '#99d2f0', marginTop: '2px', marginBottom: '4px', lineHeight: '1px', padding: '2px' }}
         key={item.id}
         onClick={() => {
-          Object.keys(window.players ?? {}).forEach((id) => window.players[id].reset('unmount'));
           dispatch(devicesActions.selectId(0));
           dispatch(devicesActions.selectId(item.id));
           window.device = (window.devices ?? {})[item.id] || null;

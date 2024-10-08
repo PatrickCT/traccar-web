@@ -8,6 +8,7 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-undef */
 /* eslint-disable no-restricted-globals */
+/* eslint-disable no-eval */
 const requestCache = {};
 const alarmTranslator = (alarm) => {
   switch (alarm.toUpperCase()) {
@@ -821,3 +822,46 @@ export class TreeWalker {
     }, obj);
   }
 }
+
+export const dateDifference = (date1, date2, timeframes = ['years', 'months', 'days', 'hours', 'minutes', 'seconds']) => {
+  const diff = Math.abs(date2 - date1);
+  let remaining = diff;
+
+  const msPer = {
+    years: 1000 * 60 * 60 * 24 * 365,
+    months: 1000 * 60 * 60 * 24 * 30,
+    days: 1000 * 60 * 60 * 24,
+    hours: 1000 * 60 * 60,
+    minutes: 1000 * 60,
+    seconds: 1000,
+  };
+
+  const msPerLang = {
+    years: 'Años',
+    months: 'Meses',
+    days: 'Dias',
+    hours: 'Horas',
+    minutes: 'Minutos',
+    seconds: 'Segundos',
+  };
+
+  const result = {};
+
+  // Calculate the time differences for the selected timeframes
+  timeframes.forEach((timeframe) => {
+    if (msPer[timeframe]) {
+      const amount = Math.floor(remaining / msPer[timeframe]);
+      if (amount > 0) {
+        result[timeframe] = amount;
+        remaining -= amount * msPer[timeframe]; // Reduce the remaining time
+      }
+    }
+  });
+
+  // Create the result string, omitting zero values
+  const formattedResult = Object.entries(result)
+    .map(([unit, value]) => `${value} ${msPerLang[unit]}`)
+    .join(', ');
+
+  return formattedResult || ''; // If all values are zero, return a default message
+};

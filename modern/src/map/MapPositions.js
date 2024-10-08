@@ -14,6 +14,7 @@ import { findFonts } from './core/mapUtil';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import RealTimeMovement from '../main/components/RealTimeMarker';
 import { checkClusters } from '../common/util/geospatial';
+import { measureExecutionTime } from '../common/util/utils';
 
 const isEqual = require('react-fast-compare');
 
@@ -262,15 +263,41 @@ const MapPositions = ({
   useEffect(() => {
     if (!positions || positions.length <= 0) return;
 
-    positions?.forEach((position) => {
-      if (window.players) {
-        if (!window.players?.hasOwnProperty(position.deviceId)) {
-          window.players[position.deviceId] = new RealTimeMovement(position.deviceId, id, {});
-        }
-        window.players[position.deviceId].updateSelectedPosition(position);
-      }
+    // positions?.forEach((position) => {
+    //   if (window.players) {
+    //     if (!window.players?.hasOwnProperty(position.deviceId)) {
+    //       window.players[position.deviceId] = new RealTimeMovement(position.deviceId, id, {});
+    //     }
+    //     window.players[position.deviceId].updateSelectedPosition(position);
+    //   }
+    // });
+
+    // measureExecutionTime((positions) => {
+    //   map.getSource(id)?.setData({
+    //     type: 'FeatureCollection',
+    //     features: positions.filter((it) => devices.hasOwnProperty(it.deviceId))
+    //       .map((position) => ({
+    //         type: 'Feature',
+    //         geometry: {
+    //           type: 'Point',
+    //           coordinates: [position.longitude, position.latitude],
+    //         },
+    //         properties: createFeature(devices, position, selectedPosition && selectedPosition.id),
+    //       })),
+    //   });
+    // }, positions);
+    map.getSource(id)?.setData({
+      type: 'FeatureCollection',
+      features: positions.filter((it) => devices.hasOwnProperty(it.deviceId))
+        .map((position) => ({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [position.longitude, position.latitude],
+          },
+          properties: createFeature(devices, position, selectedPosition && selectedPosition.id),
+        })),
     });
-    // measureExecutionTime(checkClusters, positions);
     checkClusters(positions);
   }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index, recalculate]);
 

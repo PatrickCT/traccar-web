@@ -171,3 +171,48 @@
     max-height: 100%;
     height: 100%;
 }
+
+
+.custom-marker {
+    position: relative;
+    width: 40px;
+    /* Set the desired size for the div */
+    height: 40px;
+    /* Set the desired size for the div */
+    /* background-color: red; */
+}
+
+.marker-background {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    width: 90%;
+    height: 90%;
+    object-fit: cover;
+    /* Ensures the images cover the entire area */
+    margin: 0 auto;
+    /* background-color: green; */
+}
+
+.marker-icon {
+    position: absolute;
+    top: 25%;
+    left: 25%;
+    width: 50%;
+    height: 50%;
+    object-fit: cover;
+    /* Ensures the images cover the entire area */
+    /* background-color: red; */
+}
+
+.marker-arrow {
+    position: absolute;
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
+    object-fit: cover;
+    /* Ensures the images cover the entire area */
+    margin: 0 auto;
+    /* background-color: transparent; */
+}

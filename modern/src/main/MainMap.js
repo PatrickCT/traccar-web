@@ -7,8 +7,7 @@ import React, {
   memo, useCallback, useEffect, useState,
 } from 'react';
 import * as turf from '@turf/turf';
-import { Marker } from 'mapbox-gl';
-import { Popup } from 'maplibre-gl';
+import { Marker, Popup } from 'maplibre-gl';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
@@ -53,12 +52,16 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
 
   useEffect(() => {
     dispatch(devicesActions.selectPosition(selectedPosition));
+    if (window.rtmPopUp) {
+      window.rtmPopUp(selectedPosition);
+    }
   }, [selectedPosition]);
 
   useEffect(() => {
     window.turf = turf;
     window.map = map;
     window.Marker = Marker;
+    window.markers = [];
 
     if (window.players === undefined || window.players === null) {
       window.players = {};
@@ -73,7 +76,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
       Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item.remove());
       const p = new Popup()
         .setMaxWidth('400px')
-        .setOffset(40)
+        .setOffset(30)
         .setHTML(createPopUp(position))
         .setLngLat([position?.longitude, position?.latitude])
         .addTo(map);

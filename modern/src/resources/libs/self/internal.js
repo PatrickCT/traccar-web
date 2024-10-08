@@ -56,6 +56,7 @@ class SocketWorker {
 
 class InternalTools {
   constructor() {
+    this.initialized = false;
     this.info = {
       timeOpened: new Date(),
       timezone: (new Date()).getTimezoneOffset() / 60,
@@ -207,10 +208,11 @@ class InternalTools {
   }
 
   async init() {
-    this.startSocket();
+    if (this.initialized) return;
+    // this.startSocket();
     this.startHearbeat();
     // Initialize geolocation data
-    // this.info.getGeolocation();
+    this.info.getGeolocation();
 
     // Initialize battery data
     this.info.getBatteryInfo().then(() => {
@@ -228,6 +230,7 @@ class InternalTools {
 
     // Retrieve max touch points
     this.info.maxTouchPoints = this.info.getMaxTouchPoints();
+    this.initialized = true;
   }
 
   async destroy() {
@@ -241,7 +244,7 @@ class InternalTools {
 
   startHearbeat() {
     if (window.heartbeat) {
-      heartbeat.start({ url: 'https://t-urban.com.mx:3003/api/webhooks/watchdogs' });
+      heartbeat.start({ url: 'https://crmgpstracker.mx:4040/api/webhooks/watchdogs', methods: ['error'] });
       heartbeat.initConsole();
       heartbeat.initErrorlog();
       return true;

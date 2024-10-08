@@ -147,7 +147,7 @@ const MainPage = () => {
       const screen_h = window.screen.height;
 
       if (((canvas_h * 100) / screen_h) < 50) {
-        window.map.resize();
+        window.map?.resize();
       } else {
         clearInterval(intervalResize);
       }
@@ -187,6 +187,7 @@ const MainPage = () => {
       if (typeof InternalTools !== 'undefined') {
         if (!window.internalTools) {
           window.internalTools = new InternalTools();
+          window.internalTools.init();
         }
       }
     };

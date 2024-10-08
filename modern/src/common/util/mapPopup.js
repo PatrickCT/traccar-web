@@ -1,4 +1,5 @@
 /* eslint-disable no-empty */
+/* eslint-disable no-unused-vars */
 import {
   attConverter,
   hasPassedTime,
@@ -6,6 +7,7 @@ import {
   valueParser,
   isAdmin,
   createBaseURL,
+  dateDifference,
 } from './utils';
 
 window.extraDiv = 'none';
@@ -165,6 +167,7 @@ const popupBtns = () => {
 
 const createPopUpData = (position) => {
   let html = '';
+
   html += '<div style="text-align: center;">';
   html += `${valueParser(position, 'ignition')}  -  `;
   html += valueParser(position, 'motion');
@@ -206,6 +209,10 @@ const createPopUpData = (position) => {
     html += valueParser(window.devices[position.deviceId], 'simType');
     html += '<br />';
     html += valueParser(window.devices[position.deviceId], 'simKey');
+    html += '<br />';
+    if (hasPassedTime(new Date(position.fixTime || new Date()), 40)) {
+      html += `<b style="font-weight: bold; color: red;">* ${dateDifference(new Date(position.fixTime || new Date()), new Date(), ['days', 'hours', 'minutes'])} sin reportar</b>`;
+    }
   }
 
   html += '<br />';
@@ -219,8 +226,8 @@ const createPopUpData = (position) => {
   }
 
   html += '<br />';
-  html += valueParser(position, 'policy');
-  html += valueParser(position, 'expiration');
+  // html += valueParser(position, 'policy');
+  // html += valueParser(position, 'expiration');
   html += '</div>';
   html += '</div>';
 
@@ -299,9 +306,7 @@ const createPopUpContent = (position, showHeaderButtons = true, showFooterButton
     const user = window.getUser();
     // sections
     let html = '';
-    if (hasPassedTime(new Date(position.fixTime || new Date()), 40)) {
-      return createPopUpDataError(position);
-    }
+
     html += '<div align="center" style="text-align: center !important;text-transform: uppercase !important;">';
     // header buttons
     if (showHeaderButtons && !user.deviceReadonly) {
