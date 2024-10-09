@@ -9,6 +9,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-eval */
+/* eslint-disable no-bitwise */
 const requestCache = {};
 const alarmTranslator = (alarm) => {
   switch (alarm.toUpperCase()) {
@@ -415,6 +416,11 @@ export const attConverter = (obj, attribute) => {
       const value = obj.simKey;
       return value || null;
     }
+    case 'duration': {
+      const value = attVariantsEvaluator(obj, attribute);
+      // return `${Math.floor(value / 3600000)}H ${Math.floor((value % 3600000) / 60000)}m` || null;
+      return dateDifference(new Date(), new Date().setDate(), ['hours', 'minutes'], value) || null;
+    }
     default: {
       const value = attVariantsEvaluator(obj, attribute);
       return value || null;
@@ -530,6 +536,8 @@ export const valueParser = (obj, value) => {
       return `<b style="font-weight: bold;text-transform: uppercase;">Hora inicial:</b> ${attConverter(obj, value)} `;
     case 'endTime':
       return `<b style="font-weight: bold;text-transform: uppercase;">Hora final:</b> ${attConverter(obj, value)} `;
+    case 'duration':
+      return `<b style="font-weight: bold;text-transform: uppercase;">Duración:</b> ${attConverter(obj, value)} `;
     case 'simType':
       return `<b style="font-weight: bold;text-transform: uppercase;">Tipo de sim:</b> ${attConverter(obj, value)} `;
     case 'simKey':
@@ -823,8 +831,8 @@ export class TreeWalker {
   }
 }
 
-export const dateDifference = (date1, date2, timeframes = ['years', 'months', 'days', 'hours', 'minutes', 'seconds']) => {
-  const diff = Math.abs(date2 - date1);
+export const dateDifference = (date1, date2, timeframes = ['years', 'months', 'days', 'hours', 'minutes', 'seconds'], epoch = null) => {
+  const diff = epoch || Math.abs(date2 - date1);
   let remaining = diff;
 
   const msPer = {
@@ -865,3 +873,5 @@ export const dateDifference = (date1, date2, timeframes = ['years', 'months', 'd
 
   return formattedResult || ''; // If all values are zero, return a default message
 };
+
+export const randomColor = () => '#000000'.replace(/0/g, () => (~~(Math.random() * 16)).toString(16));

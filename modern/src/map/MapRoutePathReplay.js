@@ -46,7 +46,7 @@ const MapRoutePath = ({ name, positions, coordinates, values }) => {
       },
       paint: {
         'line-color': ['get', 'color'],
-        'line-width': 8,
+        'line-width': 12,
       },
     });
     if (name) {
@@ -132,18 +132,6 @@ const MapRoutePath = ({ name, positions, coordinates, values }) => {
       },
     }))];
 
-    // map.getSource(id)?.setData({
-    //   type: 'Feature',
-    //   geometry: {
-    //     type: 'LineString',
-    //     coordinates,
-    //   },
-    //   properties: {
-    //     name,
-    //     color: reportColor,
-    //   },
-    // });
-    // Set the data with the array of features
     map.getSource(id)?.setData({
       type: 'FeatureCollection',
       features,

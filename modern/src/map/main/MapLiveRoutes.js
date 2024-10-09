@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import { useId, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useTheme } from '@mui/styles';
@@ -15,6 +16,7 @@ const MapLiveRoutes = () => {
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
 
   const history = useSelector((state) => state.session.history);
+  const user = useSelector((state) => state.session.user);
 
   useEffect(() => {
     if (type !== 'none') {
@@ -38,7 +40,7 @@ const MapLiveRoutes = () => {
         },
         paint: {
           'line-color': ['get', 'color'],
-          'line-width': 2,
+          'line-width': user.attributes.liveRouteWidth || 2,
         },
       });
 
@@ -51,7 +53,7 @@ const MapLiveRoutes = () => {
         }
       };
     }
-    return () => {};
+    return () => { };
   }, [type]);
 
   useEffect(() => {
@@ -70,7 +72,7 @@ const MapLiveRoutes = () => {
             coordinates: history[deviceId],
           },
           properties: {
-            color: devices[deviceId].attributes['web.reportColor'] || theme.palette.colors.geometry,
+            color: user.attributes.liveRouteColor || devices[deviceId].attributes['web.reportColor'] || theme.palette.colors.geometry,
           },
         })),
       });

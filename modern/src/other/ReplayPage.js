@@ -159,6 +159,7 @@ const ReplayPage = () => {
   });
 
   window.deviceName = deviceName;
+  window.Popup = Popup;
 
   const changeIndex = useCallback((_, index) => {
     setIndex(index);
@@ -223,14 +224,15 @@ const ReplayPage = () => {
   }, [setIndex]);
 
   const onMarkerClick = useCallback((_, deviceId, map, event) => {
-    if (event === undefined) return;
-    const stopsMarkers = map.queryRenderedFeatures(event.point, { layers: ['stops-layer'] });
-    stopsMarkers.forEach((stop) => (new Popup()
-      .setMaxWidth('400px')
-      .setOffset(40)
-      .setHTML(createPopUpSimple(stops[stop.properties.index]))
-      .setLngLat([stops[stop.properties.index].longitude, stops[stop.properties.index].latitude])
-      .addTo(map)));
+    // if (event === undefined) return;
+    // const stopsMarkers = map.queryRenderedFeatures(event.point, { layers: ['stops-layer'] });
+
+    // stopsMarkers.forEach((stop) => (new Popup()
+    //   .setMaxWidth('400px')
+    //   .setOffset(40)
+    //   .setHTML(createPopUpSimple(stops[stop.properties.index]))
+    //   .setLngLat([stops[stop.properties.index].longitude, stops[stop.properties.index].latitude])
+    //   .addTo(map)));
   }, [memoPositions, memoStops]);
 
   const changeSpeed = useCallback((_, value) => {
@@ -279,8 +281,6 @@ const ReplayPage = () => {
 
       setPositions(positions);
       setStops(stops);
-      // const m = new Marker();
-      // setMarker(m);
       if (positions.length) {
         setExpanded(false);
       } else {
@@ -307,7 +307,6 @@ const ReplayPage = () => {
         <MapRoutePath positions={positions} values={value} />
         <MapRoutePoints positions={positions} onClick={onPointClick} replay />
         {index < memoPositions.length && (
-
           <MapPositions selectedPosition={positions[index]} positions={memoPositions} index={index} onClick={onMarkerClick} titleField="fixTime" replay showStatus stops={memoStops} />
         )}
       </MapView>
@@ -326,6 +325,7 @@ const ReplayPage = () => {
         max={memoPositions.length}
         expanded={expanded}
         value={value}
+        stops={stops}
       />
       {/* {showCard && index < positions.length && (
         <StatusCard

@@ -222,8 +222,8 @@ const MapPositions = ({
         layout: {
           'icon-image': 'replay-stop',
           'icon-size': iconScale,
-          'icon-allow-overlap': true,
-          'text-allow-overlap': true,
+          'icon-offset': [0, -30],
+          'icon-allow-overlap': false,
           'text-anchor': 'bottom',
           'text-offset': [0, -2 * iconScale],
           'text-font': findFonts(map),
@@ -322,7 +322,7 @@ const MapPositions = ({
     map.on('mouseleave', id, onMouseLeave);
     map.on('mouseenter', clusters, onMouseEnter);
     map.on('mouseleave', clusters, onMouseLeave);
-    map.on('click', id, onMarkerClick);
+    map.on('click', 'stops', onMarkerClick);
     map.on('click', clusters, onClusterClick);
     map.on('click', onMapClick);
     // map.on('moveend', () => setRecalculate(new Date()));
@@ -345,7 +345,7 @@ const MapPositions = ({
       map.off('mouseleave', id, onMouseLeave);
       map.off('mouseenter', clusters, onMouseEnter);
       map.off('mouseleave', clusters, onMouseLeave);
-      map.off('click', id, onMarkerClick);
+      map.off('click', 'stops', onMarkerClick);
       map.off('click', clusters, onClusterClick);
       map.off('click', onMapClick);
       // map.off('moveend', id, () => setRecalculate(new Date()));
@@ -367,7 +367,6 @@ const MapPositions = ({
 
       return true;
     });
-    console.log(positions);
 
     // if (replay && map.getSource(id)?.)
     map.getSource(id)?.setData(dataGenerator(visiblePositions));

@@ -175,7 +175,7 @@ const HourPage = () => {
               onChange={(event) => setName(event.target.value)}
               label={t('sharedName')}
             />
-
+            <TextField multiline rows={4 + items.length} onChange={((event) => console.log(event.target.value.split('\n')))} />
             {saving ? (
               <Box sx={{ width: '100%' }}>
                 <LinearProgress variant="determinate" value={progress} />

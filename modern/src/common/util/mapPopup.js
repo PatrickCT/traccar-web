@@ -1,5 +1,6 @@
 /* eslint-disable no-empty */
 /* eslint-disable no-unused-vars */
+/* eslint-disable prefer-arrow-callback */
 import {
   attConverter,
   hasPassedTime,
@@ -122,14 +123,38 @@ window.confirmDialog = (type) => {
   }).show();
 };
 
-function openInNewTab(url) {
+const openInNewTab = (url) => {
   const win = window.open(url, '_blank');
   win.focus();
-}
+};
+
 export const generateRoute = () => {
   let url = '';
   url = `https://www.google.com/maps/place/${window.position.latitude},${window.position.longitude}`;
   openInNewTab(url);
+};
+
+export const streetView = (position = null) => {
+  const pos = position || window.replayPosition || window.position;
+  if (pos.latitude != null && pos.longitude != null) {
+    window.jsPanel.create({
+      theme: {
+        colorHeader: '#fff',
+        bgPanel: 'rgb(49,80,126)',
+      },
+      content: `<iframe src="../VistaCalle.html?lat=${pos.latitude}&lng=${pos.longitude}" style="position:relative; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">Your browser doesnt support iframes</iframe>`,
+      contentSize: {
+        width: window.innerWidth * (isMobile() ? 0.9 : 0.6),
+        height: window.innerHeight * (isMobile() ? 0.8 : 0.6),
+      },
+      headerTitle: 'Vista de calle',
+      headerControls: {
+        minimize: 'remove',
+        smallify: 'remove',
+      },
+      top: '56px',
+    });
+  }
 };
 
 const popupBtns = () => {
@@ -137,27 +162,27 @@ const popupBtns = () => {
   html += "<div style='display: table; margin: auto'>";
 
   html += "<div style='float: left; padding: 2px;' >";
-  html += '<a class="link-google-maps" onclick="(function(){engineLock();window.noInfoPanel?.close();}());" ><img src="./././images/botones-popup/apagar.svg" width="35" height="35" style="border-radius:6px;"/></a>';
+  html += '<a class="link-google-maps" onclick="(function(){engineLock();}());" ><img src="./././images/botones-popup/apagar.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
 
   html += "<div style='float: left; padding: 2px;' >";
-  html += '<a class="link-google-maps" onclick="(function(){engineReactivate();window.noInfoPanel?.close();}());" ><img src="./././images/botones-popup/encender.svg" width="35" height="35" style="border-radius:6px;"/></a>';
+  html += '<a class="link-google-maps" onclick="(function(){engineReactivate();}());" ><img src="./././images/botones-popup/encender.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
 
   html += "<div style='float: left; padding: 2px;' >";
-  html += "<a class='link-google-maps' onclick='(function(){streetView();window.noInfoPanel?.close();}());' ><img src='./././images/botones-popup/calle.svg' width='35' height='35' style='border-radius:6px;'/></a>";
+  html += "<a class='link-google-maps' onclick='(function(){streetView();}());' ><img src='./././images/botones-popup/calle.svg' width='35' height='35' style='border-radius:6px;'/></a>";
   html += '</div>';
 
   html += "<div style='float: left; padding: 2px;'>";
-  html += '<a class="link-google-maps" onclick="(function(){generateRoute();window.noInfoPanel?.close();}());"><img src="./././images/botones-popup/maps.svg" width="35" height="35" style="border-radius:6px;"/></a>';
+  html += '<a class="link-google-maps" onclick="(function(){generateRoute();}());"><img src="./././images/botones-popup/maps.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
 
   html += "<div style='float: left; padding: 2px;' >";
-  html += "<a class='link-google-maps' onclick='(function(){navigate(`/reports/route`);window.noInfoPanel?.close();}());'><img src='./././images/botones-popup/recorrido.svg' width='35' height='35' style='border-radius:6px;'/></a>";
+  html += "<a class='link-google-maps' onclick='(function(){navigate(`/reports/route`);}());'><img src='./././images/botones-popup/recorrido.svg' width='35' height='35' style='border-radius:6px;'/></a>";
   html += '</div>';
 
   html += "<div id='div_replay' style='float: left; padding:2px;' >";
-  html += '<a class="link-google-maps" onClick="(function(){navigate(`/replay`);window.noInfoPanel?.close();}());"><img src="./././images/botones-popup/replay.svg" width="35" height="35" style="border-radius:6px;"/></a>';
+  html += '<a class="link-google-maps" onClick="(function(){navigate(`/replay`);}());"><img src="./././images/botones-popup/replay.svg" width="35" height="35" style="border-radius:6px;"/></a>';
   html += '</div>';
 
   html += '</div>';
@@ -273,33 +298,32 @@ const createPopUpDataError = (position) => {
 
 const popupButton = (icon, onclick, restrictions = [], overrides = { w: 14, h: 14 }) => {
   if (restrictions.some((value) => value)) return '';
+
   const baseUrlIcon = `${createBaseURL()}${icon}`;
   return `
-    <a
-      onclick="((${onclick})());"
-    >
+    <a onclick="((${onclick})());">
       <img src="${baseUrlIcon}" width="${overrides.w}" height="${overrides.h}" />
-    </a>`;
+    </a > `;
 };
 
 const createPopUpHeadersButtons = (position) => `
-  <div align='center' style='text-align: center;'>
+  <div align = 'center' style = 'text-align: center;' >
     ${popupButton('/images/botones-popup/connection.svg', (() => window.navigate(`/settings/device/${position.deviceId}/connections`)))}
     ${popupButton('/images/botones-popup/edit.svg', (() => window.navigate(`/settings/device/${position.deviceId}`)))}
     ${popupButton('/images/botones-popup/command.svg', (() => window.navigate(`/settings/device/${position.deviceId}/command`)), [!isAdmin()])}
     ${popupButton('/images/botones-popup/position.svg', (() => window.navigate(`/position/${position.id}`)), [!isAdmin()])}
     ${popupButton('/images/botones-popup/accumulator.svg', (() => window.navigate(`/settings/accumulators/${position.deviceId}`)))}
-  </div>`;
+  </div> `;
 
 const createPopUpFooterButtons = () => `
-    <div align='center' style='text-align: center;'>
-    ${popupButton('/images/botones-popup/apagar.svg', (() => { window.engineLock(); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/encender.svg', (() => { window.engineReactivate(); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/calle.svg', (() => { window.streetView(); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/maps.svg', (() => { window.generateRoute(); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/recorrido.svg', (() => { window.navigate('/reports/route'); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/replay.svg', (() => { window.navigate('/replay'); window.noInfoPanel?.close(); }), [!isAdmin()], { w: 35, h: 35 })}
-    </div>`;
+  <div name = 'pufb' align = 'center' style = 'text-align: center;' >
+    ${popupButton('/images/botones-popup/apagar.svg', (() => { window.engineLock(); }), [], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/encender.svg', (() => { window.engineReactivate(); }), [], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/calle.svg', (() => { window.streetView(); }), [], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/maps.svg', (() => { window.generateRoute(); }), [], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/recorrido.svg', (() => { window.navigate('/reports/route'); }), [], { w: 35, h: 35 })}
+    ${popupButton('/images/botones-popup/replay.svg', (() => { window.navigate('/replay'); }), [], { w: 35, h: 35 })}
+    </div> `;
 
 const createPopUpContent = (position, showHeaderButtons = true, showFooterButtons = true) => {
   try {
@@ -320,7 +344,8 @@ const createPopUpContent = (position, showHeaderButtons = true, showFooterButton
     // policy
     // footer bottons
     if (showFooterButtons && !user.deviceReadonly) {
-      html += createPopUpFooterButtons();
+      // html += createPopUpFooterButtons();
+      html += popupBtns();
     }
     return html;
   } catch (_) {
@@ -337,7 +362,7 @@ export const createPopUpReport = (position) => {
   let html = '<div>';
   html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
 
-  html += `<h3><b>${attConverter(position, 'name')}</b></h3></div>`;
+  html += `<h3> <b>${attConverter(position, 'name')}</b></h3></div> `;
   html += valueParser(position, 'ignition');
   html += '<br />';
   html += valueParser(position, 'motion');
@@ -376,7 +401,7 @@ export const createPopUpReportRoute = (position) => {
   let html = '<div>';
   html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
 
-  html += `<h3 style="margin: 0px"><b>${window.deviceName || ''}</b></h3></div>`;
+  html += `<h3 style = "margin: 0px" > <b>${window.deviceName || ''}</b></h3></div> `;
   html += valueParser(position, 'ignition');
   html += '<br />';
   html += valueParser(position, 'motion');
@@ -418,36 +443,20 @@ export const createPopUpReportRoute = (position) => {
 };
 
 export const createPopUpSimple = (position) => {
+  window.replayPosition = position;
   let html = '<div>';
-
+  window.sv = (pos) => window.streetView(pos);
   html += valueParser(position, 'startTime');
   html += '<br />';
   html += valueParser(position, 'endTime');
   html += '<br />';
+  html += valueParser(position, 'duration');
+  html += '<br />';
   html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
   html += '<br>';
+  html += "<div style='float: left; padding: 2px;' >";
+  html += "<a class='link-google-maps' onclick='(function(){streetView();}());' ><img src='./././images/botones-popup/calle.svg' width='35' height='35' style='border-radius:6px;'/></a>";
+  html += '</div>';
   html += '</div>';
   return html;
-};
-
-export const streetView = () => {
-  if (window.position.latitude != null && window.position.longitude != null) {
-    window.jsPanel.create({
-      theme: {
-        colorHeader: '#fff',
-        bgPanel: 'rgb(49,80,126)',
-      },
-      content: `<iframe src="../VistaCalle.html?lat=${window.position.latitude}&lng=${window.position.longitude}" style="position:relative; top:0; left:0; bottom:0; right:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;">Your browser doesnt support iframes</iframe>`,
-      contentSize: {
-        width: window.innerWidth * (isMobile() ? 0.9 : 0.6),
-        height: window.innerHeight * (isMobile() ? 0.8 : 0.6),
-      },
-      headerTitle: 'Vista de calle',
-      headerControls: {
-        minimize: 'remove',
-        smallify: 'remove',
-      },
-      top: '56px',
-    });
-  }
 };

@@ -2,10 +2,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-rest-params */
 /* eslint-disable react/no-this-in-sfc */
-
+import { Popup } from 'maplibre-gl';
 import { useNavigate } from 'react-router-dom';
 import {
-  Box, Button, IconButton, MenuItem, Paper, Select, Slider, Toolbar, Typography, useMediaQuery, useTheme,
+  Box, Button, IconButton, ListItemText, MenuItem, Paper, Select, Slider, Toolbar, Typography, useMediaQuery, useTheme, ListItemButton, ListItemIcon,
 } from '@mui/material';
 import React, {
   memo, useEffect, useState,
@@ -19,9 +19,12 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import FastForwardIcon from '@mui/icons-material/FastForward';
 import FastRewindIcon from '@mui/icons-material/FastRewind';
+import { KeyboardArrowDownOutlined } from '@mui/icons-material';
 import ReportFilter from '../reports/components/ReportFilter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import Modal from '../main/components/BasicModal';
+
+import { createPopUpSimple, streetView } from '../common/util/mapPopup';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -222,12 +225,13 @@ const DiscreteSlider = (props) => {
 };
 
 const ReplaySideBar = ({
-  setExpanded, setIndex, setPlaying, handleDownload, handleChange, handleSubmit, changeSpeed, index, max, playing, expanded,
+  setExpanded, setIndex, setPlaying, handleDownload, handleChange, handleSubmit, changeSpeed, index, max, playing, expanded, stops,
 }) => {
   const [speed, setSpeed] = useState(500);
   const [value, setValue] = React.useState([50, 100]);
   const [showModalSpeed, setShowModalSpeed] = useState(false);
   const [showBack, setShowBack] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const classes = useStyles({ values: value });
   const navigate = useNavigate();
@@ -236,6 +240,7 @@ const ReplaySideBar = ({
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
   useEffect(() => {
+    window.streetView = streetView;
     setTimeout(() => setShowBack(document.querySelectorAll('[data-testid="ArrowBackIcon"]').length <= 1), 10);
   }, []);
 
@@ -371,6 +376,113 @@ const ReplaySideBar = ({
               <div style={{ width: '20px', height: '20px', backgroundColor: 'transparent', marginRight: '80%' }} />
               <Button onClick={() => setShowModalSpeed(true)}>Cambiar</Button>
             </div>
+          </Box>
+        </Paper>
+      )}
+
+      {!expanded && desktop && (
+        <Paper className={classes.content} square>
+          <Box
+            sx={[
+              open
+                ? {
+                  bgcolor: 'rgba(255, 255, 255, 1)',
+                }
+                : {
+                  bgcolor: null,
+                },
+              open
+                ? {
+                  pb: 2,
+                }
+                : {
+                  pb: 0,
+                },
+            ]}
+          >
+            <ListItemButton
+              alignItems="flex-start"
+              onClick={() => setOpen(!open)}
+              sx={[
+                {
+                  px: 3,
+                  pt: 2.5,
+                },
+                open
+                  ? {
+                    pb: 0,
+                  }
+                  : {
+                    pb: 2.5,
+                  },
+                open
+                  ? {
+                    '&:hover, &:focus': {
+                      '& svg': {
+                        opacity: 1,
+                      },
+                    },
+                  }
+                  : {
+                    '&:hover, &:focus': {
+                      '& svg': {
+                        opacity: 1,
+                      },
+                    },
+                  },
+              ]}
+            >
+              <ListItemText
+                primary="Paradas"
+                primaryTypographyProps={{
+                  fontSize: 15,
+                  fontWeight: 'medium',
+                  lineHeight: '20px',
+                  mb: '2px',
+                }}
+                sx={{ my: 0 }}
+              />
+              <KeyboardArrowDownOutlined
+                sx={[
+                  {
+                    mr: -1,
+                    opacity: 0,
+                    transition: '0.2s',
+                  },
+                  open
+                    ? {
+                      transform: 'rotate(-180deg)',
+                    }
+                    : {
+                      transform: 'rotate(0)',
+                    },
+                ]}
+              />
+            </ListItemButton>
+            {open &&
+              stops.map((item) => (
+                <ListItemButton
+                  key={item.positionId}
+                  sx={{ py: 0, minHeight: 32, color: 'black' }}
+                  onClick={(() => {
+                    Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item.remove());
+                    new Popup({ closeOnClick: true, closeButton: false })
+                      .setMaxWidth('400px')
+                      .setOffset(40)
+                      .setHTML(createPopUpSimple(item))
+                      .setLngLat([item.longitude, item.latitude])
+                      .addTo(window.map);
+                  })}
+                >
+                  <ListItemIcon sx={{ color: 'inherit' }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.deviceName}
+                    primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
+                  />
+                </ListItemButton>
+              ))}
           </Box>
         </Paper>
       )}

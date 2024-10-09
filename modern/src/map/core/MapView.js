@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import 'maplibre-gl/dist/maplibre-gl.css';
 import maplibregl from 'maplibre-gl';
 import React, {
@@ -43,8 +44,6 @@ const updateReadyValue = (value) => {
 };
 
 const initMap = async () => {
-  console.log('init map', ready);
-
   if (ready) return;
   try {
     if (!map.hasImage('background')) {
@@ -66,6 +65,12 @@ const initMap = async () => {
         throw err;
       }
       map.addImage('arrowW', image);
+    });
+    map.loadImage('../images/arrowB.png', (err, image) => {
+      if (err) {
+        throw err;
+      }
+      map.addImage('arrowB', image);
     });
     map.loadImage('../images/replay-neutral.png', (err, image) => {
       if (err) {
@@ -105,9 +110,7 @@ const initMap = async () => {
       map.addImage('replay-stop', image);
     });
     updateReadyValue(true);
-    console.log(ready);
   } catch (error) {
-    console.warn(error);
   }
 };
 
@@ -116,7 +119,6 @@ map.addControl(new maplibregl.NavigationControl());
 const switcher = new SwitcherControl(
   () => updateReadyValue(false),
   (styleId) => {
-    console.log(styleId);
     savePersistedState('selectedMapStyle', styleId);
   },
   () => {

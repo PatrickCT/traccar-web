@@ -194,6 +194,10 @@ const MainPage = () => {
 
     const intervalId = setInterval(checkScriptLoaded, 100);
 
+    if (user.attributes.debug && window.screenLog) {
+      window.screenLog.init({ autoScroll: true });
+    }
+
     // Clean up the function when the component unmounts
     return () => {
       delete window.navigate;

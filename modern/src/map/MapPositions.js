@@ -45,7 +45,7 @@ const MapPositions = ({
   const devices = useSelector((state) => state.devices.items);
   window.devices = useSelector((state) => state.devices.items);
 
-  const mapCluster = useAttributePreference('mapCluster', true);
+  const mapCluster = useAttributePreference('mapCluster', false);
   const hours12 = usePreference('twelveHourFormat');
   const directionType = useAttributePreference('mapDirection', 'selected');
 

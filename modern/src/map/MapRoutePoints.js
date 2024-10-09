@@ -17,7 +17,7 @@ const MapRoutePoints = ({
 
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
-  const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
+  const iconScale = useAttributePreference('iconScale', desktop ? 0.85 : 1);
 
   const onMouseEnter = () => map.getCanvas().style.cursor = 'pointer';
   const onMouseLeave = () => map.getCanvas().style.cursor = '';
@@ -75,37 +75,12 @@ const MapRoutePoints = ({
       },
     });
 
-    // map.addLayer({
-    //   id,
-    //   type: 'circle',
-    //   source: id,
-    //   paint: {
-    //     'circle-radius': 5,
-    //     'circle-color': theme.palette.colors.geometry,
-    //   },
-    // });
-
-    // map.addLayer({
-    //   id: clusters,
-    //   type: 'symbol',
-    //   source: id,
-    //   filter: ['has', 'point_count'],
-    //   layout: {
-    //     'icon-image': 'cluster',
-    //     'icon-size': iconScale,
-    //     'icon-rotate': ['get', 'course'],
-    //     'icon-rotation-alignment': 'map',
-    //     'symbol-placement': 'point',
-    //     'icon-allow-overlap': true,
-    //   },
-    // });
-
     map.addLayer({
       id,
       type: 'symbol',
       source: id,
       layout: {
-        'icon-image': replay ? 'arrowW' : 'arrow',
+        'icon-image': replay ? 'arrowB' : 'arrow',
         'icon-size': replay ? iconScale : 0.4,
         'icon-allow-overlap': true,
         'icon-rotate': ['get', 'course'],

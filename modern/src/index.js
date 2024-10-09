@@ -1,12 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
 import React from 'react';
+
+// special libs
+import { driver } from 'driver.js';
+import screenLog from 'screenlog';
+import Notiflix from 'notiflix';
+
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { CssBaseline, ThemeProvider, StyledEngineProvider } from '@mui/material';
-import Notiflix from 'notiflix';
-import { driver } from 'driver.js';
 import store from './store';
 import { LocalizationProvider } from './common/components/LocalizationProvider';
 import ErrorHandler from './common/components/ErrorHandler';
@@ -27,6 +31,7 @@ import './resources/libs/jsPanel/extensions/dialog/jspanel.dialog.min.css';
 import { jsPanel } from './resources/libs/jsPanel/jspanel.min';
 import { loadModal } from './resources/libs/jsPanel/extensions/modal/jspanel.modal';
 import { loadDialog } from './resources/libs/jsPanel/extensions/dialog/jspanel.dialog';
+
 import InternalTools from './resources/libs/self/internal';
 import './resources/libs/self/heartbeat.min';
 import 'driver.js/dist/driver.css';
@@ -45,6 +50,7 @@ setTimeout(async () => {
   window.InternalTools = InternalTools;
   window.driver = driver;
   window.alertify = alertify;
+  window.screenlog = screenLog;
   loadModal();
   loadDialog();
   await preloadImages();
