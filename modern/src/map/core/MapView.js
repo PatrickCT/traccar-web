@@ -17,6 +17,12 @@ element.style.boxSizing = 'initial';
 export const map = new maplibregl.Map({
   container: element,
   attributionControl: false,
+  version: 8,
+  name: 'Empty',
+  metadata: {
+    'mapbox:autocomposite': true,
+  },
+  glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
 });
 
 let ready = false;
@@ -37,73 +43,82 @@ const updateReadyValue = (value) => {
 };
 
 const initMap = async () => {
-  if (ready) return;
-  if (!map.hasImage('background')) {
-    Object.entries(mapImages).forEach(([key, value]) => {
-      map.addImage(key, value, {
-        pixelRatio: window.devicePixelRatio,
-        ...(key === 'background' ? ({ sdf: true }) : ({})),
-      });
-    });
-  }
-  map.loadImage('../images/arrow.png', (err, image) => {
-    if (err) {
-      return;
-    }
-    map.addImage('arrow', image);
-  });
-  map.loadImage('../images/arrowW.png', (err, image) => {
-    if (err) {
-      return;
-    }
-    map.addImage('arrowW', image);
-  });
-  map.loadImage('../images/replay-neutral.png', (err, image) => {
-    if (err) {
-      return;
-    }
-    map.addImage('replay-neutral', image);
-  });
-  map.loadImage('../images/replay-positive.png', (err, image) => {
-    if (err) {
-      return;
-    }
-    map.addImage('replay-positive', image);
-  });
-  map.loadImage('../images/replay-negative.png', (err, image) => {
-    if (err) {
-      return;
-    }
-    map.addImage('replay-negative', image);
-  });
-  // markadores playback fijos
-  map.loadImage('../images/p_start_en.png', (err, image) => {
-    if (err) {
-      return;
-    }
-    map.addImage('replay-start', image);
-  });
-  map.loadImage('../images/p_end_en.png', (err, image) => {
-    if (err) {
-      return;
-    }
-    map.addImage('replay-end', image);
-  });
-  map.loadImage('../images/stopicon.png', (err, image) => {
-    if (err) {
-      return;
-    }
-    map.addImage('replay-stop', image);
-  });
+  console.log('init map', ready);
 
-  updateReadyValue(true);
+  if (ready) return;
+  try {
+    if (!map.hasImage('background')) {
+      Object.entries(mapImages).forEach(([key, value]) => {
+        map.addImage(key, value, {
+          pixelRatio: window.devicePixelRatio,
+          ...(key === 'background' ? ({ sdf: true }) : ({})),
+        });
+      });
+    }
+    map.loadImage('../images/arrow.png', (err, image) => {
+      if (err) {
+        throw err;
+      }
+      map.addImage('arrow', image);
+    });
+    map.loadImage('../images/arrowW.png', (err, image) => {
+      if (err) {
+        throw err;
+      }
+      map.addImage('arrowW', image);
+    });
+    map.loadImage('../images/replay-neutral.png', (err, image) => {
+      if (err) {
+        throw err;
+      }
+      map.addImage('replay-neutral', image);
+    });
+    map.loadImage('../images/replay-positive.png', (err, image) => {
+      if (err) {
+        throw err;
+      }
+      map.addImage('replay-positive', image);
+    });
+    map.loadImage('../images/replay-negative.png', (err, image) => {
+      if (err) {
+        throw err;
+      }
+      map.addImage('replay-negative', image);
+    });
+    // markadores playback fijos
+    map.loadImage('../images/p_start_en.png', (err, image) => {
+      if (err) {
+        throw err;
+      }
+      map.addImage('replay-start', image);
+    });
+    map.loadImage('../images/p_end_en.png', (err, image) => {
+      if (err) {
+        throw err;
+      }
+      map.addImage('replay-end', image);
+    });
+    map.loadImage('../images/stopicon.png', (err, image) => {
+      if (err) {
+        throw err;
+      }
+      map.addImage('replay-stop', image);
+    });
+    updateReadyValue(true);
+    console.log(ready);
+  } catch (error) {
+    console.warn(error);
+  }
 };
 
 map.addControl(new maplibregl.NavigationControl());
 
 const switcher = new SwitcherControl(
   () => updateReadyValue(false),
-  (styleId) => savePersistedState('selectedMapStyle', styleId),
+  (styleId) => {
+    console.log(styleId);
+    savePersistedState('selectedMapStyle', styleId);
+  },
   () => {
     map.once('styledata', () => {
       const waiting = () => {

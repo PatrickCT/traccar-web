@@ -76,7 +76,7 @@ const MapGeofence = () => {
         }
       };
     }
-    return () => {};
+    return () => { };
   }, [mapGeofences]);
 
   useEffect(() => {

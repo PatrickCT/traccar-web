@@ -210,6 +210,7 @@ const MapPositions = ({
       type: 'symbol',
       source: id,
       filter: ['has', 'point_count'],
+      glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
       layout: {
         'icon-image': 'cluster',
         'icon-size': iconScale,

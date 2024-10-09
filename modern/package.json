@@ -8,6 +8,7 @@
     "@emotion/styled": "^11.13.0",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@mapbox/mapbox-gl-style-spec": "^14.7.1",
+    "@mapbox/point-geometry": "^1.1.0",
     "@maplibre/maplibre-gl-geocoder": "^1.7.0",
     "@material-ui/lab": "^4.0.0-alpha.61",
     "@mui/icons-material": "^6.1.2",

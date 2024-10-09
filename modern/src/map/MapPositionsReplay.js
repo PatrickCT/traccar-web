@@ -41,7 +41,7 @@ const MapPositions = ({
 
   const devices = useSelector((state) => state.devices.items);
 
-  const mapCluster = useAttributePreference('mapCluster', true);
+  const mapCluster = useAttributePreference('mapCluster', false);
   const hours12 = usePreference('twelveHourFormat');
   const directionType = useAttributePreference('mapDirection', 'selected');
 
@@ -68,8 +68,6 @@ const MapPositions = ({
       name: device?.name || '',
       fixTime: formatTime(position.fixTime, 'seconds', hours12),
       category: mapIconKey(device?.category),
-      // category: getStatusColor(device.status) === 'positive' ? mapIconKey(device.category) : mapIconKey('cross'),
-      // category: ((hasPassedTime(new Date(device.lastUpdate), 40) || hasPassedTime(new Date(position.fixTime), 40)) ? mapIconKey('cross') : (hasPassedTime(new Date(position.fixTime), 10) ? mapIconKey('stop') : mapIconKey(device.category))),
       color: showStatus ? (position.attributes.color || getStatusColor(device?.status)) : 'neutral',
       rotation: position.course,
       direction: true,
@@ -161,60 +159,6 @@ const MapPositions = ({
       },
     });
 
-    map.addSource('realTime', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: [],
-      },
-      cluster: mapCluster,
-      clusterMaxZoom: 14,
-      clusterRadius: 50,
-    });
-
-    map.addLayer({
-      id: 'realTime',
-      type: 'symbol',
-      source: 'realTime',
-      filter: ['!has', 'point_count'],
-      layout: {
-        'icon-image': `${(replay) ? 'replay-neutral' : '{category}-{color}'}`,
-        'icon-size': replay ? 0.08 : iconScale,
-        'icon-allow-overlap': true,
-        'text-field': `{${titleField || 'name'}}`,
-        'text-allow-overlap': true,
-        'text-anchor': 'bottom',
-        'text-offset': [0, -2 * iconScale],
-        'text-font': findFonts(map),
-        'text-size': 12,
-        'icon-rotate': replay ? ['get', 'rotation'] : ['case', ['==', ['get', 'rotate'], true], ['get', 'rotation'], 0],
-        // 'icon-rotate': ['get', 'rotation'],
-        'icon-rotation-alignment': 'map',
-      },
-      paint: {
-        'text-halo-color': 'white',
-        'text-halo-width': 1,
-      },
-    });
-
-    map.addLayer({
-      id: `${direction}2`,
-      type: 'symbol',
-      source: 'realTime',
-      filter: [
-        'all',
-        ['!has', 'point_count'],
-        ['==', 'direction', true],
-      ],
-      layout: {
-        'icon-image': 'direction',
-        'icon-size': iconScale,
-        'icon-allow-overlap': true,
-        'icon-rotate': ['get', 'rotation'],
-        'icon-rotation-alignment': 'map',
-      },
-    });
-
     map.addLayer({
       id: clusters,
       type: 'symbol',
@@ -269,32 +213,6 @@ const MapPositions = ({
         clusterMaxZoom: 14,
         clusterRadius: 50,
       });
-      // map.addSource('stops', {
-      //   type: 'geojson',
-      //   data: {
-      //     type: 'FeatureCollection',
-      //     features: [...stops.map((stop, index) => {
-      //       new Popup()
-      //         .setMaxWidth('500px')
-      //         .setHTML(createPopUpSimple(stop))
-      //         .setLngLat([stop.longitude, stop.latitude])
-      //         .addTo(map);
-      //       return ({
-      //         type: 'Feature',
-      //         geometry: {
-      //           type: 'Point',
-      //           coordinates: [stop.longitude, stop.latitude],
-      //         },
-      //         properties: {
-      //           index,
-      //         },
-      //       });
-      //     })],
-      //   },
-      //   cluster: mapCluster,
-      //   clusterMaxZoom: 14,
-      //   clusterRadius: 50,
-      // });
 
       map.addLayer({
         id: 'stops-layer',
@@ -449,6 +367,8 @@ const MapPositions = ({
 
       return true;
     });
+    console.log(positions);
+
     // if (replay && map.getSource(id)?.)
     map.getSource(id)?.setData(dataGenerator(visiblePositions));
   }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index]);

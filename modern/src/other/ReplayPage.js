@@ -3,10 +3,9 @@
 import React, {
   useState, useCallback, useRef, useEffect, useMemo, memo,
 } from 'react';
+import { LngLat, Popup } from 'maplibre-gl';
 import * as turf from '@turf/turf';
-import { LngLat, Popup } from 'mapbox-gl';
 import makeStyles from '@mui/styles/makeStyles';
-// import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import MapView, { map } from '../map/core/MapView';
 import MapRoutePath from '../map/MapRoutePathReplay';
@@ -16,14 +15,14 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useCatch } from '../reactHelper';
 import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
-// import StatusCard from '../common/components/StatusCard';
-// import { usePreference } from '../common/util/preferences';
 import {
+  createPopUp,
   createPopUpReportRoute, createPopUpSimple,
 } from '../common/util/mapPopup';
 import ReplaySideBar from './ReplaySideBar';
 import { attConverter } from '../common/util/utils';
 import { toast } from '../common/util/toasts';
+import './ReplayPage.css';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -118,7 +117,7 @@ async function downloadUrl(url) {
 }
 
 const ReplayPage = () => {
-  // Array.from(document.getElementsByClassName('mapboxgl-popup')).map((item) => item?.remove());
+  // Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item?.remove());
   const timerRef = useRef();
   const t = useTranslation();
   const classes = useStyles();
@@ -202,7 +201,8 @@ const ReplayPage = () => {
           p.getElement().id = positions[index].deviceId;
           window.marker = p;
           window.marker._content.style = `--custom_color: ${color}`;
-          window.marker._content.classList.add('mapboxgl-popup-content-custom');
+          window.marker._content.classList.remove('maplibregl-popup-content');
+          window.marker._content.classList.add('maplibregl-popup-content-custom');
         });
       } else {
         const p = new Popup()
@@ -213,7 +213,7 @@ const ReplayPage = () => {
           .addTo(map);
         p.getElement().id = positions[index].deviceId;
         window.marker = p;
-        window.marker._content.classList.add('mapboxgl-popup-content-green');
+        window.marker._content.classList.add('maplibregl-popup-content-green');
       }
     }
   }, [index]);
@@ -307,7 +307,8 @@ const ReplayPage = () => {
         <MapRoutePath positions={positions} values={value} />
         <MapRoutePoints positions={positions} onClick={onPointClick} replay />
         {index < memoPositions.length && (
-          <MapPositions positions={memoPositions} index={index} onClick={onMarkerClick} titleField="fixTime" replay showStatus stops={memoStops} />
+
+          <MapPositions selectedPosition={positions[index]} positions={memoPositions} index={index} onClick={onMarkerClick} titleField="fixTime" replay showStatus stops={memoStops} />
         )}
       </MapView>
       <MapCamera positions={positions} />
