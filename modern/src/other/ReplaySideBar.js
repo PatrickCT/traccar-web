@@ -6,6 +6,7 @@ import { Popup } from 'maplibre-gl';
 import { useNavigate } from 'react-router-dom';
 import {
   Box, Button, IconButton, ListItemText, MenuItem, Paper, Select, Slider, Toolbar, Typography, useMediaQuery, useTheme, ListItemButton, ListItemIcon,
+  Menu,
 } from '@mui/material';
 import React, {
   memo, useEffect, useState,
@@ -25,6 +26,7 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import Modal from '../main/components/BasicModal';
 
 import { createPopUpSimple, streetView } from '../common/util/mapPopup';
+import { dateDifference } from '../common/util/utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -233,6 +235,15 @@ const ReplaySideBar = ({
   const [showBack, setShowBack] = useState(true);
   const [open, setOpen] = useState(false);
 
+  const [anchorMenu, setAnchorMenu] = React.useState(null);
+  const openMenu = Boolean(anchorMenu);
+  const handleClick = (event) => {
+    setAnchorMenu(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorMenu(null);
+  };
+
   const classes = useStyles({ values: value });
   const navigate = useNavigate();
   const t = useTranslation();
@@ -316,40 +327,60 @@ const ReplaySideBar = ({
                 <MenuItem value={1000}>8X</MenuItem>
               </Select>
             </div>
-            {/* <Slider
-              className={classes.slider}
-              value={1001 - speed}
-              onChange={(_, value) => setSpeed(1001 - value)}
-              onChangeCommitted={(_, value) => changeSpeed(_, 1001 - value)}
-              max={1001}
-              step={1}
-              valueLabelDisplay="auto"
-              // marks={Array.from({ length: 1001 }, (_, index) => ({ value: 1000 - index }))}
-              marks={null}
-            /> */}
-            {/* <Slider
-              className={classes.slider}
-              classes={{ track: classes.track }}
-              value={value}
-              onChange={(_, value) => setValue(value)}
-              onChangeCommitted={handleChange}
-              max={200}
-              step={1}
-            /> */}
 
             {!desktop && (
-              <DiscreteSlider
-                reverse={false}
-                step={1}
-                values={value}
-                min={1}
-                max={200}
-                thresholdMarks={[value[0] / 2, value[1] / 2, 200 / 2]}
-                thresholdMarksTitles={['Normal', 'Rapido', 'Exceso']}
-                setValues={setValue}
-                onChangeCommitted={handleChange}
-                valueLabelDisplay={desktop ? 'on' : 'auto'}
-              />
+              <div className={classes.controls}>
+                <div style={{ width: '75%', marginRight: '20px' }}>
+                  <DiscreteSlider
+                    reverse={false}
+                    step={1}
+                    values={value}
+                    min={1}
+                    max={200}
+                    thresholdMarks={[value[0] / 2, value[1] / 2, 200 / 2]}
+                    thresholdMarksTitles={['Normal', 'Rapido', 'Exceso']}
+                    setValues={setValue}
+                    onChangeCommitted={handleChange}
+                    valueLabelDisplay={desktop ? 'on' : 'auto'}
+                  />
+                </div>
+                <div>
+                  <Button
+                    id="basic-button"
+                    aria-controls={openMenu ? 'basic-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={openMenu ? 'true' : undefined}
+                    onClick={handleClick}
+                  >
+                    Paradas
+                  </Button>
+                  <Menu
+                    id="basic-menu"
+                    anchorEl={anchorMenu}
+                    open={openMenu}
+                    onClose={handleClose}
+                    MenuListProps={{
+                      'aria-labelledby': 'basic-button',
+                    }}
+                  >
+                    {openMenu &&
+                      stops.map((item) => (
+                        <MenuItem onClick={() => {
+                          Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item.remove());
+                          new Popup({ closeOnClick: true, closeButton: false })
+                            .setMaxWidth('400px')
+                            .setOffset(40)
+                            .setHTML(createPopUpSimple(item))
+                            .setLngLat([item.longitude, item.latitude])
+                            .addTo(window.map);
+                        }}
+                        >
+                          {dateDifference(new Date(), new Date(), ['hours', 'minutes'], item.duration)}
+                        </MenuItem>
+                      ))}
+                  </Menu>
+                </div>
+              </div>
             )}
           </>
         ) : (
@@ -459,7 +490,7 @@ const ReplaySideBar = ({
                 ]}
               />
             </ListItemButton>
-            {open &&
+            {open && desktop &&
               stops.map((item) => (
                 <ListItemButton
                   key={item.positionId}
@@ -478,7 +509,7 @@ const ReplaySideBar = ({
                     {item.icon}
                   </ListItemIcon>
                   <ListItemText
-                    primary={item.deviceName}
+                    primary={dateDifference(new Date(), new Date(), ['hours', 'minutes'], item.duration)}
                     primaryTypographyProps={{ fontSize: 14, fontWeight: 'medium' }}
                   />
                 </ListItemButton>

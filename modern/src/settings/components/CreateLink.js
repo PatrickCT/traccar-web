@@ -44,7 +44,7 @@ const CreateLink = ({ selectedItem, setSelectedItem, onClick }) => {
         fullWidth
         value={selectedItem.name || ''}
         onChange={(event) => { setSelectedItem({ ...selectedItem, name: event.target.value }); event.target.focus(); }}
-        label={`${t('sharedName')}`}
+        label="Compartir con"
         required
       />
       <div style={{ marginBottom: '20px' }} />

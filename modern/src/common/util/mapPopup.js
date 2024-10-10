@@ -157,6 +157,54 @@ export const streetView = (position = null) => {
   }
 };
 
+const popupHeaderButtons = (position) => {
+  let html = '';
+  html += "<div align = 'center' style = 'text-align: center;' >";
+
+  html += `<a onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());"><img src="${createBaseURL()}${'/images/botones-popup/connection.svg'}" width="14" height="14" /></a>`;
+
+  html += `<a onclick="(function(){navigate('/settings/device/${position.deviceId}');}());"><img src="${createBaseURL()}${'/images/botones-popup/edit.svg'}" width="14" height="14" /></a>`;
+
+  html += `<a onclick="(function(){navigate('/settings/accumulators/${position.deviceId}');}());"><img src="${createBaseURL()}${'/images/botones-popup/accumulator.svg'}" width="14" height="14" /></a>`;
+
+  if (isAdmin()) {
+    html += `<a onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());"><img src="${createBaseURL()}${'/images/botones-popup/command.svg'}" width="14" height="14" /></a>`;
+
+    html += `<a onclick="(function(){navigate('/position/${position.id}');}());"><img src="${createBaseURL()}${'/images/botones-popup/position.svg'}" width="14" height="14" /></a>`;
+  }
+
+  html += '</div>';
+
+  return html;
+};
+
+const popupFooterButtons = (include = ['engineLock', 'engineResume', 'streetView', 'maps', 'report', 'replay']) => {
+  let html = '';
+  html += "<div align = 'center' style = 'text-align: center;' >";
+  if (include.includes('engineLock')) {
+    html += `<a onclick="(function(){engineLock();}());"><img src="${createBaseURL()}${'/images/botones-popup/apagar.svg'}" width="14" height="14" /></a>`;
+  }
+  if (include.includes('enginResume')) {
+    html += `<a onclick="(function(){engineReactivate();}());"><img src="${createBaseURL()}${'/images/botones-popup/encender.svg'}" width="14" height="14" /></a>`;
+  }
+  if (include.includes('streetView')) {
+    html += `<a onclick="(function(){streetView();}());"><img src="${createBaseURL()}${'/images/botones-popup/calle.svg'}" width="14" height="14" /></a>`;
+  }
+  if (include.includes('maps')) {
+    html += `<a onclick="(function(){generateRoute();}());"><img src="${createBaseURL()}${'/images/botones-popup/maps.svg'}" width="14" height="14" /></a>`;
+  }
+  if (include.includes('report')) {
+    html += `<a onclick="(function(){navigate('/reports/route');}());"><img src="${createBaseURL()}${'/images/botones-popup/recorrido.svg'}" width="14" height="14" /></a>`;
+  }
+  if (include.includes('replay')) {
+    html += `<a onclick="(function(){navigate('/replay');}());"><img src="${createBaseURL()}${'/images/botones-popup/replay.svg'}" width="14" height="14" /></a>`;
+  }
+
+  html += '</div>';
+
+  return html;
+};
+
 const popupBtns = () => {
   let html = '';
   html += "<div style='display: table; margin: auto'>";
@@ -263,67 +311,23 @@ const createPopUpData = (position) => {
   return html;
 };
 
-const createPopUpDataError = (position) => {
-  let html = '<div style="width: 250px;">';
-  if (isAdmin()) {
-    html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
-    html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());" ><img src="./././images/botones-popup/edit.svg" width="14" height="14" /></a>`;
-    html += ` <a class="link-google-maps" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());" ><img src="./././images/botones-popup/command.svg" width="14" height="14" /></a>`;
-    html += ` <a class="link-google-maps" onclick="(function(){navigate('/position/${position.id}');}());" ><img src="./././images/botones-popup/position.svg" width="14" height="14" /></a>`;
-
-    html += `<h3><b>${attConverter(position, 'name')}</b>`;
-    html += '</h3></div>';
-  }
-
-  html += `<b style="line-height: 20px;display:flex; font-weight: bold; color: white; text-transform: uppercase; text-shadow: 0 0 red;font-size: 22px; text-align: center;">Sin reportar, comuníquese con soporte</b><a href="https://wa.me/4434521162?text=Ayuda, mi dispositivo: ${attConverter(position, 'name')}, no esta reportando, usuario: ${window.getUser()?.name}, servidor: ${window.findServerName(window.location.hostname)}" style="left: 40%; position: relative;"><br><img src="./././images/botones-popup/whatsapp.svg" width="56" height="56" style="border-radius:6px;"/></a>`;
-
-  html += '<br />';
-  if (isAdmin()) {
-    html += valueParser(position, 'protocol');
-    html += '<br />';
-    html += valueParser(window.devices[position.deviceId], 'phone');
-    html += '<br />';
-    html += valueParser(window.devices[position.deviceId], 'imei');
-    html += '<br />';
-    html += valueParser(window.devices[position.deviceId], 'simType');
-    html += '<br />';
-    html += valueParser(window.devices[position.deviceId], 'simKey');
-  }
-  html += '<br />';
-  html += popupBtns();
-  html += '</div>';
-  html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
-  return html;
-};
-
-const popupButton = (icon, onclick, restrictions = [], overrides = { w: 14, h: 14 }) => {
+const popupButton = (icon, onClick, restrictions = [], overrides = { w: 14, h: 14 }) => {
   if (restrictions.some((value) => value)) return '';
 
   const baseUrlIcon = `${createBaseURL()}${icon}`;
+
+  // Convert the function to string properly to avoid it being treated as text
+  const onClickString = onClick.toString().replace(/^.*?\{(.*)\}$/, '$1').trim();
+
   return `
-    <a onclick="((${onclick})());">
-      <img src="${baseUrlIcon}" width="${overrides.w}" height="${overrides.h}" />
-    </a > `;
+    <a href="javascript:void(0);" onclick="(${onClickString})">
+      <img src="${baseUrlIcon}" width="${overrides.w}" height="${overrides.h}" style="border-radius: 6px;" />
+    </a>`;
 };
 
-const createPopUpHeadersButtons = (position) => `
-  <div align = 'center' style = 'text-align: center;' >
-    ${popupButton('/images/botones-popup/connection.svg', (() => window.navigate(`/settings/device/${position.deviceId}/connections`)))}
-    ${popupButton('/images/botones-popup/edit.svg', (() => window.navigate(`/settings/device/${position.deviceId}`)))}
-    ${popupButton('/images/botones-popup/command.svg', (() => window.navigate(`/settings/device/${position.deviceId}/command`)), [!isAdmin()])}
-    ${popupButton('/images/botones-popup/position.svg', (() => window.navigate(`/position/${position.id}`)), [!isAdmin()])}
-    ${popupButton('/images/botones-popup/accumulator.svg', (() => window.navigate(`/settings/accumulators/${position.deviceId}`)))}
-  </div> `;
+const createPopUpHeadersButtons = (position) => popupHeaderButtons(position);
 
-const createPopUpFooterButtons = () => `
-  <div name = 'pufb' align = 'center' style = 'text-align: center;' >
-    ${popupButton('/images/botones-popup/apagar.svg', (() => { window.engineLock(); }), [], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/encender.svg', (() => { window.engineReactivate(); }), [], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/calle.svg', (() => { window.streetView(); }), [], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/maps.svg', (() => { window.generateRoute(); }), [], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/recorrido.svg', (() => { window.navigate('/reports/route'); }), [], { w: 35, h: 35 })}
-    ${popupButton('/images/botones-popup/replay.svg', (() => { window.navigate('/replay'); }), [], { w: 35, h: 35 })}
-    </div> `;
+const createPopUpFooterButtons = (include = ['engineLock', 'engineResume', 'streetView', 'maps', 'report', 'replay']) => popupFooterButtons(include);
 
 const createPopUpContent = (position, showHeaderButtons = true, showFooterButtons = true) => {
   try {
@@ -344,8 +348,7 @@ const createPopUpContent = (position, showHeaderButtons = true, showFooterButton
     // policy
     // footer bottons
     if (showFooterButtons && !user.deviceReadonly) {
-      // html += createPopUpFooterButtons();
-      html += popupBtns();
+      html += createPopUpFooterButtons();
     }
     return html;
   } catch (_) {

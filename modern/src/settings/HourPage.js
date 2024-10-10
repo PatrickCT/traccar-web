@@ -1,11 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
-import dayjs from 'dayjs';
 import { useParams } from 'react-router-dom';
-import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import {
   Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, Table, TableHead, TableRow, TableCell, TableBody, Button, Box, LinearProgress,
 } from '@mui/material';
@@ -34,7 +30,6 @@ const HourPage = () => {
 
   const [item, setItem] = useState(null);
   const [items, setItems] = useState([]);
-  const [repeticion, setRepeticion] = useState(0);
 
   const [name, setName] = useState('');
 
@@ -42,20 +37,17 @@ const HourPage = () => {
   const [hoursStart, minutesStart] = ('00:00').split(':');
   newDateStart.setHours(hoursStart);
   newDateStart.setMinutes(minutesStart);
-  const [start, setStart] = useState(dayjs(newDateStart));
 
   const newDateEnd = new Date();
   const [hoursEnd, minutesEnd] = ('00:00').split(':');
   newDateEnd.setHours(hoursEnd);
   newDateEnd.setMinutes(minutesEnd);
-  const [end, setEnd] = useState(dayjs(newDateEnd));
 
-  const newDate = new Date();
   const [hours, minutes] = ('00:00').split(':');
   newDateEnd.setHours(hours);
   newDateEnd.setMinutes(minutes);
-  const [date, setDate] = useState(dayjs(newDate));
 
+  const [stringDates, setStringDates] = useState('');
   const [progress, setProgress] = useState(0);
   const [saving, setSaving] = useState(false);
 
@@ -88,42 +80,25 @@ const HourPage = () => {
       });
   }, []);
 
-  useEffect(() => {
-    setStart(dayjs(newDateStart));
-    setEnd(dayjs(newDateEnd));
-  }, []);
+  const parseTimeToDate = (timeString) => {
+    const [hours, minutes] = timeString.split(':').map(Number); // Split and convert to numbers
+    const now = new Date(); // Get the current date
 
-  const updateStart = (newstart) => {
-    setStart(dayjs(newstart));
-  };
+    // Set the hours and minutes
+    now.setHours(hours, minutes, 0, 0); // Setting seconds and milliseconds to 0
 
-  const updateEnd = (newend) => {
-    setEnd(dayjs(newend));
+    return now;
   };
 
   const hoursGenerator = () => {
-    if (repeticion <= 0) return;
-
-    const h = start.toDate();
-    const i = items;
-    h.setSeconds(0);
-    while (h < end.toDate()) {
-      i.push({ id: items.length + 1, hour: new Date(h), name });
-      h.setMinutes(h.getMinutes() + repeticion);
-    }
-    setItems(i);
     setItem(null);
-  };
-
-  const updateItem = (item) => {
-    setItem(item);
-    setDate(dayjs(item.hour));
-  };
-
-  const saveItem = () => {
-    const i = items.map((i) => (i.id === item.id ? item : i));
-    setItems(i);
-    setItem(null);
+    const dd = stringDates
+      .split('\n')
+      .filter((d) => d.includes(':'))
+      .map((d) => parseTimeToDate(d))
+      .sort((a, b) => a - b)
+      .map((d, i) => ({ id: i + 1, name, hour: d }));
+    setItems(dd);
   };
 
   const removeItem = (item) => {
@@ -131,9 +106,7 @@ const HourPage = () => {
     setItems(i);
     setItem(null);
     if (item.gpsid) {
-      fetch(`/api/horasalidas/${item.gpsid}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } })
-        .then((response) => response.json())
-        .then((data) => data);
+      fetch(`/api/horasalidas/${item.gpsid}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
     }
   };
 
@@ -148,6 +121,10 @@ const HourPage = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     }
   }, [saving]);
+
+  useEffect(() => {
+    setItems(() => [...items.map((i) => ({ ...i, name }))]);
+  }, [name]);
 
   const validate = () => name && items.length > 0;
 
@@ -175,61 +152,14 @@ const HourPage = () => {
               onChange={(event) => setName(event.target.value)}
               label={t('sharedName')}
             />
-            <TextField multiline rows={4 + items.length} onChange={((event) => console.log(event.target.value.split('\n')))} />
+            <TextField value={stringDates} multiline rows={4 + items.length} onChange={(evt) => setStringDates(evt.target.value)} />
             {saving ? (
               <Box sx={{ width: '100%' }}>
                 <LinearProgress variant="determinate" value={progress} />
               </Box>
             ) : (
               <FormControl fullWidth>
-                <TextField onChange={(event) => setRepeticion(Number(event.target.value))} label="Repetición" />
-                <br />
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={['TimePicker', 'TimePicker']}>
-                    <DemoItem>
-                      <TimePicker
-                        label={t('reportStartTime')}
-                        value={start}
-                        onChange={(newValue) => updateStart(newValue)}
-                      />
-                    </DemoItem>
-
-                  </DemoContainer>
-                </LocalizationProvider>
-                <br />
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={['TimePicker', 'TimePicker']}>
-                    <DemoItem>
-                      <TimePicker
-                        label={t('reportEndTime')}
-                        value={end}
-                        onChange={(newValue) => updateEnd(newValue)}
-                      />
-                    </DemoItem>
-
-                  </DemoContainer>
-                </LocalizationProvider>
-
-                <br />
                 <Button onClick={hoursGenerator}>Generar</Button>
-
-                {item.id && (
-                  <>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DemoContainer components={['TimePicker', 'TimePicker']}>
-                        <DemoItem>
-                          <TimePicker
-                            label={t('reportEndTime')}
-                            value={date}
-                            onChange={(newValue) => { setItem({ ...item, hour: dayjs(newValue) }); setDate(dayjs(newValue)); }}
-                          />
-                        </DemoItem>
-
-                      </DemoContainer>
-                    </LocalizationProvider>
-                    <Button onClick={(() => saveItem())}>Guardar</Button>
-                  </>
-                )}
 
               </FormControl>
             )}
@@ -252,7 +182,7 @@ const HourPage = () => {
                         <TableCell>{name}</TableCell>
                         <TableCell>{new Date(item.hour).toLocaleString()}</TableCell>
                         <TableCell className={classes.columnAction} padding="none">
-                          <Button onClick={(() => updateItem(item))}>Editar</Button>
+                          {/* <Button onClick={(() => updateItem(item))}>Editar</Button> */}
                           <Button onClick={(() => removeItem(item))}>Eliminar</Button>
                         </TableCell>
                       </TableRow>

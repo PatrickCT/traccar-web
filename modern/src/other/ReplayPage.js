@@ -161,6 +161,16 @@ const ReplayPage = () => {
   window.deviceName = deviceName;
   window.Popup = Popup;
 
+  // Function to adjust speed based on zoom level
+  const getAdjustedSpeed = (zoom, speed) => {
+    const minZoom = 8;
+    const maxZoom = 14;
+
+    if (zoom >= maxZoom) return speed; // No adjustment for zoom >= 14
+    const zoomFactor = 1 + (((maxZoom - zoom) * 1.5) / (maxZoom - minZoom));
+    return speed / zoomFactor;
+  };
+
   const changeIndex = useCallback((_, index) => {
     setIndex(index);
   }, [setIndex]);
@@ -171,7 +181,7 @@ const ReplayPage = () => {
       timerRef.current = setInterval(() => {
         // changeIndex(null, (index) => index + 1);
         setIndex((index) => index + 1);
-      }, speed);
+      }, getAdjustedSpeed(map.getZoom(), speed));
     }
 
     return () => clearInterval(timerRef.current);

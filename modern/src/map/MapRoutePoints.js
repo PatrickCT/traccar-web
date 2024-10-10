@@ -17,7 +17,7 @@ const MapRoutePoints = ({
 
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
-  const iconScale = useAttributePreference('iconScale', desktop ? 0.85 : 1);
+  const iconScale = useAttributePreference('iconScale', desktop ? 1 : 1);
 
   const onMouseEnter = () => map.getCanvas().style.cursor = 'pointer';
   const onMouseLeave = () => map.getCanvas().style.cursor = '';
@@ -81,7 +81,7 @@ const MapRoutePoints = ({
       source: id,
       layout: {
         'icon-image': replay ? 'arrowB' : 'arrow',
-        'icon-size': replay ? iconScale : 0.4,
+        'icon-size': replay ? iconScale : 0.8,
         'icon-allow-overlap': true,
         'icon-rotate': ['get', 'course'],
         'icon-rotation-alignment': 'map',

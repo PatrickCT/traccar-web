@@ -15,12 +15,10 @@ import {
   Step,
   StepLabel,
 } from '@mui/material';
-import { DeleteOutlined, EditOutlined, Share } from '@mui/icons-material';
-import dayjs from 'dayjs';
+import {
+  CopyAllOutlined, DeleteOutlined, EditOutlined, Share,
+} from '@mui/icons-material';
 import moment from 'moment';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import makeStyles from '@mui/styles/makeStyles';
 import { useEffectAsync } from '../reactHelper';
 import PageLayout from '../common/components/PageLayout';
@@ -163,6 +161,11 @@ const LinksPage = () => {
     );
   };
 
+  const copyLink = (code = null) => {
+    toast.toast('Enlace copiado');
+    ClipboardJS.copy(`${window.location.protocol}//${window.location.host}/share-location.html?code=${selectedItem?.code || code || ''}`);
+  };
+
   const ShareLink = () => {
     const { handleStep } = useWizard();
     handleStep(() => { });
@@ -175,8 +178,7 @@ const LinksPage = () => {
             id: 0,
             label: 'Copiar link',
             onClik: (() => {
-              toast.toast('Enlace copiado');
-              ClipboardJS.copy(`${window.location.protocol}//${window.location.host}/share-location.html?code=${selectedItem?.code || ''}`);
+              copyLink();
             }),
           }].map((value) => {
             const labelId = `checkbox-list-label-${value}`;
@@ -207,7 +209,8 @@ const LinksPage = () => {
         <TableHead>
           <TableRow>
             <TableCell>Valido hasta</TableCell>
-            <TableCell>Codigo</TableCell>
+            <TableCell>Se comparte con</TableCell>
+            <TableCell>Contraseña</TableCell>
             <TableCell>Habilitado</TableCell>
             <TableCell className={classes.columnAction} />
           </TableRow>
@@ -220,10 +223,22 @@ const LinksPage = () => {
           }).map((item) => (
             <TableRow key={item.id}>
               <TableCell>{moment(item.limitDate).format('D/MM/YYYY')}</TableCell>
+              <TableCell>{item.name}</TableCell>
               <TableCell>{item.pass}</TableCell>
               <TableCell>{item.enabled ? 'Si' : 'No'}</TableCell>
               <TableCell className={classes.columnAction} padding="none">
                 <div className={classes.row}>
+                  <IconButton
+                    color="inherit"
+                    edge="start"
+                    sx={{ mr: 2 }}
+                    onClick={async () => {
+                      setSelectedItem({ ...item, isNew: false });
+                      copyLink(item.code);
+                    }}
+                  >
+                    <CopyAllOutlined />
+                  </IconButton>
                   <IconButton
                     color="inherit"
                     edge="start"
