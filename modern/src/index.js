@@ -31,13 +31,13 @@ import './resources/libs/jsPanel/extensions/dialog/jspanel.dialog.min.css';
 import { jsPanel } from './resources/libs/jsPanel/jspanel.min';
 import { loadModal } from './resources/libs/jsPanel/extensions/modal/jspanel.modal';
 import { loadDialog } from './resources/libs/jsPanel/extensions/dialog/jspanel.dialog';
-
 import InternalTools from './resources/libs/self/internal';
 import './resources/libs/self/heartbeat.min';
 import 'driver.js/dist/driver.css';
 import alertify from './resources/libs/alertify/alertify.min';
 import './resources/libs/alertify/css/alertify.css';
 import './resources/libs/alertify/css/themes/default.min.css';
+import PushNotificationsManager from './common/util/push';
 
 setTimeout(async () => {
   jsPanel.ziBase = (() => {
@@ -51,6 +51,7 @@ setTimeout(async () => {
   window.driver = driver;
   window.alertify = alertify;
   window.screenlog = screenLog;
+  window.PushNotificationsManager = PushNotificationsManager;
   loadModal();
   loadDialog();
   await preloadImages();

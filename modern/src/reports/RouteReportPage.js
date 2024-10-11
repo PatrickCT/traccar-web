@@ -32,10 +32,12 @@ import MapGeofence from '../map/MapGeofence';
 import scheduleReport from './common/scheduleReport';
 import {
   createPopUp,
+  createPopUpReport,
   generateRoute,
   streetView,
 } from '../common/util/mapPopup';
 import { TreeWalker } from '../common/util/utils';
+import '../main/MainPage.css';
 
 const VirtuosoTableComponents = {
   Scroller: React.forwardRef((props, ref) => (
@@ -152,7 +154,7 @@ const RouteReportPage = () => {
     new Popup()
       .setMaxWidth('400px')
       .setOffset(30)
-      .setHTML(createPopUp(items.find((it) => it.id === positionId)))
+      .setHTML(createPopUpReport(items.find((it) => it.id === positionId)))
       .setLngLat([items.find((it) => it.id === positionId).longitude, items.find((it) => it.id === positionId).latitude])
       .addTo(map);
     window.position = items.find((it) => it.id === positionId);

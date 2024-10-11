@@ -296,31 +296,33 @@ const PreferencesPage = () => {
                 </FormGroup>
               </AccordionDetails>
             </Accordion>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle1">
-                  {t('deviceTitle')}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails className={classes.details}>
-                <SelectField
-                  emptyValue={null}
-                  value={attributes.devicePrimary || 'name'}
-                  onChange={(e) => setAttributes({ ...attributes, devicePrimary: e.target.value })}
-                  data={deviceFields}
-                  titleGetter={(it) => t(it.name)}
-                  label={t('devicePrimaryInfo')}
-                />
-                <SelectField
-                  emptyValue=""
-                  value={attributes.deviceSecondary || ''}
-                  onChange={(e) => setAttributes({ ...attributes, deviceSecondary: e.target.value })}
-                  data={deviceFields}
-                  titleGetter={(it) => t(it.name)}
-                  label={t('deviceSecondaryInfo')}
-                />
-              </AccordionDetails>
-            </Accordion>
+            {user.administrator && (
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="subtitle1">
+                    {t('deviceTitle')}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails className={classes.details}>
+                  <SelectField
+                    emptyValue={null}
+                    value={attributes.devicePrimary || 'name'}
+                    onChange={(e) => setAttributes({ ...attributes, devicePrimary: e.target.value })}
+                    data={deviceFields}
+                    titleGetter={(it) => t(it.name)}
+                    label={t('devicePrimaryInfo')}
+                  />
+                  <SelectField
+                    emptyValue=""
+                    value={attributes.deviceSecondary || ''}
+                    onChange={(e) => setAttributes({ ...attributes, deviceSecondary: e.target.value })}
+                    data={deviceFields}
+                    titleGetter={(it) => t(it.name)}
+                    label={t('deviceSecondaryInfo')}
+                  />
+                </AccordionDetails>
+              </Accordion>
+            )}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="subtitle1">

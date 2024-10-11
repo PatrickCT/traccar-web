@@ -6,7 +6,6 @@ import {
   ListItemText, ListItemButton, useMediaQuery, Tooltip, IconButton,
 } from '@mui/material';
 import CrisisAlertIcon from '@mui/icons-material/CrisisAlert';
-import moment from 'moment';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
 import Battery60Icon from '@mui/icons-material/Battery60';
@@ -20,7 +19,7 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useAdministrator } from '../common/util/permissions';
 import { useAttributePreference } from '../common/util/preferences';
 import { formatAlarm, formatBoolean, formatPercentage } from '../common/util/formatter';
-import { hasPassedTime } from '../common/util/utils';
+import { dateDifference, hasPassedTime } from '../common/util/utils';
 import { map } from '../map/core/MapView';
 
 const useStyles = makeStyles((theme) => ({
@@ -64,15 +63,9 @@ const DeviceRow = ({ data, index, style }) => {
   const position = useSelector((state) => state.session.positions[item.id]);
   const geofences = useSelector((state) => state.geofences.items);
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
-  // const deviceSecondary = useAttributePreference('deviceSecondary', '');
+  const deviceSecondary = useAttributePreference('deviceSecondary', '');
 
   const formatProperty = (key) => {
-    let status;
-    if (item.status === 'online') {
-      status = 'Reportando';
-    } else {
-      status = 'Sin reportar';
-    }
     if (key === 'geofenceIds') {
       const geofenceIds = item[key] || [];
       return geofenceIds
@@ -82,19 +75,8 @@ const DeviceRow = ({ data, index, style }) => {
     }
     return (
       <>
-        <span style={{ fontWeight: 'bold', fontSize: '14px' }}>{`${item[key]} `}</span>
-        {' • '}
-        <span style={{ color: item.status === 'online' ? 'green' : 'red', fontWeight: 'normal', fontSize: '14px' }}>{status}</span>
-        {' • '}
-        {position && position.fixTime ? (
-          <>
-            <span style={{ fontSize: '14px' }}>{`Conexión: ${moment(item.lastUpdate).format('YYYY-MM-D HH:mm:ss')}`}</span>
-            {' • '}
-            <span style={{ fontSize: '14px' }}>{`Posición: ${moment(position.fixTime).format('YYYY-MM-D HH:mm:ss')}`}</span>
-          </>
-        ) : (
-          <span style={{ fontSize: '14px' }} />
-        )}
+        <span style={{ fontWeight: 'bold', fontSize: '14px' }}>{`${item[devicePrimary]} `}</span>
+        <span style={{ fontWeight: 'bold', fontSize: '14px' }}>{`${item[deviceSecondary] || ''} `}</span>
       </>
     );
   };
@@ -116,17 +98,18 @@ const DeviceRow = ({ data, index, style }) => {
         }}
         disabled={!admin && item.disabled}
       >
-        <Tooltip classes={{ tooltip: classes.customTooltip }} title={formatProperty(devicePrimary)}>
-          <ListItemText
-            primary={formatProperty(devicePrimary)}
-            primaryTypographyProps={{ noWrap: true }}
+        {/* <Tooltip classes={{ tooltip: classes.customTooltip }} title={formatProperty(devicePrimary)}>
 
-          />
-        </Tooltip>
+        </Tooltip> */}
+        <ListItemText
+          primary={formatProperty(devicePrimary)}
+          primaryTypographyProps={{ noWrap: true }}
+
+        />
         {position && (
           <>
-            {hasPassedTime(new Date(position.fixTime), 30) && (
-              <Tooltip title={t('eventAlarm')}>
+            {hasPassedTime(new Date(position.fixTime), 40) && (
+              <Tooltip title={`${dateDifference(new Date(position.fixTime), new Date(), ['days', 'hours', 'minutes'])} sin actualizar posición`}>
                 <CrisisAlertIcon fontSize="small" className={classes.negative} />
               </Tooltip>
             )}

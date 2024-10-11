@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
-
+import { Popup } from 'maplibre-gl';
 import {
   formatDistance, formatHours, formatVolume, formatTime,
 } from '../common/util/formatter';
@@ -17,12 +17,14 @@ import usePersistedState from '../common/util/usePersistedState';
 import { useCatch } from '../reactHelper';
 import useReportStyles from './common/useReportStyles';
 import MapPositions from '../map/MapPositionsOriginal';
-import MapView from '../map/core/MapView';
+import MapView, { map } from '../map/core/MapView';
 import MapCamera from '../map/MapCamera';
 import AddressValue from '../common/components/AddressValue';
 import TableShimmer from '../common/components/TableShimmer';
 import MapGeofence from '../map/MapGeofence';
 import scheduleReport from './common/scheduleReport';
+import { createPopUpSimple } from '../common/util/mapPopup';
+import '../main/MainPage.css';
 
 const columnsArray = [
   ['startTime', 'reportStartTime'],
@@ -108,6 +110,16 @@ const StopReportPage = () => {
     }
   };
 
+  const showPU = (position) => {
+    Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item.remove());
+    new Popup()
+      .setMaxWidth('400px')
+      .setOffset(30)
+      .setHTML(createPopUpSimple(position))
+      .setLngLat([position.longitude, position.latitude])
+      .addTo(map);
+  };
+
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportStops']}>
       <div className={classes.container}>
@@ -145,7 +157,10 @@ const StopReportPage = () => {
               {!loading ? items.map((item) => (
                 <TableRow
                   key={item.id}
-                  onClick={() => setSelectedItem(item)}
+                  onClick={() => {
+                    setSelectedItem(item);
+                    showPU(item);
+                  }}
                   style={{ backgroundColor: selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent' }}
                 >
                   <TableCell className={classes.columnAction} padding="none" />

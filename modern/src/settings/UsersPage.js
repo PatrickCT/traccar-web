@@ -123,14 +123,9 @@ const UsersPage = () => {
     { field: 'name', headerName: `${t('sharedName')}`, width: 200 },
     { field: 'email', headerName: `${t('userEmail')}`, width: 300 },
     {
-      field: 'admin',
+      field: 'administrator',
       headerName: `${t('userAdmin')}`,
-      valueGetter: (_, params) => params.administrator,
-      renderCell: (params) => (
-        <span>
-          {formatBoolean(params.administrator, t)}
-        </span>
-      ),
+      valueGetter: (_, params) => `${formatBoolean(params.administrator, t)}`,
       width: 200,
     },
     {

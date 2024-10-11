@@ -28,7 +28,9 @@ import { sessionActions } from '../store';
 import SelectField from '../common/components/SelectField';
 import SettingsMenu from './components/SettingsMenu';
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
-import { useAdministrator, useRestriction, useManager } from '../common/util/permissions';
+import {
+  useAdministrator, useRestriction, useManager, useUser,
+} from '../common/util/permissions';
 import useQuery from '../common/util/useQuery';
 import { useCatch } from '../reactHelper';
 import useMapStyles from '../map/core/useMapStyles';
@@ -52,6 +54,7 @@ const UserPage = () => {
   const dispatch = useDispatch();
   const t = useTranslation();
 
+  const user = useUser();
   const admin = useAdministrator();
   const manager = useManager();
   const fixedEmail = useRestriction('fixedEmail');
@@ -128,21 +131,18 @@ const UserPage = () => {
               </Typography>
             </AccordionSummary>
             <AccordionDetails className={classes.details}>
-              {admin && (
-                <>
-                  <TextField
-                    value={item.name || ''}
-                    onChange={(event) => setItem({ ...item, name: event.target.value })}
-                    label={t('sharedName')}
-                  />
-                  <TextField
-                    value={item.email || ''}
-                    onChange={(event) => setItem({ ...item, email: event.target.value })}
-                    label={t('userEmail')}
-                    disabled={fixedEmail}
-                  />
-                </>
-              )}
+              <TextField
+                value={item.name || ''}
+                onChange={(event) => setItem({ ...item, name: event.target.value })}
+                label={t('sharedName')}
+                disabled={(item.id === user.id)}
+              />
+              <TextField
+                value={item.email || ''}
+                onChange={(event) => setItem({ ...item, email: event.target.value })}
+                label={t('userEmail')}
+                disabled={fixedEmail || (item.id === user.id)}
+              />
               {!openIdForced && (
                 <TextField
                   type="password"
@@ -407,22 +407,27 @@ const UserPage = () => {
                     />
                   </>
                 )}
-                <FormControlLabel
-                  control={<Checkbox checked={item.deviceReadonly} onChange={(e) => setItem({ ...item, deviceReadonly: e.target.checked })} />}
-                  label={t('userDeviceReadonly')}
-                  disabled={!manager}
-                />
+                {(item?.id !== user.id) && (
+                  <FormControlLabel
+                    control={<Checkbox checked={item.deviceReadonly} onChange={(e) => setItem({ ...item, deviceReadonly: e.target.checked })} />}
+                    label={t('userDeviceReadonly')}
+                    disabled={!manager}
+                  />
+                )}
               </FormGroup>
             </AccordionDetails>
           </Accordion>
 
-          <EditAttributesAccordion
-            attribute={attribute}
-            attributes={item.attributes}
-            setAttributes={(attributes) => setItem({ ...item, attributes })}
-            definitions={{ ...commonUserAttributes, ...userAttributes }}
-            focusAttribute={attribute}
-          />
+          {admin && (
+            <EditAttributesAccordion
+              attribute={attribute}
+              attributes={item.attributes}
+              setAttributes={(attributes) => setItem({ ...item, attributes })}
+              definitions={{ ...commonUserAttributes, ...userAttributes }}
+              focusAttribute={attribute}
+              canAdd={admin}
+            />
+          )}
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">

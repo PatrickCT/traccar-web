@@ -159,18 +159,18 @@ export const streetView = (position = null) => {
 
 const popupHeaderButtons = (position) => {
   let html = '';
-  html += "<div align = 'center' style = 'text-align: center;' >";
+  html += "<div align='center' style='text-align: center;' >";
 
-  html += `<a onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());"><img src="${createBaseURL()}${'/images/botones-popup/connection.svg'}" width="14" height="14" /></a>`;
+  html += `<a style="margin: auto 2px" onclick="(function(){navigate('/settings/device/${position.deviceId}/connections');}());"><img src="${createBaseURL()}${'/images/botones-popup/connection.svg'}" width="14" height="14" /></a>`;
 
-  html += `<a onclick="(function(){navigate('/settings/device/${position.deviceId}');}());"><img src="${createBaseURL()}${'/images/botones-popup/edit.svg'}" width="14" height="14" /></a>`;
+  html += `<a style="margin: auto 2px" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());"><img src="${createBaseURL()}${'/images/botones-popup/edit.svg'}" width="14" height="14" /></a>`;
 
-  html += `<a onclick="(function(){navigate('/settings/accumulators/${position.deviceId}');}());"><img src="${createBaseURL()}${'/images/botones-popup/accumulator.svg'}" width="14" height="14" /></a>`;
+  html += `<a style="margin: auto 2px" onclick="(function(){navigate('/settings/accumulators/${position.deviceId}');}());"><img src="${createBaseURL()}${'/images/botones-popup/accumulator.svg'}" width="14" height="14" /></a>`;
 
   if (isAdmin()) {
-    html += `<a onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());"><img src="${createBaseURL()}${'/images/botones-popup/command.svg'}" width="14" height="14" /></a>`;
+    html += `<a style="margin: auto 2px" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());"><img src="${createBaseURL()}${'/images/botones-popup/command.svg'}" width="14" height="14" /></a>`;
 
-    html += `<a onclick="(function(){navigate('/position/${position.id}');}());"><img src="${createBaseURL()}${'/images/botones-popup/position.svg'}" width="14" height="14" /></a>`;
+    html += `<a style="margin: auto 2px" onclick="(function(){navigate('/position/${position.id}');}());"><img src="${createBaseURL()}${'/images/botones-popup/position.svg'}" width="14" height="14" /></a>`;
   }
 
   html += '</div>';
@@ -180,58 +180,25 @@ const popupHeaderButtons = (position) => {
 
 const popupFooterButtons = (include = ['engineLock', 'engineResume', 'streetView', 'maps', 'report', 'replay']) => {
   let html = '';
-  html += "<div align = 'center' style = 'text-align: center;' >";
+  html += "<div align='center' style='text-align: center;' >";
   if (include.includes('engineLock')) {
-    html += `<a onclick="(function(){engineLock();}());"><img src="${createBaseURL()}${'/images/botones-popup/apagar.svg'}" width="14" height="14" /></a>`;
+    html += `<a style="margin: auto 2px" onclick="(function(){engineLock();}());"><img src="${createBaseURL()}${'/images/botones-popup/apagar.svg'}" width="35" height="35" /></a>`;
   }
-  if (include.includes('enginResume')) {
-    html += `<a onclick="(function(){engineReactivate();}());"><img src="${createBaseURL()}${'/images/botones-popup/encender.svg'}" width="14" height="14" /></a>`;
+  if (include.includes('engineResume')) {
+    html += `<a style="margin: auto 2px" onclick="(function(){engineReactivate();}());"><img src="${createBaseURL()}${'/images/botones-popup/encender.svg'}" width="35" height="35" /></a>`;
   }
   if (include.includes('streetView')) {
-    html += `<a onclick="(function(){streetView();}());"><img src="${createBaseURL()}${'/images/botones-popup/calle.svg'}" width="14" height="14" /></a>`;
+    html += `<a style="margin: auto 2px" onclick="(function(){streetView();}());"><img src="${createBaseURL()}${'/images/botones-popup/calle.svg'}" width="35" height="35" /></a>`;
   }
   if (include.includes('maps')) {
-    html += `<a onclick="(function(){generateRoute();}());"><img src="${createBaseURL()}${'/images/botones-popup/maps.svg'}" width="14" height="14" /></a>`;
+    html += `<a style="margin: auto 2px" onclick="(function(){generateRoute();}());"><img src="${createBaseURL()}${'/images/botones-popup/maps.svg'}" width="35" height="35" /></a>`;
   }
   if (include.includes('report')) {
-    html += `<a onclick="(function(){navigate('/reports/route');}());"><img src="${createBaseURL()}${'/images/botones-popup/recorrido.svg'}" width="14" height="14" /></a>`;
+    html += `<a style="margin: auto 2px" onclick="(function(){navigate('/reports/route');}());"><img src="${createBaseURL()}${'/images/botones-popup/recorrido.svg'}" width="35" height="35" /></a>`;
   }
   if (include.includes('replay')) {
-    html += `<a onclick="(function(){navigate('/replay');}());"><img src="${createBaseURL()}${'/images/botones-popup/replay.svg'}" width="14" height="14" /></a>`;
+    html += `<a style="margin: auto 2px" onclick="(function(){navigate('/replay');}());"><img src="${createBaseURL()}${'/images/botones-popup/replay.svg'}" width="35" height="35" /></a>`;
   }
-
-  html += '</div>';
-
-  return html;
-};
-
-const popupBtns = () => {
-  let html = '';
-  html += "<div style='display: table; margin: auto'>";
-
-  html += "<div style='float: left; padding: 2px;' >";
-  html += '<a class="link-google-maps" onclick="(function(){engineLock();}());" ><img src="./././images/botones-popup/apagar.svg" width="35" height="35" style="border-radius:6px;"/></a>';
-  html += '</div>';
-
-  html += "<div style='float: left; padding: 2px;' >";
-  html += '<a class="link-google-maps" onclick="(function(){engineReactivate();}());" ><img src="./././images/botones-popup/encender.svg" width="35" height="35" style="border-radius:6px;"/></a>';
-  html += '</div>';
-
-  html += "<div style='float: left; padding: 2px;' >";
-  html += "<a class='link-google-maps' onclick='(function(){streetView();}());' ><img src='./././images/botones-popup/calle.svg' width='35' height='35' style='border-radius:6px;'/></a>";
-  html += '</div>';
-
-  html += "<div style='float: left; padding: 2px;'>";
-  html += '<a class="link-google-maps" onclick="(function(){generateRoute();}());"><img src="./././images/botones-popup/maps.svg" width="35" height="35" style="border-radius:6px;"/></a>';
-  html += '</div>';
-
-  html += "<div style='float: left; padding: 2px;' >";
-  html += "<a class='link-google-maps' onclick='(function(){navigate(`/reports/route`);}());'><img src='./././images/botones-popup/recorrido.svg' width='35' height='35' style='border-radius:6px;'/></a>";
-  html += '</div>';
-
-  html += "<div id='div_replay' style='float: left; padding:2px;' >";
-  html += '<a class="link-google-maps" onClick="(function(){navigate(`/replay`);}());"><img src="./././images/botones-popup/replay.svg" width="35" height="35" style="border-radius:6px;"/></a>';
-  html += '</div>';
 
   html += '</div>';
 
@@ -311,25 +278,11 @@ const createPopUpData = (position) => {
   return html;
 };
 
-const popupButton = (icon, onClick, restrictions = [], overrides = { w: 14, h: 14 }) => {
-  if (restrictions.some((value) => value)) return '';
-
-  const baseUrlIcon = `${createBaseURL()}${icon}`;
-
-  // Convert the function to string properly to avoid it being treated as text
-  const onClickString = onClick.toString().replace(/^.*?\{(.*)\}$/, '$1').trim();
-
-  return `
-    <a href="javascript:void(0);" onclick="(${onClickString})">
-      <img src="${baseUrlIcon}" width="${overrides.w}" height="${overrides.h}" style="border-radius: 6px;" />
-    </a>`;
-};
-
 const createPopUpHeadersButtons = (position) => popupHeaderButtons(position);
 
-const createPopUpFooterButtons = (include = ['engineLock', 'engineResume', 'streetView', 'maps', 'report', 'replay']) => popupFooterButtons(include);
+const createPopUpFooterButtons = (include) => popupFooterButtons(include);
 
-const createPopUpContent = (position, showHeaderButtons = true, showFooterButtons = true) => {
+const createPopUpContent = (position, showHeaderButtons = true, showFooterButtons = true, includeFooterButtons = ['engineLock', 'engineResume', 'streetView', 'maps', 'report', 'replay']) => {
   try {
     const user = window.getUser();
     // sections
@@ -348,7 +301,7 @@ const createPopUpContent = (position, showHeaderButtons = true, showFooterButton
     // policy
     // footer bottons
     if (showFooterButtons && !user.deviceReadonly) {
-      html += createPopUpFooterButtons();
+      html += createPopUpFooterButtons(includeFooterButtons);
     }
     return html;
   } catch (_) {
@@ -361,44 +314,7 @@ export const createPopUp = (position, showHeaderButtons = true, showFooterButton
 
 window.createPopUp = createPopUp;
 
-export const createPopUpReport = (position) => {
-  let html = '<div>';
-  html += "<div align='center' style='text-align: center !important;text-transform: uppercase !important;'>";
-
-  html += `<h3> <b>${attConverter(position, 'name')}</b></h3></div> `;
-  html += valueParser(position, 'ignition');
-  html += '<br />';
-  html += valueParser(position, 'motion');
-  html += '<br />';
-  html += valueParser(position, 'dateTime');
-  html += '<br />';
-  html += valueParser(position, 'status');
-  html += '<br />';
-  html += valueParser(position, 'direccion');
-  html += '<br />';
-  html += valueParser(position, 'fuel');
-  html += '<br />';
-  html += valueParser(position, 'totalDistance');
-  html += '<br />';
-  html += valueParser(position, 'speed');
-  html += '<br />';
-  html += valueParser(position, 'hours');
-  html += '<br />';
-  html += valueParser(position, 'temperaturaC');
-  html += '<br />';
-  html += valueParser(position, 'temperaturaC');
-  html += '<br />';
-  html += valueParser(position, 'bateria');
-  html += '<br />';
-  html += valueParser(position, 'simType');
-  html += '<br />';
-  html += valueParser(position, 'simKey');
-  html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
-
-  html += '</div>';
-  html += '</div>';
-  return html;
-};
+export const createPopUpReport = (position, showHeaderButtons = false, showFooterButtons = true) => createPopUpContent(position, showHeaderButtons, showFooterButtons, ['streetView']);
 
 export const createPopUpReportRoute = (position) => {
   let html = '<div>';
@@ -457,9 +373,6 @@ export const createPopUpSimple = (position) => {
   html += '<br />';
   html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
   html += '<br>';
-  html += "<div style='float: left; padding: 2px;' >";
-  html += "<a class='link-google-maps' onclick='(function(){streetView();}());' ><img src='./././images/botones-popup/calle.svg' width='35' height='35' style='border-radius:6px;'/></a>";
-  html += '</div>';
-  html += '</div>';
+  html += createPopUpFooterButtons(['streetView']);
   return html;
 };

@@ -237,7 +237,7 @@ const DevicePage = () => {
           )}
           {!user.deviceReadonly && (
             <EditAttributesAccordion
-              attributes={{ speedLimit: 0, rendimiento: 0, ...item.attributes }}
+              attributes={{ speedLimit: 0, rendimiento: 0, ...(admin ? (item.attributes) : {}) }}
               setAttributes={(attributes) => setItem({ ...item, attributes })}
               definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
               canAdd={admin}

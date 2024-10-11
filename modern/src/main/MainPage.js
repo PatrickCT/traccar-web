@@ -37,6 +37,7 @@ import Banner from './components/Banner';
 import { toast } from '../common/util/toasts';
 import MainModals from './MainModals';
 import MainMapButtons from './MainMapButtons';
+import PushNotificationsManager from '../common/util/push';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -182,7 +183,8 @@ const MainPage = () => {
     window.localStorage.setItem('showMapPopup', true);
     window.groupsNames = groups;
     window.layerManager = LayersManager.getInstance(20);
-
+    const pushManager = new PushNotificationsManager();
+    window.pushManager = pushManager;
     const checkScriptLoaded = () => {
       if (typeof InternalTools !== 'undefined') {
         if (!window.internalTools) {
