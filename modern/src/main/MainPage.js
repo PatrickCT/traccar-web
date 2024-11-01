@@ -28,7 +28,7 @@ import {
 import { map } from '../map/core/MapView';
 import './MainPage.css';
 import Counter from '../common/components/Counter';
-import ConnectionStatus from '../common/components/ConnectionStatus';
+// import ConnectionStatus from '../common/components/ConnectionStatus';
 import DebtModal from '../common/components/DebtModal';
 import PositionDrawer from './PositionInfoDrawer';
 import { useAdministrator } from '../common/util/permissions';
@@ -287,9 +287,9 @@ const MainPage = () => {
         )}
       </div>
       <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
-      <ConnectionStatus />
+      {/* <ConnectionStatus /> */}
       {
-        user.debt && (
+        user.debt && !user.administrator && (
           <DebtModal />
         )
       }

@@ -520,6 +520,7 @@
     "notificatorTraccar": "Traccar",
     "notificatorTelegram": "Telegram",
     "notificatorPushover": "Pushover",
+    "notificatorPush": "Push",
     "reportTicket": "Reporte de tickets",
     "reportSalidas": "Reporte de salidas",
     "reportHojaSalidas": "Hoja de salidas",
@@ -627,5 +628,15 @@
     "turbanRoute": "Ruta T-Urban",
     "clearFilters": "Limpiar Filtros",
     "extraModulesTitle": "Modulos Extra",
-    "emptyString": ""
+    "emptyString": "",
+    "pushNotifications": "Notificaciones Push",
+    "enableString": "Habilitar",
+    "disableString": "Deshabilitar",
+    "insuranceCompany": "Aseguradora",
+    "cache_reset": "Borrar cache de la aplicación y recargar",
+    "save_session": "Guardar incio de sesión",
+    "sharedClose": "Cerrar",
+    "sharedNext": "Siguiente",
+    "sharedShare": "Compartir",
+    "sharedAll": "Todo"
 }

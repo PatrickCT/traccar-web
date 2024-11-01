@@ -15,14 +15,11 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import { useCatch } from '../reactHelper';
 import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
-import {
-  createPopUp,
-  createPopUpReportRoute, createPopUpSimple,
-} from '../common/util/mapPopup';
 import ReplaySideBar from './ReplaySideBar';
 import { attConverter } from '../common/util/utils';
 import { toast } from '../common/util/toasts';
 import './ReplayPage.css';
+import { createPopUpReportRoute } from '../common/util/mapPopup';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -196,7 +193,7 @@ const ReplayPage = () => {
   }, [index, positions]);
 
   useEffect(() => {
-    if (positions && positions.length > 0) {
+    if (positions && positions.length > 0 && index < positions.length) {
       Array.from(document.getElementsByClassName('maplibregl-popup')).filter((popup) => popup.id !== '').map((item) => item.remove());
       const speed = parseFloat((attConverter(positions[index], 'speed') ?? (attConverter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -')).split(' ')[0]) || 0;
       const currentType = (speed < value[0] ? 1 : (speed < value[1] ? 2 : 3));

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +10,7 @@ import SocketController from './SocketController';
 import CachingController from './CachingController';
 import { useEffectAsync } from './reactHelper';
 import { sessionActions } from './store';
+import ConnectionStatus from './common/components/ConnectionStatus';
 
 const useStyles = makeStyles(() => ({
   page: {
@@ -48,6 +50,7 @@ const App = () => {
 
   return !initialized ? (<LinearProgress />) : (
     <>
+      <ConnectionStatus />
       <SocketController />
       <CachingController />
       <div className={classes.page}>

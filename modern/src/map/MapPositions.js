@@ -2,7 +2,6 @@
 /* eslint-disable no-unused-vars */
 import {
   useId, useCallback, useEffect, memo, useState,
-  useRef,
 } from 'react';
 import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
@@ -12,9 +11,7 @@ import { formatTime, getStatusColor } from '../common/util/formatter';
 import { mapIconKey } from './core/preloadImages';
 import { findFonts } from './core/mapUtil';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
-import RealTimeMovement from '../main/components/RealTimeMarker';
 import { checkClusters } from '../common/util/geospatial';
-import { measureExecutionTime } from '../common/util/utils';
 
 const isEqual = require('react-fast-compare');
 
@@ -27,7 +24,7 @@ const propPrint = (prop) => {
 };
 
 const MapPositions = ({
-  positions, onClick, titleField, selectedPosition, showStatus = true, index, replay = false,
+  positions, onClick, titleField, selectedPosition, showStatus = true, index,
 }) => {
   const id = useId();
   window.id = id;
@@ -49,31 +46,15 @@ const MapPositions = ({
   const hours12 = usePreference('twelveHourFormat');
   const directionType = useAttributePreference('mapDirection', 'selected');
 
-  const [recalculate, setRecalculate] = useState(new Date());
-
-  const createFeature = (devices, position, selectedPositionId) => {
+  const createFeature = (devices, position) => {
     const device = (devices || window.devices || {})[position?.deviceId];
 
-    let showDirection;
-    switch (directionType) {
-      case 'none':
-        showDirection = false;
-        break;
-      case 'all':
-        showDirection = true;
-        break;
-      default:
-        showDirection = selectedPositionId === position?.id;
-        break;
-    }
     return {
       id: position?.id,
       deviceId: position?.deviceId,
       name: device?.name || '',
       fixTime: formatTime(position?.fixTime, 'seconds', hours12),
       category: mapIconKey(device?.category),
-      // category: getStatusColor(device.status) === 'positive' ? mapIconKey(device.category) : mapIconKey('cross'),
-      // category: ((hasPassedTime(new Date(device.lastUpdate), 40) || hasPassedTime(new Date(position.fixTime), 40)) ? mapIconKey('cross') : (hasPassedTime(new Date(position.fixTime), 10) ? mapIconKey('stop') : mapIconKey(device.category))),
       color: showStatus ? (position?.attributes.color || getStatusColor(device?.status)) : 'neutral',
       rotation: position?.course,
       direction: true,
@@ -139,7 +120,6 @@ const MapPositions = ({
       cluster: mapCluster,
       clusterMaxZoom: 14,
       clusterRadius: 50,
-      // generateId: true,
     });
 
     map.addLayer({
@@ -148,14 +128,12 @@ const MapPositions = ({
       source: id,
       filter: ['!has', 'point_count'],
       layout: {
-        'icon-image': `${(replay) ? 'altBackground' : 'background'}`,
+        'icon-image': 'background',
         'icon-size': iconScale,
         'icon-allow-overlap': true,
       },
       paint: {
         'icon-color': ['get', 'background'],
-        // 'icon-halo-color': '#fff',
-        // 'icon-halo-width': 2,
       },
     });
 
@@ -165,25 +143,23 @@ const MapPositions = ({
       source: id,
       filter: ['!has', 'point_count'],
       layout: {
-        'icon-image': `${(replay) ? 'replay-neutral' : '{category}-{color}'}`,
-        'icon-size': replay ? 0.08 : iconScale / 2,
+        'icon-image': '{category}-{color}',
+        'icon-size': iconScale / 2,
         'icon-allow-overlap': true,
-        'text-field': `{${titleField || 'name'}}`,
+        'text-field': titleField ? `{${titleField}}` : '',
         'text-allow-overlap': true,
         'text-anchor': 'bottom',
         'text-offset': [0, -2 * iconScale],
         'text-font': findFonts(map),
         'text-size': 14,
-        'icon-rotate': replay ? ['get', 'rotation'] : ['case', ['==', ['get', 'rotate'], true], ['get', 'rotation'], 0],
-        // 'icon-rotate': ['get', 'rotation'],
-        'icon-rotation-alignment': 'map',
+        'icon-rotate': ['case', ['==', ['get', 'rotate'], true], ['get', 'rotation'], 0],
+        'icon-rotation-alignment': 'viewport',
       },
       paint: {
-        'text-halo-color': 'white',
-        'text-halo-width': 10,
-        // 'icon-color': '#00ff001a',
-        // 'icon-halo-color': '#fff',
-        // 'icon-halo-width': 2,
+        'text-halo-color': 'white', // The color of the outline (or border) around each character.
+        'text-halo-width': 2, // Reduced width for a more character-specific border.
+        'text-halo-blur': 0, // Ensures that the halo stays sharp, you can adjust this value for subtle blur.
+        'text-color': '#000000', // The actual text color.
       },
     });
 
@@ -227,12 +203,6 @@ const MapPositions = ({
     map.on('click', icons, onMarkerClick);
     map.on('click', clusters, onClusterClick);
     map.on('click', onMapClick);
-    // map.on('movestart', () => throttle(() => Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(true))));
-    // map.on('moveend', () => setTimeout(() => {
-    //   throttle(() => Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(true)));
-    // }, 3000));
-    // map.on('dragstart', () => Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(true)));
-    // map.on('dragend', () => Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(false)));
 
     window.createFeature = createFeature;
     window.dataGenerator = dataGenerator;
@@ -264,29 +234,6 @@ const MapPositions = ({
   useEffect(() => {
     if (!positions || positions.length <= 0) return;
 
-    // positions?.forEach((position) => {
-    //   if (window.players) {
-    //     if (!window.players?.hasOwnProperty(position.deviceId)) {
-    //       window.players[position.deviceId] = new RealTimeMovement(position.deviceId, id, {});
-    //     }
-    //     window.players[position.deviceId].updateSelectedPosition(position);
-    //   }
-    // });
-
-    // measureExecutionTime((positions) => {
-    //   map.getSource(id)?.setData({
-    //     type: 'FeatureCollection',
-    //     features: positions.filter((it) => devices.hasOwnProperty(it.deviceId))
-    //       .map((position) => ({
-    //         type: 'Feature',
-    //         geometry: {
-    //           type: 'Point',
-    //           coordinates: [position.longitude, position.latitude],
-    //         },
-    //         properties: createFeature(devices, position, selectedPosition && selectedPosition.id),
-    //       })),
-    //   });
-    // }, positions);
     map.getSource(id)?.setData({
       type: 'FeatureCollection',
       features: positions.filter((it) => devices.hasOwnProperty(it.deviceId))
@@ -300,7 +247,7 @@ const MapPositions = ({
         })),
     });
     checkClusters(positions);
-  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index, recalculate]);
+  }, [mapCluster, clusters, onMarkerClick, onClusterClick, devices, positions, selectedPosition, index]);
 
   return true;
 };

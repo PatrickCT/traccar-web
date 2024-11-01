@@ -9,6 +9,8 @@ import useQuery from './common/util/useQuery';
 import { useEffectAsync } from './reactHelper';
 import { devicesActions } from './store';
 import App from './App';
+import MainPageNoAuth from './main/MainPageNoAuth';
+import ShareNoAuth from './ShareNoAuth';
 
 const CombinedReportPage = lazy(() => import('./reports/CombinedReportPage'));
 const RouteReportPage = lazy(() => import('./reports/RouteReportPage'));
@@ -116,6 +118,11 @@ const Navigation = () => {
       <Route path="/register" element={<Suspense fallback={<Loading type="08" />}><RegisterPage /></Suspense>} />
       <Route path="/reset-password" element={<Suspense fallback={<Loading type="08" />}><ResetPasswordPage /></Suspense>} />
       <Route path="/change-server" element={<Suspense fallback={<Loading type="08" />}><ChangeServerPage /></Suspense>} />
+      <Route path="no-auth">
+        <Route path="share" element={<Suspense fallback={<Loading type="08" />}><ShareNoAuth /></Suspense>}>
+          <Route index element={<Suspense fallback={<Loading type="08" />}><MainPageNoAuth /></Suspense>} />
+        </Route>
+      </Route>
       <Route path="/" element={<App />}>
         <Route index element={<Suspense fallback={<Loading type="08" />}><MainPage /></Suspense>} />
 

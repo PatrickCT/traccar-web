@@ -38,6 +38,7 @@ import { map } from '../map/core/MapView';
 import ExtraEmailList from '../common/components/ExtraEmailList';
 import ExtraPhoneList from '../common/components/ExtraPhoneList';
 import SubUserList from '../common/components/SubUserList';
+import { toast } from '../common/util/toasts';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -106,6 +107,7 @@ const UserPage = () => {
   const onItemSaved = (result) => {
     if (result.id === currentUser.id) {
       dispatch(sessionActions.updateUser(result));
+      toast.toast('Datos actualizados');
     }
   };
 

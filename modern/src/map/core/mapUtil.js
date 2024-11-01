@@ -1,5 +1,6 @@
 import { parse, stringify } from 'wellknown';
 import circle from '@turf/circle';
+import * as turf from '@turf/turf';
 
 export const loadImage = (url) => new Promise((imageLoaded) => {
   const image = new Image();
@@ -132,3 +133,9 @@ export const findFonts = (map) => {
   }
   return ['Roboto Regular'];
 };
+
+export const shareableMapsLink = (coords) => ((coords, first, last) => `https://www.google.com/maps/dir/?api=1&origin=${coords[first][1]},${coords[first][0]}&destination=${coords[last][1]},${coords[last][0]}&waypoints=${coords.slice(first + 1, last).map((a) => `${a[1]},${a[0]}`).join('|')}`)(coords, 0, coords.length - 1);
+
+export const limitCoords = (coords) => coords.slice(0, 23);
+
+export const simplyfyCoords = (positions, tolerance, highQuality, limit) => ((coords, limit) => (limit ? limitCoords(coords) : coords))(turf.simplify(turf.lineString([...positions.map((p) => [p.longitude, p.latitude])]), { tolerance, highQuality }).geometry.coordinates, limit);

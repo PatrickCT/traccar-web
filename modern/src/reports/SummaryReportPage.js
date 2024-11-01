@@ -104,7 +104,7 @@ const SummaryReportPage = () => {
         return formatHours(item[key]);
       case 'spentFuel': {
         const distance = (item.endOdometer / 1000 || 0) - (item.startOdometer / 1000 || 0);
-        const lpk = devices[item.deviceId].attributes.fuelEfficiency || 0;
+        const lpk = devices[item.deviceId].attributes.fuelEfficiency || devices[item.deviceId].attributes.rendimiento || 0;
         const consumed = distance / lpk;
         let value = formatVolume(item[key], volumeUnit, t);
         if (parseFloat(value.split(' ')[0]) === 0) {

@@ -17,6 +17,7 @@ import PageLayout from '../common/components/PageLayout';
 import SettingsMenu from './components/SettingsMenu';
 import { useCatch } from '../reactHelper';
 import { useRestriction } from '../common/util/permissions';
+import { toast } from '../common/util/toasts';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -73,6 +74,7 @@ const CommandDevicePage = () => {
     });
 
     if (response.ok) {
+      setTimeout(() => toast.toast('Comando enviado'), 1000);
       navigate(-1);
     } else {
       throw Error(await response.text());

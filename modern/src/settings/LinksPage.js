@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable import/no-extraneous-dependencies */
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useState } from 'react';
 import ClipboardJS from 'clipboard';
 import { Wizard, useWizard } from 'react-use-wizard';
 import {
-  Table, TableRow, TableCell, TableHead, TableBody, Switch, TextField, Button, IconButton,
+  Table, TableRow, TableCell, TableHead, TableBody, Switch, Button, IconButton,
   List,
   ListItem,
   ListItemIcon,
@@ -22,7 +22,6 @@ import moment from 'moment';
 import makeStyles from '@mui/styles/makeStyles';
 import { useEffectAsync } from '../reactHelper';
 import PageLayout from '../common/components/PageLayout';
-import CollectionFab from './components/CollectionFab';
 import TableShimmer from '../common/components/TableShimmer';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import Modal from '../main/components/BasicModal';
@@ -50,13 +49,8 @@ const LinksPage = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showDevices, setShowDevices] = useState(false);
-  const [showShare, setShowShare] = useState(false);
   const [selectedItem, setSelectedItem] = useState({});
   const [reload, setReload] = useState(false);
-  const [strPhone, setStrPhone] = useState('');
-  const [phones, setphones] = useState([]);
-  const [subModalOpen, setSubModalOpen] = useState(false);
   const steps = ['1.-Crear/Editar enlace', '2.-Asignar unidades', '3.-Compartir'];
   const [activeStep, setActiveStep] = useState(0);
 
@@ -115,38 +109,12 @@ const LinksPage = () => {
     }));
   };
 
-  const shareLink = async () => {
-    phones.forEach(async (phone) => {
-      await fetch('./api/notifications/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          numero: phone,
-          msg: `${window.location.protocol}//${window.location.host}/share-location.html?code=${selectedItem.code}`,
-        }),
-      });
-
-      if (selectedItem.pass !== '') {
-        await fetch('./api/notifications/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            numero: phone,
-            msg: `La contraseña es ${selectedItem.pass}`,
-          }),
-        });
-      }
-    });
-    setSelectedItem({});
-  };
-
   const AssignUnits = () => {
     const { handleStep, nextStep } = useWizard();
     handleStep(() => { });
 
     return (
       <>
-        <h3>Elija los dispositivos que desea compartir</h3>
         <LinkDevices link={selectedItem?.id ?? 10} />
         <Button
           style={{ position: 'fixed', bottom: '0px', right: '0px' }}
@@ -155,7 +123,7 @@ const LinksPage = () => {
             setActiveStep(2);
           }}
         >
-          Compartir
+          {t('sharedShare')}
         </Button>
       </>
     );
@@ -163,7 +131,7 @@ const LinksPage = () => {
 
   const copyLink = (code = null) => {
     toast.toast('Enlace copiado');
-    ClipboardJS.copy(`${window.location.protocol}//${window.location.host}/share-location.html?code=${selectedItem?.code || code || ''}`);
+    ClipboardJS.copy(`${window.location.protocol}//${window.location.host}/no-auth/share?code=${selectedItem?.code || code || ''}`);
   };
 
   const ShareLink = () => {
@@ -276,10 +244,23 @@ const LinksPage = () => {
           )) : (<TableShimmer columns={2} endAction />)}
         </TableBody>
       </Table>
-      <CollectionFab disabled={subModalOpen} onClick={() => { setSelectedItem({ limitDate: null, pass: '', isNew: true }); setShowModal(true); setSubModalOpen(true); setActiveStep(0); }} />
+      <Button
+        style={{ position: 'fixed', bottom: '0px', right: '0px' }}
+        onClick={() => {
+          setSelectedItem({ limitDate: null, pass: '', isNew: true });
+          setShowModal(true);
+          setActiveStep(0);
+        }}
+      >
+        {t('sharedAdd')}
+      </Button>
+
       <Modal
         isOpen={showModal}
-        onClose={() => { setShowModal(false); setSelectedItem({}); setSubModalOpen(false); }}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedItem({});
+        }}
         zIndex={2000}
         style={{ height: '70vh' }}
       >
@@ -311,58 +292,6 @@ const LinksPage = () => {
           <AssignUnits />
           <ShareLink />
         </Wizard>
-      </Modal>
-
-      <Modal
-        isOpen={showDevices}
-        onClose={() => { setShowDevices(false); }}
-      >
-        <iframe title="Dispositivos" src="./linkDevices" frameBorder="0" />
-      </Modal>
-
-      <Modal
-        isOpen={showShare}
-        onClose={() => { setShowShare(false); }}
-        zIndex={1001}
-      >
-        <h3>Ingrese los numeros a los cuales desea compartirles el enlace separados por coma</h3>
-        <TextField
-          fullWidth
-          value={strPhone}
-          onChange={(event) => { setStrPhone(event.target.value); }}
-          label={t('sharedPhone')}
-        />
-
-        {phones.forEach((phone) => (
-          <TextField
-            fullWidth
-            value={phone}
-            disabled
-          />
-        ))}
-
-        <Button
-          disabled={phones.length <= 0}
-          style={{ position: 'fixed', bottom: '0px', right: '100px' }}
-          onClick={() => {
-            toast.toast('Enlace copiado');
-            ClipboardJS.copy(`${window.location.protocol}//${window.location.host}/share-location.html?code=${selectedItem?.code || ''}`);
-          }}
-        >
-          Copiar enlace
-        </Button>
-        <Button
-          disabled={phones.length <= 0}
-          style={{ position: 'fixed', bottom: '0px', right: '0px' }}
-          onClick={() => {
-            setphones(strPhone.split(','));
-            setStrPhone('');
-            shareLink();
-            setShowShare(false);
-          }}
-        >
-          Enviar
-        </Button>
       </Modal>
     </PageLayout>
   );

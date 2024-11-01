@@ -15,6 +15,7 @@ import { sessionActions } from '../../store';
 import { useTranslation } from './LocalizationProvider';
 import { useRestriction } from '../util/permissions';
 import { nativePostMessage } from './NativeInterface';
+import { forgetMe } from '../util/utils';
 
 const BottomMenu = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const BottomMenu = () => {
 
   const handleLogout = async () => {
     setAnchorEl(null);
-
+    forgetMe();
     const notificationToken = window.localStorage.getItem('notificationToken');
     if (notificationToken && !user.readonly) {
       window.localStorage.removeItem('notificationToken');

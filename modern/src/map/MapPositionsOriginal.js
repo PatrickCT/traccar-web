@@ -7,6 +7,7 @@ import { formatTime, getStatusColor } from '../common/util/formatter';
 import { mapIconKey } from './core/preloadImages';
 import { useAttributePreference } from '../common/util/preferences';
 import { useCatchCallback } from '../reactHelper';
+import { findFonts } from './core/mapUtil';
 
 const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleField }) => {
   const id = useId();
@@ -46,6 +47,7 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
       color: showStatus ? position.attributes.color || getStatusColor(device.status) : 'neutral',
       rotation: position.course,
       direction: showDirection,
+      background: device?.attributes?.background || '#163b61',
     };
   };
 
@@ -97,7 +99,22 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
         features: [],
       },
     });
+
     [id, selected].forEach((source) => {
+      map.addLayer({
+        id: `background-${source}`,
+        type: 'symbol',
+        source,
+        filter: ['!has', 'point_count'],
+        layout: {
+          'icon-image': 'background',
+          'icon-size': iconScale,
+          'icon-allow-overlap': true,
+        },
+        paint: {
+          'icon-color': ['get', 'background'],
+        },
+      });
       map.addLayer({
         id: source,
         type: 'symbol',
@@ -105,19 +122,21 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
         filter: ['!has', 'point_count'],
         layout: {
           'icon-image': '{category}-{color}',
-          'icon-size': iconScale,
+          'icon-size': iconScale / 2,
           'icon-allow-overlap': true,
-          'text-field': `{${titleField || 'name'}}`,
+          'text-field': titleField ? `{${titleField}}` : '',
           'text-allow-overlap': true,
           'text-anchor': 'bottom',
           'text-offset': [0, -2 * iconScale],
-          'text-size': 12,
+          'text-font': findFonts(map),
+          'text-size': 14,
         },
         paint: {
           'text-halo-color': 'white',
           'text-halo-width': 1,
         },
       });
+
       map.addLayer({
         id: `direction-${source}`,
         type: 'symbol',
@@ -178,6 +197,9 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
         }
         if (map.getLayer(`direction-${source}`)) {
           map.removeLayer(`direction-${source}`);
+        }
+        if (map.getLayer(`background-${source}`)) {
+          map.removeLayer(`background-${source}`);
         }
         if (map.getSource(source)) {
           map.removeSource(source);

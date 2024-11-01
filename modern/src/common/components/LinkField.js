@@ -1,9 +1,14 @@
 /* eslint-disable no-unused-vars */
-import { Autocomplete, Button, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  LinearProgress,
+} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { useEffectAsync } from '../../reactHelper';
-import LoadingSpinner from './LoadingSpinner';
+import { useTranslation } from './LocalizationProvider';
+import { confirmDialog } from '../util/utils';
 
 const LinkField = ({
   label,
@@ -16,10 +21,11 @@ const LinkField = ({
   titleGetter = (item) => item.name,
 }) => {
   const [active, setActive] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [items, setItems] = useState();
-  const [linked, setLinked] = useState();
-  const [itemsLoading, setItemsLoading] = useState();
+  const [items, setItems] = useState([]);
+  const [linked, setLinked] = useState([]);
+  const [bulk, setBulk] = useState([]);
+
+  const t = useTranslation();
 
   useEffectAsync(async () => {
     if (active) {
@@ -38,18 +44,12 @@ const LinkField = ({
       const response = await fetch(endpointLinked);
       if (response.ok) {
         const l = await response.json();
-        setLinked(l);
+        setLinked(l.map((i) => i.id));
       } else {
         throw Error(await response.text());
       }
     }
   }, [active]);
-
-  useEffect(() => {
-    const loadings = {};
-    (items ?? []).forEach((item) => loadings[item.id] = false);
-    setItemsLoading(loadings);
-  }, [items]);
 
   const createBody = (linkId) => {
     const body = {};
@@ -59,28 +59,33 @@ const LinkField = ({
   };
 
   const onChange = async (value) => {
-    const loadings = itemsLoading;
-    loadings[value.id] = true;
-    setItemsLoading(loadings);
-    setActive(!active);
+    setActive(false);
+    // setItems((old) => old.map((item) => (item.id !== value.id ? item : { ...value, checked: !value.checked })));
 
     if (value.checked) {
+      setLinked((old) => old.filter((i) => i !== value.id));
       await fetch('/api/permissions', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(createBody(keyGetter(value))),
       });
     } else {
+      setLinked((old) => [...old, value.id]);
       await fetch('/api/permissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(createBody(keyGetter(value))),
       });
     }
+  };
 
-    loadings[value.id] = false;
-    setItemsLoading(loadings);
-    setActive(!active);
+  const removeAll = async () => {
+    await fetch('/api/permissions/bulk', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(linked.map((id) => createBody(id.toString()))),
+    });
+    window.location.reload();
   };
 
   const deviceColumns = [
@@ -89,20 +94,19 @@ const LinkField = ({
       headerName: '',
       width: 100,
       renderCell: (params) => (
-        (itemsLoading[params.row.id]) ? <span>⌛</span> : (
-          <input
-            type="checkbox"
-            checked={params.value}
-            onChange={() => onChange(params.row)}
-          />
-        )
+        <input
+          type="checkbox"
+          checked={params.value}
+          onChange={() => onChange(params.row)}
+        />
       ),
     },
     { field: 'id', headerName: 'ID', width: 30 },
-    { field: 'name', headerName: 'Nombre', width: 100 },
-    { field: 'uniqueId', headerName: 'Imei', width: 100 },
+    { field: 'name', headerName: 'Nombre', width: 200 },
+    { field: 'uniqueId', headerName: 'Imei', width: 200 },
   ];
 
+  const genericColumnsKeyField = (str) => ((options) => (options[Object.keys(options).find((key) => str.includes(key))] || 'name'))({ commands: 'description', notifications: 'type' });
   const genericColumns = [
     {
       field: 'checked',
@@ -116,8 +120,8 @@ const LinkField = ({
         />
       ),
     },
-    { field: 'id', headerName: 'ID', width: 33 },
-    { field: 'name', headerName: 'Nombre', width: 130 },
+    { field: 'id', headerName: 'ID', width: 50 },
+    { field: genericColumnsKeyField(endpointAll), headerName: 'Nombre', width: 230 },
   ];
 
   useEffect(() => setActive(true), []);
@@ -125,11 +129,38 @@ const LinkField = ({
   return (
     <>
       <div style={{ height: 400, width: '100%' }}>
-        <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 14 }}>
-          {label}
-        </Button>
+        <div style={{ width: '100%', display: 'flex' }}>
+          <Button variant="text" disabled style={{ color: 'black', flex: 1, fontSize: 14, display: 'inline-block' }}>
+            {label}
+          </Button>
+          <div style={{ flex: 10, display: 'inline-block', paddingTop: '18px' }} />
+          {
+            linked.length > 0 && (
+              <Button
+                variant="text"
+                style={{ color: 'black', flex: 1, fontSize: 14, display: 'inline-block' }}
+                onClick={() => {
+                  confirmDialog((async () => removeAll()), (() => { }));
+                }}
+              >
+                {t('sharedRemove')}
+                &nbsp;
+                {t('sharedAll')}
+              </Button>
+            )
+          }
+          {/* <FormGroup style={{ flex: 9, display: 'inline-block' }}>
+            <FormControlLabel control={<Switch checked={bulk} onChange={(evt) => setBulk(evt.target.checked)} />} label="Masivo" />
+          </FormGroup>
+          {bulk && (
+            <IconButton style={{ flex: 1, display: 'inline-block' }}>
+              <SaveOutlined />
+            </IconButton>
+          )} */}
+        </div>
         <DataGrid
-          rows={(items ?? []).map((item) => ({ ...item, checked: (linked ?? []).some((selectedItem) => selectedItem.id === item.id) }))}
+          style={{ flex: 12 }}
+          rows={(items ?? []).map((item) => ({ ...item, checked: (linked).includes(item.id) }))}
           columns={endpointAll.toString().includes('devices') ? deviceColumns : genericColumns}
           hideFooter
         />

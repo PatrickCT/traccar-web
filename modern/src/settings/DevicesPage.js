@@ -104,9 +104,7 @@ const DevicesPage = () => {
     },
   ];
 
-  if (!admin) {
-    delete columns[7];
-  }
+  const filterColumns = admin ? [] : ['phone', 'model', 'simType'];
 
   return (
     <PageLayout menu={<SettingsMenu />} breadcrumbs={['settingsTitle', 'deviceTitle']}>
@@ -116,13 +114,13 @@ const DevicesPage = () => {
           <DataGrid
             autoHeight={false}
             rows={items.filter(filterByKeyword(searchKeyword))}
-            columns={columns}
+            columns={columns.filter((c) => !filterColumns.includes(c.field))}
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 12 },
               },
             }}
-            pageSizeOptions={[15, 20, 50, 100]}
+            pageSizeOptions={[12, 20, 50, 100]}
           />
         </LoadingComponent>
       </div>

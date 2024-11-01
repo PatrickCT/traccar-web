@@ -36,6 +36,7 @@ const BaseCommandView = ({ deviceId, item, setItem }) => {
         if (type === 'boolean') {
           return (
             <FormControlLabel
+              key={key}
               control={(
                 <Checkbox
                   checked={item.attributes[key]}
@@ -52,8 +53,9 @@ const BaseCommandView = ({ deviceId, item, setItem }) => {
         }
         return (
           <TextField
+            key={key}
             type={type === 'number' ? 'number' : 'text'}
-            value={item.attributes[key]}
+            value={item.attributes[key] || ''}
             onChange={(e) => {
               const updateItem = { ...item, attributes: { ...item.attributes } };
               updateItem.attributes[key] = type === 'number' ? Number(e.target.value) : e.target.value;

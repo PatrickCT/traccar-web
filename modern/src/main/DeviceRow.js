@@ -113,7 +113,7 @@ const DeviceRow = ({ data, index, style }) => {
                 <CrisisAlertIcon fontSize="small" className={classes.negative} />
               </Tooltip>
             )}
-            {position.attributes.hasOwnProperty('alarm') && (
+            {position.attributes.hasOwnProperty('alarm') && !position.attributes.alarm.includes('tampering') && (
               <Tooltip title={`${t('eventAlarm')}: ${formatAlarm(position.attributes.alarm, t)}`}>
                 <IconButton size="small">
                   <ErrorIcon fontSize="small" className={classes.negative} />

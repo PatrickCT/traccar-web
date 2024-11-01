@@ -9,6 +9,9 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-eval */
+
+import { distanceFromMeters } from './converter';
+
 /* eslint-disable no-bitwise */
 const requestCache = {};
 const alarmTranslator = (alarm) => {
@@ -222,6 +225,20 @@ const formatDateToCustomString = (date) => {
 
 window.getUser = () => JSON.parse(atob(localStorage.getItem(btoa('user')) || 'e30='));
 
+window.updatePushId = (pushId) => {
+  let user = window.getUser();
+  fetch(`${window.createBaseURL()}/api/users/${user.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...user,
+      pushId,
+    }),
+  });
+};
+
 window.findServerName = (ip) => ({
   '173.255.203.21': 'Alba',
   '198.58.114.237': 'AutoKapital',
@@ -309,7 +326,7 @@ export const attConverter = (obj, attribute) => {
       return value ? ((value * 1.8) + 32).toFixed(1) : null;
     }
     case 'name': {
-      return window.device?.name || window.deviceName || null;
+      return window.device?.name || window.deviceName || window.devices[obj.deviceId]?.name || null;
     }
     case 'ignition': {
       const motion = attConverter(obj, 'motion');
@@ -330,7 +347,7 @@ export const attConverter = (obj, attribute) => {
     }
     case 'totalDistance': {
       const value = attVariantsEvaluator(obj, attribute);
-      return value || null;
+      return `${distanceFromMeters(value).toFixed(2)} Km` || null;
     }
     case 'dateTime': {
       const value = attVariantsEvaluator(obj, 'fixTime');
@@ -365,7 +382,8 @@ export const attConverter = (obj, attribute) => {
       return ((Math.min(value ?? 0, 3.96) * 100) / 3.96).toFixed(2) || null;
     }
     case 'lastAlarm': {
-      const event = getEvent();
+      const user = window.getUser() || {};
+      const event = user.id ? getEvent() : {};
       return alarmTranslator((event?.type || '').toUpperCase());
     }
     case 'policy': {
@@ -443,7 +461,7 @@ let attVariants = (att) => {
 export const attsGetter = (obj, attribute) => (obj[specialAtts(obj, attribute)] ?? obj['attributes']?.[specialAtts(obj, attribute)] ?? obj[`attributes.${specialAtts(obj, attribute)}`] ?? obj[`attribute.${specialAtts(obj, attribute)}`] ?? null) ?? (obj[specialAtts(obj, attribute)] || obj['attributes']?.[specialAtts(obj, attribute)] || obj[`attributes.${specialAtts(obj, attribute)}`] || obj[`attribute.${specialAtts(obj, attribute)}`] || null);
 
 export const specialAtts = (obj, attribute) => {
-  switch (obj.protocol) {
+  switch (obj.protocol || '') {
     case 'ruptela':
       switch (attribute) {
         case 'ignition':
@@ -757,37 +775,22 @@ export const openModalPromociones = () => {
 };
 
 export const confirmDialog = (callBackYes, callBackNo = (() => { })) => {
-  const html = `
-    <div class="simple-confirm dialog-sm" style="display:block">
-    <p>Estas segur@?</p>
-    <div class="buttonbar">
-        <button name='yes' class="..." data-dismiss value="YES">Si</button>
-        <button name='no' class="..." data-dismiss data-cancel value="No">No</button>
-
-    </div>
-    </div>
-    `;
-  window.jsPanel.dialog.modal(html, {
-    theme: '#163b61',
-    border: '1px solid gray',
-    borderRadius: '.5rem',
-    headerTitle: '',
-    position: { my: 'center-bottom', at: 'center-center', offsetY: 0 },
-    headerControls: {
-      minimize: 'remove',
-      smallify: 'remove',
-      maximize: 'remove',
+  window.alertify.confirm('Confirmar', 'Estas segur@', (async () => {
+    callBackYes();
+  }), (() => {
+    callBackNo();
+  })).set({
+    closableByDimmer: false,
+    modal: true,
+    labels: {
+      // dialogs default title
+      title: 'Confirmar',
+      // ok button text
+      ok: 'SI',
+      // cancel button text
+      cancel: 'No',
     },
-    onclick_yes: async () => {
-      callBackYes();
-    },
-    onclick_no: () => {
-      callBackNo();
-    },
-    // onclick_cancel: (panel, elmts, event) => {
-    //   console.log(panel, elmts, event);
-    // },
-  });
+  }).show();
 };
 
 export const isAdmin = () => ((window.getUser())?.administrator || false);
@@ -875,3 +878,21 @@ export const dateDifference = (date1, date2, timeframes = ['years', 'months', 'd
 };
 
 export const randomColor = () => '#000000'.replace(/0/g, () => (~~(Math.random() * 16)).toString(16));
+
+export const parseCookies = () => Object.fromEntries(document.cookie.split('; ').map((v) => v.split(/=(.*)/s).map(decodeURIComponent)));
+
+export const rememberMe = () => {
+  let user = btoa(document.querySelector('#user').value);
+  let password = btoa(document.querySelector('#pass').value);
+  let date = new Date();
+  date.setFullYear(date.getFullYear() + 1);
+  document.cookie = `user=${user}; expires=${date.toUTCString()}; path=/`;
+  document.cookie = `password=${password}; expires=${date.toUTCString()}; path=/`;
+};
+
+export const forgetMe = () => {
+  document.cookie = 'user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  document.cookie = 'password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+};
+
+export const haveSavedSession = () => ['user', 'password'].every((elem) => [...Object.keys(parseCookies())].includes(elem));

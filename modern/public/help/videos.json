@@ -1,8 +1,38 @@
 [
     {
         "id": 1,
-        "title": "Video login",
-        "videoUrl": "../videos/file.mp4",
-        "thumbnailUrl": "../videos/output.png"
+        "title": "Reprte de checadas",
+        "videoUrl": "../videos/Checadas.mp4",
+        "thumbnailUrl": "../videos/Checadas.png"
+    },
+    {
+        "id": 2,
+        "title": "Eventos de geocercas",
+        "videoUrl": "../videos/Eventos_geocercas.mp4",
+        "thumbnailUrl": "../videos/Eventos_geocercas.png"
+    },
+    {
+        "id": 3,
+        "title": "Recorridos",
+        "videoUrl": "../videos/Recorridos.mp4",
+        "thumbnailUrl": "../videos/Recorridos.png"
+    },
+    {
+        "id": 4,
+        "title": "Creación de cuenta espejo",
+        "videoUrl": "../videos/cuenta_espejo.mp4",
+        "thumbnailUrl": "../videos/cuenta_espejo.png"
+    },
+    {
+        "id": 5,
+        "title": "Reporte de paradas",
+        "videoUrl": "../videos/reporte_de_paradas.mp4",
+        "thumbnailUrl": "../videos/reporte_de_paradas.png"
+    },
+    {
+        "id": 6,
+        "title": "Reproducción de recorridos",
+        "videoUrl": "../videos/reproduccion_de_recorridos.mp4",
+        "thumbnailUrl": "../videos/reproduccion_de_recorridos.png"
     }
 ]

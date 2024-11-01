@@ -77,7 +77,7 @@ const EditItemView = ({
 
   return (
     <PageLayout menu={menu} breadcrumbs={breadcrumbs}>
-      <Container maxWidth="md" className={classes.container}>
+      <Container maxWidth="xl" className={classes.container}>
         {item ? children : (
           <Accordion defaultExpanded>
             <AccordionSummary>

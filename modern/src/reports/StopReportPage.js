@@ -134,7 +134,7 @@ const StopReportPage = () => {
                   latitude: i.latitude,
                   longitude: i.longitude,
                 }))]}
-                titleField="fixTime"
+                titleField=""
               />
             </MapView>
             <MapCamera latitude={selectedItem.latitude} longitude={selectedItem.longitude} />
@@ -163,9 +163,9 @@ const StopReportPage = () => {
                   }}
                   style={{ backgroundColor: selectedItem === item ? 'rgba(22, 59, 97, .7)' : 'transparent' }}
                 >
-                  <TableCell className={classes.columnAction} padding="none" />
+                  <TableCell key={`${item.id}-0`} className={classes.columnAction} padding="none" />
                   {columns.map((key) => (
-                    <TableCell style={{ fontSize, lineHeight: '1', padding: '4px' }} key={key}>
+                    <TableCell key={`${item.id}-${key}`} style={{ fontSize, lineHeight: '1', padding: '4px' }}>
                       {formatValue(item, key)}
                     </TableCell>
                   ))}

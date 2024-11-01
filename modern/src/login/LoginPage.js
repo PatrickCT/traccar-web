@@ -6,6 +6,9 @@ import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import {
   useMediaQuery, InputLabel, Select, MenuItem, FormControl, Button, TextField, Link, Snackbar, IconButton, Tooltip, LinearProgress,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
@@ -25,7 +28,9 @@ import { useCatch } from '../reactHelper';
 import { loginTour } from './login_tour';
 import VideoPlayer from '../common/components/VideoPlayer';
 import ctheme from '../common/theme';
-import { openModalPromociones } from '../common/util/utils';
+import {
+  forgetMe, haveSavedSession, openModalPromociones, rememberMe,
+} from '../common/util/utils';
 
 const useStyles = makeStyles((theme) => ({
   options: {
@@ -81,6 +86,7 @@ const LoginPage = () => {
 
   const [email, setEmail] = usePersistedState('loginEmail', '');
   const [password, setPassword] = useState('');
+  const [saveSession, setSaveSession] = useState(haveSavedSession() || false);
 
   const registrationEnabled = useSelector((state) => state.session.server.registration);
   const languageEnabled = useSelector((state) => !state.session.server.attributes['ui.disableLoginLanguage']);
@@ -126,6 +132,11 @@ const LoginPage = () => {
         localStorage.setItem('aXNSZXZpc29y', (user.attributes.hasOwnProperty('Revisor') && user.attributes.Revisor));
         generateLoginToken();
         dispatch(sessionActions.updateUser(user));
+        if (saveSession) {
+          rememberMe();
+        } else {
+          forgetMe();
+        }
         navigate('/');
         const promosTimeout = setTimeout(() => {
           fetch('https://crmgpstracker.mx:4040/api/external/promotions/list').then((response) => response.json()).then((result) => {
@@ -238,17 +249,9 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             onKeyUp={handleSpecialKey}
             id="pass"
-          // inputLabelProps={{
-          //   style: {
-          //     color: desktop ? '#000000' : '#ffffff',
-          //     backgroundColor: desktop ? '#ffffff' : '#163b61',
-          //     WebkitBoxShadow: desktop
-          //       ? '0 0 0 1000px #ffffff inset' // Set the background color even for autofilled input
-          //       : '0 0 0 1000px #163b61 inset', // Set the background color for autofilled input
-          //   },
-          // }}
 
           />
+
           <Button
             onClick={handlePasswordLogin}
             onKeyUp={handleSpecialKey}
@@ -259,6 +262,11 @@ const LoginPage = () => {
           >
             {t('loginLogin')}
           </Button>
+
+          <FormGroup>
+            <FormControlLabel control={<Checkbox checked={saveSession} onChange={(evt) => setSaveSession(evt.target.checked)} />} label={`${t('save_session')}`} />
+          </FormGroup>
+
           {openIdEnabled && (
             <Button
               onClick={() => handleOpenIdLogin()}

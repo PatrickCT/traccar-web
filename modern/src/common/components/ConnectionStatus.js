@@ -1,4 +1,4 @@
-import { Snackbar } from '@mui/material';
+import { Alert, Snackbar } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 
 const ConnectionStatus = () => {
@@ -9,8 +9,9 @@ const ConnectionStatus = () => {
       setNotifications([{
         id: 1,
         show: true,
-        message: navigator.onLine ? 'Back online' : 'Connection offline',
-        duration: navigator.onLine ? 2750 : 9999999999999,
+        message: navigator.onLine ? 'Conexión reestablecida' : 'Fuera de linea',
+        duration: navigator.onLine ? 2750 : 9999999999,
+        keep: !navigator.onLine,
       }]);
     };
 
@@ -23,8 +24,9 @@ const ConnectionStatus = () => {
         setNotifications([{
           id: 1,
           show: true,
-          message: 'Slow connection',
-          duration: 9999999999999,
+          message: 'Conexión lenta',
+          duration: 10000,
+          keep: false,
         }]);
       }
     };
@@ -47,10 +49,20 @@ const ConnectionStatus = () => {
           <Snackbar
             key={notification.id}
             open={notification.show}
-            message={notification.message}
+            // message={notification.message}
             autoHideDuration={notification.duration}
-            onClose={() => setNotifications([])}
-          />
+            onClose={() => {
+              if (notification.keep) {
+                setNotifications([notification]);
+              } else {
+                setNotifications([]);
+              }
+            }}
+          >
+            <Alert variant="outlined" severity="info">
+              {notification.message}
+            </Alert>
+          </Snackbar>
         ))
       }
     </div>

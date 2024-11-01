@@ -1,7 +1,9 @@
 import React from 'react';
 import { Button } from '@mui/material';
+import { useTranslation } from '../../common/components/LocalizationProvider';
 
 const Modal = ({ isOpen, onClose, children, zIndex = 1000, style = {} }) => {
+  const t = useTranslation();
   const modalStyle = {
     display: isOpen ? 'block' : 'none',
     position: 'fixed',
@@ -32,7 +34,7 @@ const Modal = ({ isOpen, onClose, children, zIndex = 1000, style = {} }) => {
   // Apply wider width on mobile devices
   const isMobile = window.innerWidth <= 768; // Adjust the breakpoint as needed
   if (isMobile && isOpen) {
-    modalStyle.width = '80%'; // Customize the width for mobile
+    modalStyle.width = '90vw'; // Customize the width for mobile
   }
 
   if (!isOpen) return null;
@@ -43,7 +45,7 @@ const Modal = ({ isOpen, onClose, children, zIndex = 1000, style = {} }) => {
       <div className="modal" style={modalStyle}>
         <div className="modal-content">
           {children}
-          <Button style={{ position: 'fixed', bottom: '0px', left: '0px' }} onClick={onClose}>Cerrar</Button>
+          <Button style={{ position: 'fixed', bottom: '0px', left: '0px' }} onClick={onClose}>{t('sharedClose')}</Button>
         </div>
       </div>
     </div>

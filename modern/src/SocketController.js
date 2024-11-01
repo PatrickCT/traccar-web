@@ -45,11 +45,6 @@ const SocketController = () => {
     refreshUser: async () => {
       const response = await fetch('/api/session');
       if (response.ok) {
-        setNotifications([{
-          id: 0,
-          message: 'Recarga de pagina por sistema',
-          show: true,
-        }]);
         dispatch(sessionActions.updateUser(await response.json()));
       }
     },
@@ -57,11 +52,6 @@ const SocketController = () => {
       window.location.reload();
     },
     logout: () => {
-      setNotifications([{
-        id: 0,
-        message: 'Ya\'ve been logged out by the system',
-        show: true,
-      }]);
       window.handleLogout();
     },
   };
@@ -136,6 +126,7 @@ const SocketController = () => {
     socket.onmessage = (event) => {
       if (document.hidden) return;
       const data = JSON.parse(event.data);
+
       if (data.devices) {
         trackDispatch('updateDevices');
         dispatch(devicesActions.update(data.devices));

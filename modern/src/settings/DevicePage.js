@@ -61,6 +61,7 @@ const DevicePage = () => {
   });
 
   const validate = () => item && item.name && item.uniqueId;
+
   return (
     <EditItemView
       endpoint="devices"
@@ -203,6 +204,12 @@ const DevicePage = () => {
             </AccordionSummary>
             <AccordionDetails className={classes.details}>
               {/* TODO add company */}
+              <SelectField
+                value={item.insuranceCompanyId || 0}
+                onChange={(event) => setItem({ ...item, insuranceCompanyId: Number(event.target.value) })}
+                endpoint="/api/insurance/companies"
+                label={t('insuranceCompany')}
+              />
               <TextField
                 value={item.policy || ''}
                 onChange={(event) => setItem({ ...item, policy: event.target.value })}
@@ -237,7 +244,7 @@ const DevicePage = () => {
           )}
           {!user.deviceReadonly && (
             <EditAttributesAccordion
-              attributes={{ speedLimit: 0, rendimiento: 0, ...(admin ? (item.attributes) : {}) }}
+              attributes={{ speedLimit: null, rendimiento: null, ...(admin ? (item.attributes) : { ...(item.attributes.speedLimit ? { speedLimit: item.attributes.speedLimit } : {}), ...(item.attributes.rendimiento ? { rendimiento: item.attributes.rendimiento } : {}) }) }}
               setAttributes={(attributes) => setItem({ ...item, attributes })}
               definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
               canAdd={admin}

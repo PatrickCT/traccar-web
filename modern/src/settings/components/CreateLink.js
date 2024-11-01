@@ -56,7 +56,7 @@ const CreateLink = ({ selectedItem, setSelectedItem, onClick }) => {
           nextStep();
         }}
       >
-        Siguiente
+        {t('sharedNext')}
       </Button>
     </>
   );

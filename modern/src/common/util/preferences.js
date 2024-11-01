@@ -26,12 +26,12 @@ export const useAttributePreference = (key, defaultValue) => useSelector((state)
     if (containsProperty(state.session.server.attributes, key)) {
       return state.session.server.attributes[key];
     }
-    if (containsProperty(state.session.user.attributes, key)) {
+    if (containsProperty(state.session.user?.attributes || {}, key)) {
       return state.session.user.attributes[key];
     }
     return defaultValue;
   }
-  if (containsProperty(state.session.user.attributes, key)) {
+  if (containsProperty(state.session.user?.attributes || {}, key)) {
     return state.session.user.attributes[key];
   }
   if (containsProperty(state.session.server.attributes, key)) {

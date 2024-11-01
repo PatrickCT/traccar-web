@@ -43,7 +43,7 @@ const ExtraPhoneList = (props) => {
   };
 
   const handleDelete = (item) => {
-    fetch(`/api/users/${user}/phones`, {
+    fetch(`/api/users/${user}/phones/${item.phone}`, {
       method: 'DELETE',
     }).then(() => {
       setData(data.filter((d) => d.id !== item.id));

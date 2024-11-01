@@ -1,3 +1,12 @@
+/* eslint-disable func-names */
+/* eslint-disable no-unreachable */
+/* eslint-disable max-classes-per-file */
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+/* eslint-disable no-alert */
+import { createBaseURL } from './utils';
+
 class PushNotificationsManager {
   constructor() {
     this.subscription = null;
@@ -9,6 +18,7 @@ class PushNotificationsManager {
     this.init = this.init.bind(this);
     this.subscribeUser = this.subscribeUser.bind(this);
     this.unsubscribeUser = this.unsubscribeUser.bind(this);
+    this.init();
   }
 
   static urlB64ToUint8Array(base64String) {
@@ -28,19 +38,47 @@ class PushNotificationsManager {
 
   init() {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
-      navigator.serviceWorker.register('push-sw.js')
+      navigator.serviceWorker.register(`${createBaseURL()}/push-sw.js`)
         .then((swReg) => { // Use arrow function here
           this.swRegistration = swReg; // Now 'this' refers to the class instance
           // initialize
+          swReg.pushManager.getSubscription().then((subscription) => {
+            this.subscription = subscription;
+            this.isSubscribed = this.subscription !== null;
+          });
         })
         .catch(() => {
         });
     }
   }
 
-  static updateSubscriptionOnServer(subscription) {
-    // TODO: Send subscription to application server
-    console.log(subscription);
+  static updateSubscriptionOnServer(subscription, endpoint) {
+    if (subscription) {
+      fetch('https://crmgpstracker.mx:4545/api/subscriptions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user: window.getUser() || null,
+          subscription,
+          hostname: window.location.hostname,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => window.updatePushId(data.data.push_user.id))
+        .catch((err) => alert('No se pudo subscribir a las notificaciones push'));
+    } else {
+      fetch(`https://crmgpstracker.mx:4545/api/subscriptions/${btoa(endpoint)}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => window.updatePushId(null))
+        .catch((err) => alert('No se pudo cancelar la subscripción a las notificaciones push'));
+    }
   }
 
   subscribeUser() {
@@ -51,7 +89,7 @@ class PushNotificationsManager {
     })
       .then((subscription) => {
         this.subscription = subscription;
-        PushNotificationsManager.updateSubscriptionOnServer(subscription);
+        PushNotificationsManager.updateSubscriptionOnServer(subscription, null);
 
         this.isSubscribed = true;
       })
@@ -63,13 +101,13 @@ class PushNotificationsManager {
     this.swRegistration.pushManager.getSubscription()
       .then((subscription) => {
         if (subscription) {
+          PushNotificationsManager.updateSubscriptionOnServer(null, subscription.endpoint);
           subscription.unsubscribe();
         }
       })
       .catch(() => {
       })
       .then(() => {
-        PushNotificationsManager.updateSubscriptionOnServer(null);
         this.subscription = null;
         this.isSubscribed = false;
       });

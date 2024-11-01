@@ -40,11 +40,13 @@ const HelpPage = () => {
     fetch('/help/videos.json')
       .then((response) => response.json())
       .then((data) => setVideoData(data.filter((d) => (d.viewOn ?? mode) === mode)))
-      .catch((error) => setNotifications([{
-        id: 1,
-        show: true,
-        message: error,
-      }]));
+      .catch((error) => {
+        setNotifications([{
+          id: 1,
+          show: true,
+          message: error,
+        }]);
+      });
   }, []);
 
   return (
@@ -63,7 +65,7 @@ const HelpPage = () => {
             <div style={{ paddingLeft: '25px' }} className="video-item" key={video.id}>
               <p>{video.title}</p>
               <img
-                style={{ width: '250px' }}
+                style={{ width: '250px', maxHeight: '160px' }}
                 src={video.thumbnailUrl}
                 alt={`Thumbnail for ${video.title}`}
               />

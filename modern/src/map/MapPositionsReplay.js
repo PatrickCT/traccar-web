@@ -94,6 +94,7 @@ const MapPositions = ({
 
   const onMarkerClick = useCallback((event) => {
     event.preventDefault();
+
     const feature = event.features[0];
     if (onClick) {
       onClick(feature.properties.id, feature.properties.deviceId, map, event);
@@ -101,6 +102,8 @@ const MapPositions = ({
   }, [onClick]);
 
   const onMapClick = useCallback((event) => {
+    event.preventDefault();
+
     if (!event.defaultPrevented && onClick) {
       onClick();
     }
@@ -108,6 +111,7 @@ const MapPositions = ({
 
   const onClusterClick = useCallback((event) => {
     event.preventDefault();
+
     const features = map.queryRenderedFeatures(event.point, {
       layers: [clusters],
     });

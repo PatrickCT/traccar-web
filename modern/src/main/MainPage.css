@@ -26,6 +26,7 @@
     background-color: var(--custom_color) !important;
     border-radius: 15px !important;
     color: white;
+    padding: 15px 10px !important;
 }
 
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {

@@ -314,6 +314,7 @@ const ReplaySideBar = ({
               </div>
               <Select
                 defaultValue={1000 - speed}
+                value={1000 - speed}
                 onChange={
                   (e) => {
                     setSpeed(1000 - e.target.value);

@@ -1,8 +1,8 @@
 /* eslint-disable no-empty */
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-arrow-callback */
+import { toast } from './toasts';
 import {
-  attConverter,
   hasPassedTime,
   isMobile,
   valueParser,
@@ -90,37 +90,42 @@ window.engineReactivate = () => {
 };
 
 window.confirmDialog = (type) => {
-  window.alertify.confirm('Confirmar', 'Estas segur@', (async () => {
-    if (type === 1) {
-      await window.makeRequest('./api/commands/send', 'POST', {
-        type: 'engineStop',
-        attributes: {},
-        deviceId: window.position.deviceId,
-      });
-    } else if (type === 2) {
-      await window.makeRequest('./api/commands/send', 'POST', {
-        id: 0,
-        attributes: {},
-        deviceId: window.position.deviceId,
-        type: 'engineResume',
-        textChannel: false,
-        description: null,
-      });
-    }
-  }), (() => {
+  try {
+    window.alertify.confirm('Confirmar', 'Estas segur@', (async () => {
+      if (type === 1) {
+        await window.makeRequest('./api/commands/send', 'POST', {
+          type: 'engineStop',
+          attributes: {},
+          deviceId: window.position.deviceId,
+        });
+        toast.toast('Comando enviado', { style: { main: { ...(isMobile() ? { bottom: '5vh' } : {}) } } });
+      } else if (type === 2) {
+        await window.makeRequest('./api/commands/send', 'POST', {
+          id: 0,
+          attributes: {},
+          deviceId: window.position.deviceId,
+          type: 'engineResume',
+          textChannel: false,
+          description: null,
+        });
+        toast.toast('Comando enviado', { style: { main: { ...(isMobile() ? { bottom: '5vh' } : {}) } } });
+      }
+    }), (() => {
+    })).set({
+      closableByDimmer: false,
+      modal: true,
+      labels: {
+        // dialogs default title
+        title: 'Confirmar',
+        // ok button text
+        ok: 'SI',
+        // cancel button text
+        cancel: 'No',
+      },
+    }).show();
+  } catch (error) {
 
-  })).set({
-    closableByDimmer: false,
-    modal: true,
-    labels: {
-      // dialogs default title
-      title: 'Confirmar',
-      // ok button text
-      ok: 'SI',
-      // cancel button text
-      cancel: 'No',
-    },
-  }).show();
+  }
 };
 
 const openInNewTab = (url) => {
@@ -282,7 +287,7 @@ const createPopUpHeadersButtons = (position) => popupHeaderButtons(position);
 
 const createPopUpFooterButtons = (include) => popupFooterButtons(include);
 
-const createPopUpContent = (position, showHeaderButtons = true, showFooterButtons = true, includeFooterButtons = ['engineLock', 'engineResume', 'streetView', 'maps', 'report', 'replay']) => {
+const createPopUpContent = (position, showHeaderButtons = true, showFooterButtons = true, includeFooterButtons = []) => {
   try {
     const user = window.getUser();
     // sections
@@ -303,6 +308,7 @@ const createPopUpContent = (position, showHeaderButtons = true, showFooterButton
     if (showFooterButtons && !user.deviceReadonly) {
       html += createPopUpFooterButtons(includeFooterButtons);
     }
+
     return html;
   } catch (_) {
   }
@@ -310,7 +316,7 @@ const createPopUpContent = (position, showHeaderButtons = true, showFooterButton
   return '';
 };
 
-export const createPopUp = (position, showHeaderButtons = true, showFooterButtons = true) => createPopUpContent(position, showHeaderButtons, showFooterButtons);
+export const createPopUp = (position, showHeaderButtons = true, showFooterButtons = true, includeFooterButtons = ['engineLock', 'engineResume', 'streetView', 'maps', 'report', 'replay']) => createPopUpContent(position, showHeaderButtons, showFooterButtons, includeFooterButtons);
 
 window.createPopUp = createPopUp;
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +20,7 @@ import useMapOverlays from '../map/overlay/useMapOverlays';
 import { useCatch } from '../reactHelper';
 import { sessionActions } from '../store';
 import { useRestriction } from '../common/util/permissions';
+import PushNotificationsManager from '../common/util/push';
 
 const deviceFields = [
   { id: 'name', name: 'sharedName' },
@@ -53,6 +54,9 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
   },
+  hidden: {
+    display: 'none',
+  },
 }));
 
 const PreferencesPage = () => {
@@ -72,13 +76,11 @@ const PreferencesPage = () => {
 
   const [token, setToken] = useState(null);
   const [tokenExpiration, setTokenExpiration] = useState(moment().add(1, 'week').locale('en').format(moment.HTML5_FMT.DATE));
+  const pushManager = new PushNotificationsManager();
+  const [push, setPush] = useState(pushManager.isSubscribed);
 
   const mapStyles = useMapStyles();
-  const mapOverlays = useMapOverlays();
-
-  // const positionAttributes = usePositionAttributes(t);
-
-  // const filter = createFilterOptions();
+  const mapOverlays = [...useMapOverlays()].filter((l) => l.title.includes('google'));
 
   const generateToken = useCatch(async () => {
     const expiration = moment(tokenExpiration, moment.HTML5_FMT.DATE).toISOString();
@@ -112,9 +114,15 @@ const PreferencesPage = () => {
     }
   });
 
+  useEffect(() => {
+    setTimeout(() => {
+      setPush(pushManager.isSubscribed);
+    }, 2000);
+  }, []);
+
   return (
     <PageLayout menu={<SettingsMenu />} breadcrumbs={['settingsTitle', 'sharedPreferences']}>
-      <Container maxWidth="xs" className={classes.container}>
+      <Container maxWidth="lg" className={classes.container}>
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="subtitle1">
@@ -179,7 +187,7 @@ const PreferencesPage = () => {
                     }}
                     multiple
                   >
-                    {mapStyles.map((style) => (
+                    {mapStyles.filter((m) => m.id.includes('google')).map((style) => (
                       <MenuItem key={style.id} value={style.id}>
                         <Typography component="span" color={style.available ? 'textPrimary' : 'error'}>{style.title}</Typography>
                       </MenuItem>
@@ -323,6 +331,45 @@ const PreferencesPage = () => {
                 </AccordionDetails>
               </Accordion>
             )}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle1">
+                  {t('pushNotifications')}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails className={classes.details}>
+                {push && (
+                  <Button
+                    type="button"
+                    color="primary"
+                    variant="outlined"
+                    onClick={() => {
+                      setPush(false);
+                      pushManager.unsubscribeUser();
+                    }}
+                  >
+                    {t('disableString')}
+                    &nbsp;
+                    {t('pushNotifications')}
+                  </Button>
+                )}
+                {!push && (
+                  <Button
+                    type="button"
+                    color="primary"
+                    variant="outlined"
+                    onClick={() => {
+                      setPush(true);
+                      pushManager.subscribeUser();
+                    }}
+                  >
+                    {t('enableString')}
+                    &nbsp;
+                    {t('pushNotifications')}
+                  </Button>
+                )}
+              </AccordionDetails>
+            </Accordion>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="subtitle1">

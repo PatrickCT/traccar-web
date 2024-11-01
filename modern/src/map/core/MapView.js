@@ -24,6 +24,7 @@ export const map = new maplibregl.Map({
     'mapbox:autocomposite': true,
   },
   glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+  preserveDrawingBuffer: true,
 });
 
 let ready = false;

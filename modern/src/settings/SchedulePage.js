@@ -343,22 +343,6 @@ const SchedulePage = () => {
     setItem({ ...{ ...item, attributes: { ...item?.attributes, hours: horas } } });
   }, [horas]);
 
-  // useEffect(() => {
-  //   const handler = {
-  //     get(target, key) {
-  //       if (typeof target[key] === 'object' && target[key] !== null) {
-  //         return new Proxy(target[key], handler);
-  //       }
-  //       return target[key];
-  //     },
-  //     set(target, prop, value) {
-  //       target[prop] = value;
-  //       return true;
-  //     },
-  //   };
-
-  //   const stored = new Proxy(JSON.parse(localStorage.getItem('schedule-stored') || '{}'), handler);
-  // }, []);
   const updateSubruta = (evt) => {
     setSubruta(evt.target.value);
     setItem({

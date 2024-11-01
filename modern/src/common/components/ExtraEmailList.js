@@ -43,7 +43,7 @@ const ExtraEmailList = (props) => {
   };
 
   const handleDelete = (item) => {
-    fetch(`/api/users/${user}/mails`, {
+    fetch(`/api/users/${user}/mails/${item.email}`, {
       method: 'DELETE',
     }).then(() => {
       setData(data.filter((d) => d.id !== item.id));
