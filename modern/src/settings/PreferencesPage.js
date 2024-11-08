@@ -77,7 +77,7 @@ const PreferencesPage = () => {
   const [token, setToken] = useState(null);
   const [tokenExpiration, setTokenExpiration] = useState(moment().add(1, 'week').locale('en').format(moment.HTML5_FMT.DATE));
   const pushManager = new PushNotificationsManager();
-  const [push, setPush] = useState(pushManager.isSubscribed);
+  const [push, setPush] = useState((pushManager.isSubscribed || (user.pushId !== null)));
 
   const mapStyles = useMapStyles();
   const mapOverlays = [...useMapOverlays()].filter((l) => l.title.includes('google'));

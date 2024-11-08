@@ -30,10 +30,9 @@ const ShareNoAuth = () => {
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const t = useTranslation();
 
-  const [pass, setPass] = useState('');
+  const [pass, setPass] = useState(null);
   const [obj, setObj] = useState(null);
 
   const verifyPass = () => {
@@ -53,8 +52,8 @@ const ShareNoAuth = () => {
         // .set('onclose', () => { window.alertify.message(''); })
         .set('labels', { ok: 'Ok', cancel: `${t('sharedCancel')}` })
         .set('title', `${t('userPassword')}`)
-        .set('closable', false)
-        .set('type', 'number');
+        .set('closable', false);
+      // .set('type', 'number');
     } catch (error) {
       verifyPass();
     }
@@ -71,10 +70,8 @@ const ShareNoAuth = () => {
 
     if (r.ok) {
       const obj = await r.json();
-
       setObj(obj);
       setPass(obj.pass);
-      verifyPass();
     } else {
       window.Notiflix.Report.failure(
         'Notiflix Success',
@@ -95,6 +92,12 @@ const ShareNoAuth = () => {
     }
     return null;
   }, []);
+
+  useEffect(() => {
+    if (pass !== null) {
+      verifyPass();
+    }
+  }, [pass]);
 
   return !initialized ? (<LinearProgress />) : (
     <>

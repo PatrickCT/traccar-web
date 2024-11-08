@@ -82,6 +82,10 @@ class PushNotificationsManager {
   }
 
   subscribeUser() {
+    if (window.flutter_inappwebview) {
+      window.flutter_inappwebview.callHandler('flutter-push-info-user', JSON.stringify(((user) => ({ name: user?.name || '', id: user?.id || 0 }))(window.getUser() || null)));
+      return;
+    }
     const applicationServerKey = PushNotificationsManager.urlB64ToUint8Array(this.applicationServerPublicKey);
     this.swRegistration.pushManager.subscribe({
       userVisibleOnly: true,

@@ -1,6 +1,10 @@
 import { useSelector } from 'react-redux';
 
-const containsProperty = (object, key) => object.hasOwnProperty(key) && object[key] !== null;
+const containsProperty = (object, key) => {
+  object ||= {};
+
+  return object.hasOwnProperty(key) && object[key] !== null;
+};
 
 export const usePreference = (key, defaultValue) => useSelector((state) => {
   if (state.session.server.forceSettings) {
