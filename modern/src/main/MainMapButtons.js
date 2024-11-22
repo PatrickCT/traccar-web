@@ -4,7 +4,7 @@ import MapShare from '../map/share/MapShare';
 import MapCoverage from '../map/coverage/MapCoverage';
 import MapPromotions from '../map/promotions/MapPromotions';
 // import MapHorizontalButton from '../map/Buttons/MapHorizontalButton';
-import { modals } from './MainModals';
+import { modals } from './LinksModal';
 import { useAdministrator } from '../common/util/permissions';
 import { showCoberturaMap } from '../common/util/utils';
 

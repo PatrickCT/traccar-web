@@ -87,7 +87,7 @@ export default () => {
       id: 'googleSatellite',
       title: t('mapGoogleSatellite'),
       style: styleCustom({
-        tiles: [0, 1, 2, 3].map((i) => `https://mt${i}.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga`),
+        tiles: [0, 1, 2, 3].map((i) => `https://mt${i}.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}&s=Ga`),
         maxZoom: 20,
         attribution: '© Google',
       }),

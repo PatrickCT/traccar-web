@@ -37,20 +37,20 @@
 
 .maplibregl-popup-anchor-top .maplibregl-popup-tip {
     align-self: center;
-    border-bottom: none;
+    border-top: none;
     border-top-color: #06376A !important;
 }
 
 .maplibregl-popup-anchor-right .maplibregl-popup-tip {
     align-self: center;
-    border-bottom: none;
-    border-top-color: #06376A !important;
+    border-right: none;
+    border-left-color: #06376A !important;
 }
 
 .maplibregl-popup-anchor-left .maplibregl-popup-tip {
     align-self: center;
-    border-bottom: none;
-    border-top-color: #06376A !important;
+    border-left: none;
+    border-right-color: #06376A !important;
 }
 
 

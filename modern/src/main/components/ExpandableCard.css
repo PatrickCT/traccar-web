@@ -1,0 +1,21 @@
+.card {
+    height: 200px;
+    transition-property: transform, background-color;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+}
+
+.card.animated {
+    position: fixed;
+    top: 8vh;
+    left: 0;
+    right: 0;
+    height: 100vh !important;
+    z-index: 999;
+    background-color: white;
+}
+
+.card.animate {
+    will-change: transform;
+    transform-origin: 0 0;
+}

@@ -35,9 +35,10 @@ import { useAdministrator } from '../common/util/permissions';
 import { LayersManager } from '../common/util/utils';
 import Banner from './components/Banner';
 import { toast } from '../common/util/toasts';
-import MainModals from './MainModals';
+import LinksModal from './LinksModal';
 import MainMapButtons from './MainMapButtons';
 import PushNotificationsManager from '../common/util/push';
+import SurveysDialog from './components/SurverysDialog';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -299,8 +300,11 @@ const MainPage = () => {
       <Banner
         children={bannerText}
       />
-      <MainModals />
+      <LinksModal />
       <MainMapButtons />
+      {!user.administrator && (user.main || (user.principal && user.principal > 0)) && (
+        <SurveysDialog />
+      )}
     </div>
   );
 };

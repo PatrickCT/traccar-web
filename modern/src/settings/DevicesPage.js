@@ -13,7 +13,7 @@ import CollectionActions from './components/CollectionActions';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import { usePreference } from '../common/util/preferences';
 import { formatTime } from '../common/util/formatter';
-import { useAdministrator, useDeviceReadonly } from '../common/util/permissions';
+import { useAdministrator, useDeviceReadonly, useSupport } from '../common/util/permissions';
 import LoadingComponent from './components/LoadingComponent';
 
 const DevicesPage = () => {
@@ -24,6 +24,7 @@ const DevicesPage = () => {
   const hours12 = usePreference('twelveHourFormat');
 
   const deviceReadonly = useDeviceReadonly();
+  const support = useSupport();
 
   const [timestamp, setTimestamp] = useState(Date.now());
   const [items, setItems] = useState([]);
@@ -70,9 +71,9 @@ const DevicesPage = () => {
       width: 150,
       valueGetter: (_, params) => `${groups[params?.groupId]?.name || t('groupNoGroup')}`,
     },
-    { field: 'phone', headerName: `${t('sharedPhone')}`, width: 200 },
-    { field: 'model', headerName: `${t('deviceModel')}`, width: 150 },
-    { field: 'contact', headerName: `${t('deviceContact')}`, width: 200 },
+    { field: 'phone', headerName: `${t('sharedPhone')}`, width: 150 },
+    { field: 'model', headerName: `${t('deviceModel')}`, width: 120 },
+    { field: 'contact', headerName: `${t('deviceContact')}`, width: 100 },
     {
       field: 'userExpirationTime',
       headerName: `${t('userExpirationTime')}`,
@@ -89,7 +90,7 @@ const DevicesPage = () => {
       field: 'actions',
       type: 'actions',
       headerName: 'Opciones',
-      width: 100,
+      width: 120,
       cellClassName: 'actions',
       getActions: ({ id }) => [
         <CollectionActions
@@ -99,6 +100,7 @@ const DevicesPage = () => {
           setTimestamp={setTimestamp}
           customActions={[actionConnections, groupConnections]}
           readonly={deviceReadonly}
+          remove={admin && !support}
         />,
       ],
     },

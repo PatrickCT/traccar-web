@@ -243,6 +243,10 @@ const createPopUpData = (position) => {
   html += '<br />';
   html += valueParser(position, 'lastAlarm');
   html += '<br />';
+  html += valueParser(position, 'latitude');
+  html += '<br />';
+  html += valueParser(position, 'longitude');
+  html += '<br />';
 
   if (isAdmin()) {
     html += valueParser(position, 'protocol');

@@ -17,7 +17,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const CollectionActions = ({
-  itemId, editPath, endpoint, setTimestamp, customActions, readonly,
+  itemId, editPath, endpoint, setTimestamp, customActions, readonly, edit = true, remove = true,
 }) => {
   const theme = useTheme();
   const classes = useStyles();
@@ -77,15 +77,15 @@ const CollectionActions = ({
               {action.icon}
             </IconButton>
           ))}
-          {!readonly && (
-            <>
-              <IconButton size="small" onClick={handleEdit}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-              <IconButton size="small" onClick={handleRemove}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </>
+          {edit && (
+            <IconButton size="small" onClick={handleEdit}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          )}
+          {remove && (
+            <IconButton size="small" onClick={handleRemove}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
           )}
         </div>
       )}
