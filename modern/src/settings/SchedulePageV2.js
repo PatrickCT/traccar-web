@@ -723,7 +723,7 @@ const SchedulePage = () => {
                                     value={item.horasId || hour || ''}
                                     label="Tabla de salidas"
                                     onChange={updateHora}
-                                    options={[{ id: 0, name: 'Sin horario' }, ...hours]}
+                                    data={[{ id: 0, name: 'Sin horario' }, ...hours]}
                                 />
 
                             </FormControl>
@@ -738,7 +738,7 @@ const SchedulePage = () => {
                                             value={item.horasIdRel || hourRel}
                                             label="Tabla de salidas relacionada"
                                             onChange={updateHoraRel}
-                                            options={[{ id: 0, name: 'Sin horario' }, ...hours]}
+                                            data={[{ id: 0, name: 'Sin horario' }, ...hours]}
                                         />
                                     </FormControl>
                                 )

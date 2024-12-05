@@ -96,7 +96,6 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
 
   return (
     <>
-      {/* <NotificationsBanner /> */}
       <MapView>
         <MapOverlay />
         <MapGeofence />

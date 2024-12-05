@@ -43,6 +43,7 @@ import SurveysDialog from './components/SurverysDialog';
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100%',
+    overflowY: 'hidden',
   },
   sidebar: {
     pointerEvents: 'none',
@@ -288,7 +289,6 @@ const MainPage = () => {
         )}
       </div>
       <EventsDrawer open={eventsOpen} onClose={() => setEventsOpen(false)} />
-      {/* <ConnectionStatus /> */}
       {
         user.debt && !user.administrator && (
           <DebtModal />

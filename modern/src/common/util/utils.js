@@ -351,19 +351,19 @@ export const attConverter = (obj, attribute) => {
     }
     case 'dateTime': {
       const value = attVariantsEvaluator(obj, 'fixTime');
-      return formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') || null;
+      return value ? formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') : null;
     }
     case 'fixTime': {
       const value = attVariantsEvaluator(obj, attribute);
-      return formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') || null;
+      return value ? formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') : null;
     }
     case 'serverTime': {
       const value = attVariantsEvaluator(obj, attribute);
-      return formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') || null;
+      return value ? formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') : null;
     }
     case 'deviceTime': {
       const value = attVariantsEvaluator(obj, attribute);
-      return formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') || null;
+      return value ? formatDate(new Date(value), 'dd-MM-yyyy HH:mm:ss', 'es-MX') : null;
     }
     case 'speed': {
       const value = attVariantsEvaluator(obj, attribute);

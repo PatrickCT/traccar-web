@@ -109,7 +109,7 @@ const ReportFilter = ({
         <div className={classes.filterItem}>
           <FormControl fullWidth>
             <SearchSelect
-              options={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
+              data={Object.values(devices).sort((a, b) => a.name.localeCompare(b.name))}
               label={t(multiDevice ? 'deviceTitle' : 'reportDevice')}
               value={multiDevice ? deviceIds : deviceId || ''}
               onChange={(e) => dispatch(multiDevice ? devicesActions.selectIds(e.target.value) : devicesActions.selectId(e.target.value))}

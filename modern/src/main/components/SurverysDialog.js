@@ -58,7 +58,7 @@ const SurveysDialog = memo(() => {
         'Content-Type': 'application/json', // Ensure Content-Type is set to JSON
       },
       body: JSON.stringify({
-        origin: 'rastreo.gpstracker.mx', // window.location.hostname,
+        origin: window.location.hostname,
         gpsid: user.id,
         main: user.principal,
       }),
@@ -119,17 +119,22 @@ const SurveysDialog = memo(() => {
     load();
   }, []);
 
+  useEffect(() => {
+    setOpen(surveys.filter((s) => s.completion < 90).length > 0);
+  }, [surveys]);
+
   return (
     <>
-      {surveys.filter((s) => s.completion < 50).length > 0 && (
+      {surveys.filter((s) => s.completion < 90).length > 0 && (
         <Button
+          id="btn-surveys"
           style={{ position: 'absolute', right: '1vw', bottom: (isMobile() ? '12vh' : '8vh'), minWidth: 0 }}
           variant="outlined"
           size="small"
           onClick={handleClickOpen}
         >
           <Badge
-            badgeContent={surveys.filter((s) => s.completion < 50).length}
+            badgeContent={surveys.filter((s) => s.completion < 90).length}
             color="primary"
           >
             <PollOutlined />
@@ -244,7 +249,6 @@ const SurveysDialog = memo(() => {
             <div key="sep2" style={{ height: '8vh' }} />
           )}
         </List>
-
       </Dialog>
     </>
   );

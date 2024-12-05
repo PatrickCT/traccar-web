@@ -5,7 +5,7 @@ import './ExpandableCard.css';
 import {
   Button, Card, CardActions, CardContent, CardHeader, IconButton,
 } from '@mui/material';
-import { CloseOutlined } from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
 
 const ExpandableCard = ({ content, children, onSave }) => {
   const cardRef = useRef(null);
@@ -62,9 +62,10 @@ const ExpandableCard = ({ content, children, onSave }) => {
             action={
               (
                 <IconButton
+                  size="large"
                   onClick={animateCard}
                 >
-                  <CloseOutlined />
+                  <Close />
                 </IconButton>
               )
             }
@@ -73,15 +74,26 @@ const ExpandableCard = ({ content, children, onSave }) => {
           <CardContent>
             {children}
           </CardContent>
-          <CardActions>
+          <CardActions
+            disableSpacing
+            sx={{
+              alignSelf: 'stretch',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              // 👇 Edit padding to further adjust position
+              p: 1,
+            }}
+          >
             <Button
+              variant="contained"
               onClick={() => {
                 animateCard();
                 onSave();
               }}
-              size="small"
+              size="large"
             >
-              Guardar
+              Terminar encuesta
             </Button>
           </CardActions>
         </Card>

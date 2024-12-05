@@ -84,7 +84,7 @@ const TimeUpdateBtn = ({
               ]}
             >
               <DemoItem label="">
-                <TimePicker value={hourSelected} onChange={handleChangeHour} defaultValue="" ampm={false} className="picker" timeSteps={{ hours: 1, minutes: 1 }} />
+                <TimePicker value={hourSelected} onChange={handleChangeHour} ampm={false} className="picker" timeSteps={{ hours: 1, minutes: 1 }} />
               </DemoItem>
             </DemoContainer>
           </LocalizationProvider>

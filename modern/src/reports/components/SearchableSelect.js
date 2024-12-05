@@ -7,18 +7,34 @@ import MenuItem from '@mui/material/MenuItem';
 import { InputAdornment, ListSubheader } from '@mui/material';
 import { SearchOutlined } from '@mui/icons-material';
 import { useTranslation } from '../../common/components/LocalizationProvider';
+import { useEffectAsync } from '../../reactHelper';
 
-const SearchSelect = ({ options, label, value, onChange, multiple }) => {
+const SearchSelect = ({
+  label,
+  fullWidth,
+  multiple,
+  value,
+  emptyValue = 0,
+  emptyTitle = '\u00a0',
+  onChange,
+  endpoint,
+  data,
+  keyGetter = (item) => item.id,
+  titleGetter = (item) => item.name,
+  dataGetter = (data) => data,
+  debounceDelay = 300,
+}) => {
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+  const [items, setItems] = useState(data);
   const inputRef = useRef(null);
 
   // Debounce the search query
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(searchQuery);
-    }, 300); // Adjust the delay as needed
+    }, debounceDelay); // Adjust the delay as needed
 
     // Cleanup the timeout if the component unmounts or the query changes
     return () => {
@@ -33,10 +49,22 @@ const SearchSelect = ({ options, label, value, onChange, multiple }) => {
     }
   }, [debouncedQuery]);
 
-  const filteredOptions = options.filter((option) => (option && option.name.toLowerCase().includes(debouncedQuery.toLowerCase())));
+  useEffectAsync(async () => {
+    if (endpoint) {
+      const response = await fetch(endpoint);
+      if (response.ok) {
+        const d = dataGetter(await response.json());
+        setItems(d);
+      } else {
+        throw Error(await response.text());
+      }
+    }
+  }, []);
+
+  const filteredOptions = (items || []).filter((option) => (option && option.name.toLowerCase().includes(debouncedQuery.toLowerCase())));
 
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth={fullWidth}>
       <InputLabel>{label}</InputLabel>
       <Select label={label} value={value} onChange={onChange} multiple={multiple}>
         <ListSubheader>
@@ -62,9 +90,12 @@ const SearchSelect = ({ options, label, value, onChange, multiple }) => {
             inputRef={inputRef} // Add the ref here
           />
         </ListSubheader>
+        {!multiple && emptyValue !== null && (
+          <MenuItem value={emptyValue}>{emptyTitle}</MenuItem>
+        )}
         {filteredOptions.map((option) => (
-          <MenuItem key={option.id} value={option.id}>
-            {option.name}
+          <MenuItem key={keyGetter(option)} value={keyGetter(option)}>
+            {titleGetter(option)}
           </MenuItem>
         ))}
       </Select>

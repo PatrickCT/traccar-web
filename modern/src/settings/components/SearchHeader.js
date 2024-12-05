@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SearchHeader = ({ keyword, setKeyword }) => {
+const SearchHeader = ({ keyword, setKeyword, delay = 500 }) => {
   // const theme = useTheme();
   const classes = useStyles();
   const t = useTranslation();
@@ -29,7 +29,7 @@ const SearchHeader = ({ keyword, setKeyword }) => {
   const handleInputChange = (event) => setSearch(event.target.value);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => setDebounceSearch(search), 500);
+    const timeoutId = setTimeout(() => setDebounceSearch(search), delay);
 
     return () => clearTimeout(timeoutId);
   }, [search, 500]);

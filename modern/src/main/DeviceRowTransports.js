@@ -1,5 +1,5 @@
 import {
-  React, memo, useState,
+  React, memo, useEffect, useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
@@ -63,6 +63,8 @@ const DeviceRowTransporte = ({ data, index }) => {
   const geofences = useSelector((state) => state.geofences.items);
   const groups = useSelector((state) => state.groups.items);
   const [isOpened, setIsOpen] = useState(false);
+  const [hasSalida, setHasSalida] = useState(data[index]?.attributes?.Salida || false);
+
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
 
   const formatProperty = (key) => {
@@ -85,6 +87,20 @@ const DeviceRowTransporte = ({ data, index }) => {
   };
 
   const secondaryText = () => <span className={classes[getStatusColor(item.status)]}>{`${item.uniqueId ?? t('no-imei')}`}</span>;
+
+  const loadInfo = async () => {
+    const response = await fetch(`api/devices/${item.id}/ticket`);
+    if (response.ok) {
+      const information = await response.json();
+      setHasSalida((information.ticket ?? []).length > 0);
+    } else {
+      throw Error(await response.text());
+    }
+  };
+
+  useEffect(() => {
+    loadInfo();
+  }, []);
 
   return (
     <div style={{ position: 'relative' }}>
@@ -115,7 +131,7 @@ const DeviceRowTransporte = ({ data, index }) => {
           secondary={secondaryText()}
           secondaryTypographyProps={{ noWrap: true }}
         />
-        <span style={{ fontWeight: 'normal', fontSize: '12px', color: `${(data[index]?.attributes?.Salida || false) ? 'green' : 'red'}` }}>{`${(data[index]?.attributes?.Salida || false) ? 'Co' : 'Si'}n salida`}</span>
+        <span style={{ fontWeight: 'normal', fontSize: '12px', color: `${(hasSalida) ? 'green' : 'red'}` }}>{`${(hasSalida) ? 'Co' : 'Si'}n salida`}</span>
       </ListItemButton>
       <Collapse isOpened={isOpened}>
         <div className="text" style={{ padding: '1rem', width: '100%' }}><TableExist deviceId={item.id} /></div>

@@ -40,6 +40,7 @@ import './resources/libs/alertify/css/alertify.css';
 import './resources/libs/alertify/css/themes/default.min.css';
 import PushNotificationsManager from './common/util/push';
 import { createBaseURL } from './common/util/utils';
+import { surveysTour } from './common/util/tours';
 
 setTimeout(async () => {
   jsPanel.ziBase = (() => {
@@ -56,6 +57,7 @@ setTimeout(async () => {
   window.PushNotificationsManager = PushNotificationsManager;
   window.html2canvas = html2canvas;
   window.createBaseURL = createBaseURL;
+  window.surveysTour = surveysTour;
   loadModal();
   loadDialog();
   await preloadImages();

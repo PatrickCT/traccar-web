@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable no-unused-vars */
 
 import {
   React, memo, useEffect, useState,
@@ -53,6 +54,9 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
       }));
       setTickets((information.ticket ?? []));
       setSubroutes((information.subroutes ?? []));
+      // if (setHasSalida) {
+      //   setHasSalida((information.ticket ?? []).length > 0);
+      // }
       setLoading(false);
     } else {
       setLoading(false);
@@ -85,15 +89,15 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
     setDate(moment().format('YYYY-MM-D'));
   }, [toDay]);
 
-  useEffectAsync(async () => {
-    await loadInfoTable();
-  }, []);
-
   const handleSelectedOption = (value) => {
     setOption(value);
   };
 
   useEffect(() => {
+    async function load() {
+      await loadInfoTable();
+    }
+    load();
     const intervalId = setInterval(async () => {
       await loadInfoTable();
     }, 1 * 15 * 1000);

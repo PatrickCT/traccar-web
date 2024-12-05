@@ -19,11 +19,11 @@ import {
   ListItemIcon,
   Typography,
   IconButton,
+  TablePagination,
 } from '@mui/material';
-import itemsjs from 'itemsjs';
-import { SaveAltOutlined } from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
+import { Delete, SaveAltOutlined } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
 import SettingsMenu from './components/SettingsMenu';
@@ -31,12 +31,24 @@ import SelectField from '../common/components/SelectField';
 import Navbar from '../common/components/NavBar';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 
+const useStyles = makeStyles((theme) => ({
+  list: {
+    maxHeight: '100%',
+  },
+  listInner: {
+    position: 'absolute',
+    margin: theme.spacing(1.5, 0),
+  },
+}));
+
 const DeviceConnectionGroupPage = () => {
+  const classes = useStyles();
   const [listOne, setListOne] = useState([]);
   const [listTwo, setListTwo] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [pagination, setPagination] = useState({ page: 0, perpage: 50 });
 
-  const [group, setGroup] = useState(-1);
+  const [group, setGroup] = useState(0);
   const [devices, setDevices] = useState([]);
   const [filter, setFilter] = useState('');
   const groups = useSelector((state) => state.groups.items);
@@ -71,16 +83,6 @@ const DeviceConnectionGroupPage = () => {
     setSelectedItems([]);
   };
 
-  const onDragEnd = (result) => {
-    const { destination, source } = result;
-    const item = listOne[source.index];
-
-    const newListOne = listOne.filter((i) => i !== item);
-    setListOne(newListOne);
-    setListTwo([...listTwo, item]);
-    setTimeout(() => setSelectedItems([]), 1000);
-  };
-
   const handleChangeGroup = async () => {
     Notiflix.Block.standard('body', 'Por favor espere...', { zindex: 9999 });
     await Promise.all(listTwo.map((item) => fetch(`/api/devices/${item.id}`, {
@@ -91,6 +93,10 @@ const DeviceConnectionGroupPage = () => {
     Notiflix.Notify.success('Listo, la pagina se recargara', { width: '100vw', opacity: '1', fontSize: '30px', success: { textColor: 'white', background: '#1a237e' } });
     window.location.reload();
   };
+
+  useEffect(() => {
+    setListOne(devices.filter(filterByKeyword(filter)).filter(i => !listTwo.includes(i)));
+  }, [filter, listTwo]);
 
   return (
     <PageLayout menu={<SettingsMenu />} breadcrumbs={['settingsTitle', 'sharedDrivers']}>
@@ -129,63 +135,48 @@ const DeviceConnectionGroupPage = () => {
       </Navbar>
       <Box sx={{ padding: 4 }}>
         <Grid container spacing={2} justifyContent="center">
-          <Grid item xs={12} md={5}>
+          <Grid item xs={12} md={6}>
             <Paper elevation={3} sx={{ padding: 2 }}>
               <Typography variant="h6">Grupo actual</Typography>
-              <SelectField
-                fullWidth
-                value={group || -1}
-                onChange={(event) => setGroup(Number(event.target.value))}
-                endpoint="/api/groups?all=true"
-                label={t('groupParent')}
-              />
               <SearchHeader keyword={filter} setKeyword={setFilter} />
               <Button
                 variant="contained"
                 onClick={handleSelectAll}
-                disabled={filter !== ''}
+                // disabled={filter !== ''}
                 sx={{ marginBottom: 2, marginTop: 1 }}
               >
                 {selectedItems.length === listOne.length
                   ? 'Desmarcar todo'
                   : 'Marcar todo'}
               </Button>
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="listOne">
-                  {(provided) => (
-                    <List
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      sx={{ maxHeight: '60vh', overflow: 'auto' }}
-                    >
-                      {listOne.filter(filterByKeyword(filter)).map((item, index) => (
-                        <Draggable key={item.id} draggableId={`di-${item.id}`} index={index}>
-                          {(provided) => (
-                            <ListItem
-                              key={`li-${item.id}`}
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              button
-                              onClick={() => handleSelect(item)}
-                            >
-                              <ListItemIcon>
-                                <Checkbox
-                                  edge="start"
-                                  checked={selectedItems.includes(item)}
-                                  tabIndex={-1}
-                                />
-                              </ListItemIcon>
-                              <ListItemText primary={`${item.name} - ${item.groupId || 'NaN'}:${groups[item.groupId]?.name || t('groupNoGroup')}`} />
-                            </ListItem>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </List>
-                  )}
-                </Droppable>
-              </DragDropContext>
+              <TablePagination
+                component="div"
+                count={listOne.length}
+                page={pagination.page}
+                onPageChange={(evt, page) => setPagination({ ...pagination, page })}
+                rowsPerPage={pagination.perpage}
+                onRowsPerPageChange={(evt) => setPagination({ ...pagination, perpage: parseInt(evt.target.value, 10) })}
+              />
+              <List
+                sx={{ maxHeight: '50vh', overflow: 'auto' }}
+              >
+                {listOne.slice(pagination.page * pagination.perpage, (pagination.page * pagination.perpage) + pagination.perpage).map((item, index) => (
+                  <ListItem
+                    key={`li-${item.id}`}
+                    onClick={() => handleSelect(item)}
+                  >
+                    <ListItemIcon>
+                      <Checkbox
+                        edge="start"
+                        checked={selectedItems.includes(item)}
+                        tabIndex={-1}
+                      />
+                    </ListItemIcon>
+                    <ListItemText primary={`${item.name} - ${item.groupId || 'NaN'}:${groups[item.groupId]?.name || t('groupNoGroup')}`} />
+                  </ListItem>
+                ))}
+              </List>
+
               <Button
                 variant="contained"
                 color="primary"
@@ -198,18 +189,56 @@ const DeviceConnectionGroupPage = () => {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={5}>
+          <Grid item xs={12} md={6}>
             <Paper elevation={3} sx={{ padding: 2 }}>
               <Typography variant="h6">
-                Grupo nuevo
+                Moviendo
+                (
+                {`${listTwo.length} unidades`}
+                )
+                al grupo
                 (
                 {`${group}:${groups[group]?.name || t('groupNoGroup')}`}
                 )
               </Typography>
-              <List sx={{ maxHeight: '60vh', overflow: 'auto' }}>
+              <br />
+              <SelectField
+                fullWidth
+                value={group}
+                onChange={(event) => setGroup(Number(event.target.value))}
+                endpoint="/api/groups?all=true"
+                label={t('groupParent')}
+              />
+              <br />
+              <br />
+              <Button
+                variant="contained"
+                onClick={() => setListTwo([])}
+                sx={{ marginBottom: 2, marginTop: 1 }}
+              >
+                Quitar todo
+              </Button>
+              <List sx={{ maxHeight: '50vh', overflow: 'auto' }}>
                 {listTwo.map((item, index) => (
-                  <ListItem key={index}>
-                    <ListItemText primary={`${item.name} - ${groups[group]?.name || t('groupNoGroup')}`} />
+                  <ListItem
+                    key={index}
+                    secondaryAction={
+                      (
+                        <IconButton
+                          edge="end"
+                          aria-label="remove"
+                          onClick={(evt) => {
+                            setListTwo(listTwo.filter(i => i.id !== item.id));
+                          }}
+                        >
+                          <Delete />
+                        </IconButton>
+                      )
+                    }
+                  >
+                    <ListItemText
+                      primary={`${item.name} - ${groups[group]?.name || t('groupNoGroup')}`}
+                    />
                   </ListItem>
                 ))}
               </List>

@@ -39,6 +39,7 @@ import ExtraEmailList from '../common/components/ExtraEmailList';
 import ExtraPhoneList from '../common/components/ExtraPhoneList';
 import SubUserList from '../common/components/SubUserList';
 import { toast } from '../common/util/toasts';
+import SearchSelect from '../reports/components/SearchableSelect';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -126,6 +127,7 @@ const UserPage = () => {
     >
       {item && (
         <>
+          {/* base */}
           <Accordion defaultExpanded={!attribute}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">
@@ -154,7 +156,7 @@ const UserPage = () => {
               )}
             </AccordionDetails>
           </Accordion>
-
+          {/* preferences */}
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">
@@ -275,6 +277,7 @@ const UserPage = () => {
               </FormGroup>
             </AccordionDetails>
           </Accordion>
+          {/* location */}
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">
@@ -317,7 +320,7 @@ const UserPage = () => {
               </Button>
             </AccordionDetails>
           </Accordion>
-
+          {/* permissions */}
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">
@@ -359,12 +362,11 @@ const UserPage = () => {
                       disabled={!admin}
                     />
                     {!item.main && (
-                      <SelectField
-                        endpoint="/api/users/main"
-                        hidden={!item.main}
-                        value={item.principal}
+                      <SearchSelect
+                        label={t('sharedMain')}
                         onChange={(e) => setItem({ ...item, principal: e.target.value })}
-                        disabled={!admin}
+                        endpoint="/api/users/main"
+                        debounceDelay={500}
                       />
                     )}
                     <FormControlLabel
@@ -419,7 +421,7 @@ const UserPage = () => {
               </FormGroup>
             </AccordionDetails>
           </Accordion>
-
+          {/* attributes */}
           {admin && (
             <EditAttributesAccordion
               attribute={attribute}
@@ -430,6 +432,7 @@ const UserPage = () => {
               canAdd={admin}
             />
           )}
+          {/* extra emails */}
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">
@@ -442,7 +445,7 @@ const UserPage = () => {
             </AccordionDetails>
 
           </Accordion>
-
+          {/* extra phones */}
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1">
@@ -455,7 +458,7 @@ const UserPage = () => {
             </AccordionDetails>
 
           </Accordion>
-
+          {/* passwords */}
           {admin && (
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>

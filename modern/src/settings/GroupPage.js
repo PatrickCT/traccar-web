@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import TextField from '@mui/material/TextField';
-
+import { useTheme } from '@mui/styles';
 import {
   Accordion, AccordionSummary, AccordionDetails, Typography,
+  useMediaQuery,
+  Dialog,
+  TextField,
+  Button,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -17,6 +24,8 @@ import useGroupAttributes from '../common/attributes/useGroupAttributes';
 import { useCatch } from '../reactHelper';
 import { groupsActions } from '../store';
 import SubrutasList from './components/SubrutasList';
+import { useAdministrator } from '../common/util/permissions';
+import SearchSelect from '../reports/components/SearchableSelect';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -31,11 +40,24 @@ const GroupPage = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const t = useTranslation();
+  const admin = useAdministrator();
 
   const commonDeviceAttributes = useCommonDeviceAttributes(t);
   const groupAttributes = useGroupAttributes(t);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const [item, setItem] = useState();
+  const [open, setOpen] = useState(false);
+  const [link, setLink] = useState({});
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const onItemSaved = useCatch(async () => {
     const response = await fetch('/api/groups');
@@ -108,6 +130,53 @@ const GroupPage = () => {
           </AccordionDetails>
 
         </Accordion>
+      )}
+
+      {admin && (['localhost', 't-urban.com.mx'].some((h) => h.includes(document.location.hostname))) && (
+        <>
+          <Button variant="outlined" onClick={handleClickOpen}>
+            Vincular a T-Urban
+          </Button>
+          <Dialog
+            fullScreen={fullScreen}
+            open={open}
+            onClose={handleClose}
+            PaperProps={{
+              component: 'form',
+              onSubmit: (event) => {
+                event.preventDefault();
+                fetch(`https://crmgpstracker.mx:9999/api/rutas/sync/${link.id}`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(link),
+                });
+                handleClose();
+              },
+            }}
+          >
+            <DialogTitle>Asignar a ruta t-urban</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Seleccione la ruta correspondiente en T-Urban
+              </DialogContentText>
+              <br />
+              <SearchSelect
+                fullWidth
+                label="Ruta T-Urban"
+                endpoint="https://crmgpstracker.mx:9999/api/rutas"
+                debounceDelay={500}
+                value={link.id || null}
+                onChange={(evt) => setLink({ id: evt.target.value, groupId: item.id })}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancelar</Button>
+              <Button type="submit">Vincular</Button>
+            </DialogActions>
+          </Dialog>
+        </>
       )}
     </EditItemView>
   );
