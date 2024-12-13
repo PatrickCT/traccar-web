@@ -132,10 +132,11 @@ const SocketController = () => {
         dispatch(devicesActions.update(data.devices));
       }
       if (data.positions) {
-        if (!document.hidden) {
-          // dispatch(sessionActions.updatePositions(data.positions));
-          queuePositions(data.positions);
-        }
+        queuePositions(data.positions);
+        // if (!document.hidden) {
+        //   // dispatch(sessionActions.updatePositions(data.positions));
+        //   queuePositions(data.positions);
+        // }
       }
       if (data.events) {
         if (!features.disableEvents) {

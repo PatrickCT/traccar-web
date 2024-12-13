@@ -152,7 +152,7 @@ const HourPage = () => {
               onChange={(event) => setName(event.target.value)}
               label={t('sharedName')}
             />
-            <TextField value={stringDates} multiline rows={4 + items.length} onChange={(evt) => setStringDates(evt.target.value)} />
+            <TextField value={stringDates} multiline rows={10} onChange={(evt) => setStringDates(evt.target.value)} />
             {saving ? (
               <Box sx={{ width: '100%' }}>
                 <LinearProgress variant="determinate" value={progress} />

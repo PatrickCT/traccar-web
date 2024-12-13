@@ -156,7 +156,7 @@ const SurveysDialog = memo(() => {
                 onClick={handleClose}
                 aria-label="close"
               >
-                <CloseIcon />
+                <CloseIcon style={{ color: 'white' }} />
               </IconButton>
             )}
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
@@ -169,7 +169,7 @@ const SurveysDialog = memo(() => {
                 onClick={handleClose}
                 aria-label="close"
               >
-                <CloseIcon />
+                <CloseIcon style={{ color: 'white' }} />
               </IconButton>
             )}
           </Toolbar>

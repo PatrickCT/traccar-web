@@ -53,7 +53,7 @@ const HoursPage = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {!loading ? items.filter((item, index, self) => self.findIndex((t) => t?.name === item?.name) === index)
+          {!loading ? items.filter((item, index, self) => self.findIndex((t) => t?.group_uuid === item?.group_uuid) === index)
             .filter(filterByKeyword(searchKeyword)).sort((a, b) => {
               if (a.id < b.id) return -1;
               if (a.id > b.id) return 1;
@@ -63,7 +63,7 @@ const HoursPage = () => {
                 <TableCell>{item.name}</TableCell>
                 <TableCell className={classes.columnAction} padding="none">
                   <CollectionActions
-                    itemId={item.name}
+                    itemId={item.group_uuid}
                     editPath="/settings/hour"
                     endpoint="horasalidas/delete"
                     setTimestamp={setTimestamp}

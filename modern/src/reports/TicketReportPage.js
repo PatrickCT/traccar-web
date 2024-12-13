@@ -330,7 +330,7 @@ const TicketReportPage = () => {
                           {item.difference}
                         </TableCell>
                         <TableCell>
-                          {item.punishment}
+                          {item.difference > 0 ? item.punishment : 0}
                         </TableCell>
                       </TableRow>
                     ))}

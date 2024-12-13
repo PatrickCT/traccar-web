@@ -26,7 +26,7 @@ const SearchSelect = ({
 }) => {
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [items, setItems] = useState(data);
   const inputRef = useRef(null);
 

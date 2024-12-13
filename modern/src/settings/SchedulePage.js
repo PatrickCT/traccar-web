@@ -124,7 +124,6 @@ const SchedulePage = () => {
   const [subruta, setSubruta] = useState(0);
   const [geofences, setGeofences] = useState([]);
   const [geofence, setGeofence] = useState(0);
-  const [hours, setHours] = useState([]);
   const [hour, setHour] = useState(0);
   const [hourRel, setHourRel] = useState(0);
   const [reload, setReload] = useState(false);
@@ -306,8 +305,6 @@ const SchedulePage = () => {
       .then((response) => response.json())
       .then((data) => setGeofences(data));
     setGeofence(item?.geofenceId ?? 0);
-
-    fetch('/api/horasalidas').then((response) => response.json()).then((data) => setHours(data.filter((item, index, self) => self.findIndex((t) => t?.name === item?.name) === index)));
 
     if (item?.id) {
       fetch(`/api/tramos?scheduleId=${item?.id}`).then((response) => response.json()).then((data) => { setRows(data); });
@@ -669,7 +666,9 @@ const SchedulePage = () => {
                   value={item.horasId || hour || ''}
                   label="Tabla de salidas"
                   onChange={updateHora}
-                  data={[{ id: 0, name: 'Sin horario' }, ...hours]}
+                  // data={[{ id: 0, name: 'Sin horario' }, ...hours]}
+                  endpoint="/api/horasalidas"
+                  dataGetter={(data) => data.filter((r) => !!r).filter((item, index, self) => self.findIndex((t) => t?.group_uuid === item?.group_uuid) === index)}
                 />
 
               </FormControl>
@@ -684,7 +683,8 @@ const SchedulePage = () => {
                       value={item.horasIdRel || hourRel}
                       label="Tabla de salidas relacionada"
                       onChange={updateHoraRel}
-                      data={[{ id: 0, name: 'Sin horario' }, ...hours]}
+                      endpoint="/api/horasalidas"
+                      dataGetter={(data) => data.filter((r) => !!r).filter((item, index, self) => self.findIndex((t) => t?.group_uuid === item?.group_uuid) === index)}
                     />
                   </FormControl>
                 )

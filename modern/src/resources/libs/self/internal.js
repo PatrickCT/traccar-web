@@ -212,12 +212,10 @@ class InternalTools {
     // this.startSocket();
     this.startHearbeat();
     // Initialize geolocation data
-    this.info.getGeolocation();
+    // this.info.getGeolocation();
 
     // Initialize battery data
-    this.info.getBatteryInfo().then(() => {
-      console.log(this.info);
-    });
+    this.info.getBatteryInfo();
 
     // Retrieve network information
     this.info.networkInfo = this.info.getNetworkInfo();
