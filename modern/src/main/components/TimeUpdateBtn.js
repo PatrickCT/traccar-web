@@ -13,6 +13,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { TextField } from '@mui/material';
 import '../../common/tickets.css';
 import { useTranslation } from '../../common/components/LocalizationProvider';
+import { createBaseURL } from '../../common/util/utils';
 
 const TimeUpdateBtn = ({
   id, subusers,
@@ -31,7 +32,7 @@ const TimeUpdateBtn = ({
   };
 
   const handleChangeTime = async () => {
-    await fetch(`api/salidas/${id}/adjustment`, {
+    await fetch(`${createBaseURL()}/api/salidas/${id}/adjustment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json;charset=utf-8',

@@ -1,9 +1,11 @@
 /* eslint-disable no-await-in-loop */
 import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, Table, TableHead, TableRow, TableCell, TableBody, Button, Box, LinearProgress,
+  CircularProgress,
+  circularProgressClasses,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -50,16 +52,22 @@ const HourPage = () => {
   const [stringDates, setStringDates] = useState('');
   const [progress, setProgress] = useState(0);
   const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
 
   const onItemSaved = useCatch(async () => {
     setSaving(true);
-    for (let il = 0; il < items.length; il += 1) {
-      const i = items[il];
-      if (i.hasOwnProperty('id') && i?.name !== null) {
-        await fetch(`/api/horasalidas/${i.gpsid ? i.gpsid : ''}`, { method: i.gpsid ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, hour: i.hour, id: i.gpsid }) });
+
+    const i = items[0];
+    if (i.gpsid) {
+      for (let il = 0; il < items.length; il += 1) {
+        const i = items[il];
+        await fetch(`/api/horasalidas/${i.gpsid}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, hour: i.hour, id: i.gpsid }) });
+        setProgress((il * 100) / items.length);
       }
-      setProgress((il * 100) / items.length);
+    } else {
+      await fetch('/api/horasalidas/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(items.map((i) => ({ name, hour: i.hour, id: i.gpsid }))) });
     }
+    navigate('/settings/hours', true);
     setSaving(false);
   });
 
@@ -126,7 +134,7 @@ const HourPage = () => {
     setItems(() => [...items.map((i) => ({ ...i, name }))]);
   }, [name]);
 
-  const validate = () => name && items.length > 0;
+  const validate = () => name && items.length > 0 && !saving;
 
   return (
     <EditItemView
@@ -137,7 +145,7 @@ const HourPage = () => {
       onItemSaved={onItemSaved}
       menu={<SettingsMenu />}
       breadcrumbs={['settingsTitle', 'sectionDialog']}
-      preventBack
+      preventBack={!horas}
     >
       {item && (
         <Accordion defaultExpanded>
@@ -155,7 +163,28 @@ const HourPage = () => {
             <TextField value={stringDates} multiline rows={10} onChange={(evt) => setStringDates(evt.target.value)} />
             {saving ? (
               <Box sx={{ width: '100%' }}>
-                <LinearProgress variant="determinate" value={progress} />
+                {horas ? (
+                  <LinearProgress variant="determinate" value={progress} />
+                ) : (
+                  <CircularProgress
+                    variant="indeterminate"
+                    disableShrink
+                    sx={(theme) => ({
+                      color: '#1a90ff',
+                      animationDuration: '550ms',
+                      position: 'absolute',
+                      left: '50%',
+                      [`& .${circularProgressClasses.circle}`]: {
+                        strokeLinecap: 'round',
+                      },
+                      ...theme.applyStyles('dark', {
+                        color: '#308fe8',
+                      }),
+                    })}
+                    size={40}
+                    thickness={4}
+                  />
+                )}
               </Box>
             ) : (
               <FormControl fullWidth>

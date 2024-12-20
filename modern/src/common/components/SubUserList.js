@@ -5,9 +5,9 @@ import React, {
 import { Fragment, useEffect, useState } from 'react';
 import { useTranslation } from './LocalizationProvider';
 
-const SubUserList = () => {
+const SubUserList = ({ user }) => {
   const [data, setData] = useState([]);
-  const [subUser, setSubUser] = useState({});
+  const [subUser, setSubUser] = useState({ user });
   const t = useTranslation();
 
   const handleSubmit = (event) => {
@@ -29,7 +29,7 @@ const SubUserList = () => {
   };
 
   useEffect(() => {
-    fetch('/api/subusers')
+    fetch(`/api/subusers/get/${user}`)
       .then((response) => response.json())
       .then((data) => setData(data));
   }, []);

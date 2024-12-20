@@ -467,7 +467,7 @@ const UserPage = () => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <SubUserList />
+                <SubUserList user={id} />
               </AccordionDetails>
             </Accordion>
           )}
