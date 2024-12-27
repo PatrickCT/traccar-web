@@ -14,6 +14,7 @@ import CollectionFab from './components/CollectionFab';
 import CollectionActions from './components/CollectionActions';
 import TableShimmer from '../common/components/TableShimmer';
 import SearchHeader, { filterByKeyword } from './components/SearchHeader';
+import SearchSelect from '../reports/components/SearchableSelect';
 
 const useStyles = makeStyles((theme) => ({
   columnAction: {
@@ -31,10 +32,11 @@ const SchedulesPage = () => {
   const [items, setItems] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [horas, setHoras] = useState([]);
   const geofences = useSelector((state) => state.geofences.items);
   const subroutes = useSelector((state) => state.subroutes.items);
 
-  useEffectAsync(async () => {
+  const load = async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/itinerarios');
@@ -43,9 +45,21 @@ const SchedulesPage = () => {
       } else {
         throw Error(await response.text());
       }
+
+      const response2 = await fetch('/api/horasalidas');
+      if (response2.ok) {
+        const d = ((data) => data.filter((i) => !!i).filter((item, index, self) => self.findIndex((t) => t?.group_uuid === item?.group_uuid) === index))(await response2.json());
+        setHoras(d);
+      } else {
+        throw Error(await response.text());
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffectAsync(async () => {
+    await load();
   }, [timestamp]);
 
   const actionConnections = {
@@ -53,6 +67,19 @@ const SchedulesPage = () => {
     title: t('sharedConnections'),
     icon: <LinkIcon fontSize="small" />,
     handler: (itinerarioId) => navigate(`/settings/schedule/${itinerarioId}/connections`),
+  };
+
+  const update = (item, hour) => {
+    setLoading(true);
+    fetch(`/api/itinerarios/${item.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...item, horasId: hour }),
+    }).then(() => {
+      load();
+    });
   };
 
   return (
@@ -63,6 +90,7 @@ const SchedulesPage = () => {
           <TableRow>
             <TableCell>{t('sharedName')}</TableCell>
             <TableCell>{t('sharedSubroute')}</TableCell>
+            <TableCell>{t('sharedGeofence')}</TableCell>
             <TableCell>{t('sharedGeofence')}</TableCell>
             <TableCell className={classes.columnAction} />
           </TableRow>
@@ -77,6 +105,19 @@ const SchedulesPage = () => {
               <TableCell>{item.name}</TableCell>
               <TableCell>{subroutes[item.subrouteId].name}</TableCell>
               <TableCell>{geofences[item.geofenceId]?.name || ''}</TableCell>
+              <TableCell>
+                <SearchSelect
+                  fullWidth
+                  labelId="horas"
+                  id="horasid"
+                  value={item?.horasId || ''}
+                  label="Tabla de salidas"
+                  onChange={(evt) => {
+                    update(item, evt.target.value);
+                  }}
+                  data={horas}
+                />
+              </TableCell>
               <TableCell className={classes.columnAction} padding="none">
                 <CollectionActions
                   itemId={item.id}

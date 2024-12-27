@@ -53,7 +53,7 @@ const MapGeofence = () => {
         layout: {
           'text-field': '{name}',
           'text-font': findFonts(map),
-          'text-size': 15,
+          'text-size': 17,
         },
         paint: {
           'text-halo-color': '#D3D3D3',

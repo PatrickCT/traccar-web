@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {
+  useState, useEffect, useRef,
+} from 'react';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -27,7 +29,7 @@ const SearchSelect = ({
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [items, setItems] = useState(data);
+  const [items, setItems] = useState([]);
   const inputRef = useRef(null);
 
   // Debounce the search query
@@ -58,15 +60,17 @@ const SearchSelect = ({
       } else {
         throw Error(await response.text());
       }
+    } else if (data) {
+      setItems(data);
     }
   }, []);
 
-  const filteredOptions = (items || []).filter((option) => (option && option.name.toLowerCase().includes(debouncedQuery.toLowerCase())));
+  const filteredOptions = items.filter((option) => (option && option.name.toLowerCase().includes(debouncedQuery.toLowerCase())));
 
   return (
     <FormControl fullWidth={fullWidth}>
       <InputLabel>{label}</InputLabel>
-      <Select label={label} value={value} onChange={onChange} multiple={multiple}>
+      <Select label={label} value={value || null} onChange={onChange} multiple={multiple}>
         <ListSubheader>
           <TextField
             size="small"
