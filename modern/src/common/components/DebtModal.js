@@ -74,7 +74,7 @@ const DebtModal = () => {
   }, []);
 
   return (
-    <div style={modalOverlayStyle}>
+    <div id="debtModal" style={modalOverlayStyle}>
       <div style={modalContentStyle}>
         <div style={modalBodyStyle}>
           <p style={paragraphStyle}>

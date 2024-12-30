@@ -165,7 +165,7 @@ const MainPage = () => {
               setBannerText('');
             }, 1000 * 60 * 1);
             if (data.data.length > 0) {
-              setBannerText(data.join(' * '));
+              setBannerText(data.data.join(' * '));
             } else {
               setBannerText('');
             }
