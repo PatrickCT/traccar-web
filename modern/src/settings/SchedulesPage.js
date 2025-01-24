@@ -36,6 +36,11 @@ const SchedulesPage = () => {
   const geofences = useSelector((state) => state.geofences.items);
   const subroutes = useSelector((state) => state.subroutes.items);
 
+  const binaryString = (days) => (days || 0).toString(2).padStart(7, '0');
+  const daysFromBinary = (binaryValue) => binaryValue.split('').map((value, index) => (value === '1' ? ['D', 'S', 'V', 'J', 'Mi', 'M', 'L'][index] : '')).filter((e) => e !== '')
+    .reverse()
+    .join(', ');
+
   const load = async () => {
     setLoading(true);
     try {
@@ -89,6 +94,7 @@ const SchedulesPage = () => {
         <TableHead>
           <TableRow>
             <TableCell>{t('sharedName')}</TableCell>
+            <TableCell>{t('sharedDays')}</TableCell>
             <TableCell>{t('sharedSubroute')}</TableCell>
             <TableCell>{t('sharedGeofence')}</TableCell>
             <TableCell>{t('sharedGeofence')}</TableCell>
@@ -103,6 +109,7 @@ const SchedulesPage = () => {
           }).map((item) => (
             <TableRow key={item.id}>
               <TableCell>{item.name}</TableCell>
+              <TableCell>{daysFromBinary(binaryString(item.days))}</TableCell>
               <TableCell>{subroutes[item.subrouteId].name}</TableCell>
               <TableCell>{geofences[item.geofenceId]?.name || ''}</TableCell>
               <TableCell>

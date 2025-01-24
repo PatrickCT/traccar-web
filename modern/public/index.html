@@ -11,6 +11,7 @@
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
   <link rel="stylesheet" href="%PUBLIC_URL%/styles.css" id="main-style" disabled>
+  <link rel="stylesheet" href="%PUBLIC_URL%/marquee.css">
   <title>GpsTracker</title>
 
 </head>
@@ -56,7 +57,6 @@
     addViewportMetaTag();
 
     window.onload = () => {
-
       if (!window.OffscreenCanvas) {
         window.OffscreenCanvas = class OffscreenCanvas {
           constructor(width, height) {
@@ -89,6 +89,22 @@
           // notifyMe('El movimiento de los marcadores se pausara');
         }
       });
+
+      hideMarquee = () => {
+        setTimeout(() => {
+          document.getElementById('info-banner').style.display = 'none';
+          console.log('hidden at ', new Date());
+          showMarquee();
+        }, 2 * 60 * 1000);
+      };
+
+      showMarquee = () => {
+        setTimeout(() => {
+          document.getElementById('info-banner').style.display = 'block';
+          console.log('restored at ', new Date());
+          hideMarquee();
+        }, 10 * 60 * 1000);
+      };
     }
 
     const notifyMe = (message, icon, image) => {

@@ -165,7 +165,7 @@ const GroupPage = () => {
               <SearchSelect
                 fullWidth
                 label="Ruta T-Urban"
-                endpoint="https://crmgpstracker.mx:9999/api/rutas"
+                endpoint="https://crmgpstracker.mx:9999/api/rutas?filter=all"
                 debounceDelay={500}
                 value={link.id || null}
                 onChange={(evt) => setLink({ id: evt.target.value, groupId: item.id })}
