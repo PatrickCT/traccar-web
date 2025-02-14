@@ -1,16 +1,16 @@
+import { LinearProgress } from '@mui/material';
 import React, { Suspense, lazy, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   Route, Routes, useLocation, useNavigate,
 } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { LinearProgress } from '@mui/material';
+import App from './App';
 import Loading from './common/components/Loading';
 import useQuery from './common/util/useQuery';
-import { useEffectAsync } from './reactHelper';
-import { devicesActions } from './store';
-import App from './App';
 import MainPageNoAuth from './main/MainPageNoAuth';
+import { useEffectAsync } from './reactHelper';
 import ShareNoAuth from './ShareNoAuth';
+import { devicesActions } from './store';
 
 const CombinedReportPage = lazy(() => import('./reports/CombinedReportPage'));
 const RouteReportPage = lazy(() => import('./reports/RouteReportPage'));

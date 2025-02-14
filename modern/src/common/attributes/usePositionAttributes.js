@@ -369,4 +369,8 @@ export default (t) => useMemo(() => ({
     name: t('positionAudio'),
     type: 'string',
   },
+  date: {
+    name: t('date'),
+    type: 'string',
+  },
 }), [t]);

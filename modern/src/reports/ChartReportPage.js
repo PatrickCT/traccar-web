@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
 import {
-  FormControl, InputLabel, Select, MenuItem,
+  FormControl, InputLabel,
+  MenuItem,
+  Select,
 } from '@mui/material';
+import React, { useState } from 'react';
 import {
   CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
-import ReportFilter from './components/ReportFilter';
-import { formatTime } from '../common/util/formatter';
+import usePositionAttributes from '../common/attributes/usePositionAttributes';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
-import ReportsMenu from './components/ReportsMenu';
-import usePositionAttributes from '../common/attributes/usePositionAttributes';
-import { useCatch } from '../reactHelper';
-import { useAttributePreference, usePreference } from '../common/util/preferences';
 import {
   altitudeFromMeters, distanceFromMeters, speedFromKnots, volumeFromLiters,
 } from '../common/util/converter';
+import { formatTime } from '../common/util/formatter';
+import { useAttributePreference, usePreference } from '../common/util/preferences';
+import { useCatch } from '../reactHelper';
 import useReportStyles from './common/useReportStyles';
+import ReportFilter from './components/ReportFilter';
+import ReportsMenu from './components/ReportsMenu';
 
 const ChartReportPage = () => {
   const classes = useReportStyles();
@@ -90,7 +92,7 @@ const ChartReportPage = () => {
           <FormControl fullWidth>
             <InputLabel>{t('reportChartType')}</InputLabel>
             <Select label={t('reportChartType')} value={type} onChange={(e) => setType(e.target.value)}>
-              {Object.keys(positionAttributes).filter((key) => positionAttributes[key].type === 'number' && key !== 'odometer').map((key) => (
+              {Object.keys(positionAttributes).filter((key) => ['speed', 'rpm', 'fuel', 'temp', 'temp1', 'temp2', 'temp3', 'temp4'].some((f) => key.includes(f))).filter((key) => positionAttributes[key].type === 'number' && key !== 'odometer').map((key) => (
                 <MenuItem key={key} value={key}>{positionAttributes[key].name}</MenuItem>
               ))}
             </Select>

@@ -1,18 +1,18 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-underscore-dangle */
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector, connect } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { Snackbar } from '@mui/material';
-import { devicesActions, sessionActions } from './store';
-import { useEffectAsync } from './reactHelper';
+import React, { useEffect, useRef, useState } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from './common/components/LocalizationProvider';
 import { snackBarDurationLongMs } from './common/util/duration';
-import alarm from './resources/alarm.mp3';
-import { eventsActions } from './store/events';
-import useFeatures from './common/util/useFeatures';
 import { useAttributePreference } from './common/util/preferences';
+import useFeatures from './common/util/useFeatures';
+import { useEffectAsync } from './reactHelper';
+import alarm from './resources/alarm.mp3';
+import { devicesActions, sessionActions } from './store';
+import { eventsActions } from './store/events';
 
 const logoutCode = 4000;
 
@@ -160,6 +160,14 @@ const SocketController = () => {
         throw Error(await response.text());
       }
       connectSocket();
+      window.reconnectSocket = async () => {
+        const socket = socketRef.current;
+        if (socket) {
+          await socket.close();
+          connectSocket();
+        }
+      };
+
       return () => {
         const socket = socketRef.current;
         if (socket) {

@@ -86,3 +86,6 @@ root.render(
 );
 
 serviceWorkerRegistration.register();
+window.addEventListener('load', () => {
+  sessionStorage.removeItem('hasRefreshed');
+});

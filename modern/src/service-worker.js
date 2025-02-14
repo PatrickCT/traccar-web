@@ -119,6 +119,17 @@ self.onfetch = (evt) => {
   }
 };
 
+// self.onUpdate = (registration) => {
+//   const updateAvailable = window.confirm(
+//     'Se encontro una nueva actualización, ¿Desea recargar la pagina en este momento para obtener la actualización?'
+//   );
+
+//   if (updateAvailable && registration.waiting) {
+//     registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+//     window.location.reload();
+//   }
+// }
+
 // push
 self.addEventListener('push', function (event) {
   console.log('[Service Worker] Push Received.');

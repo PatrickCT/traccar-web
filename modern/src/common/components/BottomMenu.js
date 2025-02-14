@@ -1,21 +1,24 @@
+import {
+  Badge,
+  BottomNavigation, BottomNavigationAction, Menu, MenuItem,
+  Paper,
+  Typography,
+} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  Paper, BottomNavigation, BottomNavigationAction, Menu, MenuItem, Typography, Badge,
-} from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import DescriptionIcon from '@mui/icons-material/Description';
-import SettingsIcon from '@mui/icons-material/Settings';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import MapIcon from '@mui/icons-material/Map';
 import PersonIcon from '@mui/icons-material/Person';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import { sessionActions } from '../../store';
-import { useTranslation } from './LocalizationProvider';
 import { useRestriction } from '../util/permissions';
-import { nativePostMessage } from './NativeInterface';
 import { forgetMe } from '../util/utils';
+import { useTranslation } from './LocalizationProvider';
+import { nativePostMessage } from './NativeInterface';
 
 const BottomMenu = () => {
   const navigate = useNavigate();
@@ -110,7 +113,7 @@ const BottomMenu = () => {
   }, []);
 
   return (
-    <Paper square elevation={3}>
+    <Paper square elevation={3} id="bottomMenu">
       <BottomNavigation value={currentSelection()} onChange={handleSelection} showLabels>
         <BottomNavigationAction
           label={t('mapTitle')}

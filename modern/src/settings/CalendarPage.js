@@ -1,20 +1,26 @@
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  FormControl, InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from '@mui/material';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
 import moment from 'moment';
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import TextField from '@mui/material/TextField';
-import {
-  Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, InputLabel, Select, MenuItem,
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { DropzoneArea } from 'react-mui-dropzone';
-import EditItemView from './components/EditItemView';
-import EditAttributesAccordion from './components/EditAttributesAccordion';
+import { useDispatch } from 'react-redux';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import SettingsMenu from './components/SettingsMenu';
 import { prefixString } from '../common/util/stringUtils';
-import { calendarsActions } from '../store';
 import { useCatch } from '../reactHelper';
+import { calendarsActions } from '../store';
+import EditAttributesAccordion from './components/EditAttributesAccordion';
+import EditItemView from './components/EditItemView';
+import SettingsMenu from './components/SettingsMenu';
 
 const formatCalendarTime = (time) => {
   const tzid = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -137,7 +143,7 @@ const CalendarPage = () => {
                   onChange={(e) => setItem({ ...item, data: (e.target.value === 'simple' ? simpleCalendar() : null) })}
                 >
                   <MenuItem value="simple">{t('calendarSimple')}</MenuItem>
-                  <MenuItem value="custom">{t('reportCustom')}</MenuItem>
+                  {/* <MenuItem value="custom">{t('reportCustom')}</MenuItem> */}
                 </Select>
               </FormControl>
               {simple ? (

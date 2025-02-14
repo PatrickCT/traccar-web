@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+/* eslint-disable no-unused-vars */
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
-  AccordionSummary,
   AccordionDetails,
-  Typography,
+  AccordionSummary,
+  Button,
   Container,
   TextField,
-  Button,
+  Typography,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
-import SettingsMenu from './components/SettingsMenu';
-import { useCatch } from '../reactHelper';
-import { useAttributePreference } from '../common/util/preferences';
 import { distanceFromMeters, distanceToMeters, distanceUnitString } from '../common/util/converter';
+import { useAttributePreference } from '../common/util/preferences';
+import { useCatch } from '../reactHelper';
+import SettingsMenu from './components/SettingsMenu';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -46,11 +47,18 @@ const AccumulatorsPage = () => {
   const t = useTranslation();
 
   const distanceUnit = useAttributePreference('distanceUnit');
-
   const { deviceId } = useParams();
   const position = useSelector((state) => state.session.positions[deviceId]);
-
   const [item, setItem] = useState();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [hideMenu, setHideMenu] = useState(searchParams.get('hideMenu') || false);
+  const [hideNavigation, setHideNavigation] = useState(searchParams.get('hideNavigation') || false);
+
+  useEffect(() => {
+    if (hideNavigation) {
+      document.getElementById('bottomMenu').style.display = 'none';
+    }
+  }, []);
 
   useEffect(() => {
     if (position) {
@@ -77,7 +85,7 @@ const AccumulatorsPage = () => {
   });
 
   return (
-    <PageLayout menu={<SettingsMenu />} breadcrumbs={['sharedDeviceAccumulators']}>
+    <PageLayout menu={!hideMenu ? <SettingsMenu /> : null} breadcrumbs={['sharedDeviceAccumulators']}>
       {item && (
         <Container maxWidth="xs" className={classes.container}>
           <Accordion defaultExpanded>

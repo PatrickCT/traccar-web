@@ -561,9 +561,9 @@ export const valueParser = (obj, value) => {
     case 'simKey':
       return `<b style="font-weight: bold;text-transform: uppercase;">Clave de sim:</b> ${attConverter(obj, value)} `;
     case 'latitude':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Latitud::</b> ${attConverter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Latitud:</b> ${attConverter(obj, value)} `;
     case 'longitude':
-      return `<b style="font-weight: bold;text-transform: uppercase;">Longitud::</b> ${attConverter(obj, value)} `;
+      return `<b style="font-weight: bold;text-transform: uppercase;">Longitud:</b> ${attConverter(obj, value)} `;
   }
   return '';
 };

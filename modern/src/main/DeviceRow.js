@@ -59,11 +59,14 @@ const DeviceRow = ({ data, index, style }) => {
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
   const admin = useAdministrator();
+  // const user = useSelector((state) => state.session.user);
   const item = data[index];
   const position = useSelector((state) => state.session.positions[item.id]);
   const geofences = useSelector((state) => state.geofences.items);
   const devicePrimary = useAttributePreference('devicePrimary', 'name');
   const deviceSecondary = useAttributePreference('deviceSecondary', '');
+
+  // const hasSalida = () => item.attributes?.Salida || false;
 
   const formatProperty = (key) => {
     if (key === 'geofenceIds') {
@@ -150,6 +153,13 @@ const DeviceRow = ({ data, index, style }) => {
                 </IconButton>
               </Tooltip>
             )}
+            {/* {user.attributes.hasOwnProperty('Transporte') && user.attributes.Salida && !hasPassedTime(new Date(position.fixTime), 15) && hasSalida() && (
+              <Tooltip title="Salida activa">
+                <IconButton size="small">
+                  <FlagOutlined fontSize="small" className={classes.positive} />
+                </IconButton>
+              </Tooltip>
+            )} */}
           </>
         )}
       </ListItemButton>

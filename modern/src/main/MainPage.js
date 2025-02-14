@@ -14,7 +14,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useSelector } from 'react-redux';
 import DeviceList from './DeviceList';
-import DeviceListTransport from './DeviceListTransport';
+// import DeviceListTransport from './DeviceListTransport';
 import BottomMenu from '../common/components/BottomMenu';
 import usePersistedState from '../common/util/usePersistedState';
 import EventsDrawer from './EventsDrawer';
@@ -278,8 +278,9 @@ const MainPage = () => {
             className={classes.contentList}
             style={devicesOpen ? {} : { visibility: 'hidden' }}
           >
-            {user.attributes.hasOwnProperty('Transporte') &&
-              user.attributes.Transporte ? (<DeviceListTransport devices={filteredDevices} />) : (<DeviceList devices={filteredDevices} />)}
+            {/* {user.attributes.hasOwnProperty('Transporte') &&
+              user.attributes.Transporte ? (<DeviceListTransport devices={filteredDevices} />) : (<DeviceList devices={filteredDevices} />)} */}
+            <DeviceList devices={filteredDevices} />
           </Paper>
         </div>
         {desktop && (
