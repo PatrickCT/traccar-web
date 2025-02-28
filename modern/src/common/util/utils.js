@@ -319,7 +319,7 @@ export const attConverter = (obj, attribute) => {
     }
     case 'temperaturaC': {
       const value = attVariantsEvaluator(obj, 'temperature');
-      return value ? value.toFixed(1) : null;
+      return value ? (obj.protocol === 'teltonika' ? (value * 10) : value).toFixed(1) : null;
     }
     case 'temperaturaF': {
       const value = attVariantsEvaluator(obj, 'temperature');

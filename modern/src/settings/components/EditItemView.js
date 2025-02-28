@@ -1,12 +1,17 @@
+import {
+  Accordion, AccordionDetails, AccordionSummary,
+  Button,
+  Container,
+  Skeleton,
+  TextField,
+  Typography,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import makeStyles from '@mui/styles/makeStyles';
-import {
-  Container, Button, Accordion, AccordionDetails, AccordionSummary, Skeleton, Typography, TextField,
-} from '@mui/material';
-import { useCatch, useEffectAsync } from '../../reactHelper';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import PageLayout from '../../common/components/PageLayout';
+import { useCatch, useEffectAsync } from '../../reactHelper';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -28,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const EditItemView = ({
-  children, endpoint, item, setItem, defaultItem, validate, onItemSaved, menu, breadcrumbs, preventBack = false,
+  children, endpoint, item, setItem, defaultItem, validate, onItemSave, onItemSaved, menu, breadcrumbs, preventBack = false,
 }) => {
   const navigate = useNavigate();
   const classes = useStyles();
@@ -55,6 +60,9 @@ const EditItemView = ({
     let url = `/api/${endpoint}`;
     if (id) {
       url += `/${id}`;
+    }
+    if (onItemSave) {
+      onItemSave();
     }
 
     const response = await fetch(url, {

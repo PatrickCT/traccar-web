@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+/* eslint-disable  no-unsafe-optional-chaining */
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
@@ -15,6 +16,7 @@ import {
   Typography,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import usePositionAttributes from '../common/attributes/usePositionAttributes';
@@ -158,7 +160,6 @@ const MaintenancePage = () => {
   const validate = () => item && item.name && item.type && item.start && item.period && (!item.id ? (deviceId) : true);
 
   const linkDevice = async (maintenance) => {
-    window.Notiflix.Loading.dots('Guardando');
     // vincular dispositivo
     document.getElementById('NotiflixLoadingMessage').innerText = 'Vinculando equipo';
     await fetch(`${createBaseURL()}/api/permissions`, {
@@ -167,7 +168,7 @@ const MaintenancePage = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        deviceId: deviceId.toString(),
+        deviceId: (deviceId || device?.id).toString(),
         maintenanceId: maintenance.id,
       }),
     });
@@ -185,7 +186,7 @@ const MaintenancePage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          deviceId: deviceId.toString(),
+          deviceId: (deviceId || device?.id).toString(),
           notificationId: notification.id,
         }),
       });
@@ -205,7 +206,7 @@ const MaintenancePage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          deviceId: deviceId.toString(),
+          deviceId: (deviceId || device?.id).toString(),
           notificationId: newNotification.id,
         }),
       });
@@ -223,6 +224,9 @@ const MaintenancePage = () => {
       validate={validate}
       menu={<SettingsMenu />}
       breadcrumbs={['settingsTitle', 'sharedMaintenance']}
+      onItemSave={() => {
+        window.Notiflix.Loading.dots('Guardando');
+      }}
       onItemSaved={async (response) => {
         await linkDevice(response);
       }}
@@ -277,7 +281,7 @@ const MaintenancePage = () => {
                   <TextField
                     label={t('reportFrom')}
                     type="datetime-local"
-                    value={((d) => (!d ? new Date() : new Date(((parts) => `${parts[2]}/${parts[1]}/${parts[0]}`)(d.split('-')))))(item?.attributes?.last)}
+                    value={moment((item?.attributes?.last || ''), 'DD-MM-YYYY').locale('es').format(moment.HTML5_FMT.DATETIME_LOCAL)}
                     onChange={(e) => {
                       setItem({ ...item, start: 1, attributes: { ...item.attributes, last: formatDate(new Date(e.target.value), 'dd-MM-yyyy') } });
                     }}
@@ -308,7 +312,7 @@ const MaintenancePage = () => {
                 </>
               )}
 
-              {item?.type === 'totalDistance' && (item?.device?.id || deviceId) && (
+              {(item?.type === 'totalDistance' || item?.type === 'hours') && (item?.device?.id || deviceId) && (
                 <Button onClick={handleOpen}>Actualizar acumuladores</Button>
               )}
               <Modal
