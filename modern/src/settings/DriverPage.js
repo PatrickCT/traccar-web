@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import TextField from '@mui/material/TextField';
-import {
-  Accordion, AccordionSummary, AccordionDetails, Typography,
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Typography,
+} from '@mui/material';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
+import React, { useState } from 'react';
 // import { PhoneInput } from 'react-international-phone';
 // import 'react-international-phone/style.css';
-import EditItemView from './components/EditItemView';
-import EditAttributesAccordion from './components/EditAttributesAccordion';
 import { useTranslation } from '../common/components/LocalizationProvider';
+import EditAttributesAccordion from './components/EditAttributesAccordion';
+import EditItemView from './components/EditItemView';
 import SettingsMenu from './components/SettingsMenu';
 
 const useStyles = makeStyles((theme) => ({

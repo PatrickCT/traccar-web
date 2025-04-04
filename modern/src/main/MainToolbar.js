@@ -1,19 +1,35 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Info } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
+import MapIcon from '@mui/icons-material/Map';
+import TuneIcon from '@mui/icons-material/Tune';
+import ViewListIcon from '@mui/icons-material/ViewList';
 import {
-  Toolbar, IconButton, OutlinedInput, InputAdornment, Popover, FormControl, InputLabel, Select, MenuItem, FormGroup, FormControlLabel, Checkbox, Badge, ListItemButton, ListItemText, Tooltip, Button,
+  Badge,
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  ListItemButton, ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Popover,
+  Select,
+  Toolbar,
+  Tooltip,
   useMediaQuery,
 } from '@mui/material';
-import { Info } from '@mui/icons-material';
 import { makeStyles, useTheme } from '@mui/styles';
-import MapIcon from '@mui/icons-material/Map';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import AddIcon from '@mui/icons-material/Add';
-import TuneIcon from '@mui/icons-material/Tune';
+import React, { useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useDeviceReadonly } from '../common/util/permissions';
+import SearchSelect from '../reports/components/SearchableSelect';
 import DeviceRow from './DeviceRow';
 import PulsingIconButton from './components/PulsingIconButton';
 
@@ -141,17 +157,13 @@ const MainToolbar = ({
             </Select>
           </FormControl>
           <FormControl>
-            <InputLabel>{t('settingsGroups')}</InputLabel>
-            <Select
+            <SearchSelect
+              data={Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))}
               label={t('settingsGroups')}
               value={filter.groups}
               onChange={(e) => setFilter({ ...filter, groups: e.target.value })}
               multiple
-            >
-              {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).map((group) => (
-                <MenuItem key={group.id} value={group.id}>{group.name}</MenuItem>
-              ))}
-            </Select>
+            />
           </FormControl>
           <FormControl>
             <InputLabel>{t('sharedSortBy')}</InputLabel>
@@ -192,12 +204,6 @@ const MainToolbar = ({
             </Tooltip>
           </IconButton>
         )}
-
-      <PulsingIconButton
-        onClick={() => navigate('help')}
-        disabled={deviceReadonly && Object.keys(devices).length === 0}
-        title={t('help')}
-      />
 
       {!desktop && (
         <PulsingIconButton

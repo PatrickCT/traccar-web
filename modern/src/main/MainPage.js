@@ -3,42 +3,43 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-undef */
 /* eslint-disable import/no-extraneous-dependencies */
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+/* eslint-disable no-console */
 import {
   Paper,
 } from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 // import { Marker } from 'maplibre-gl';
-import { makeStyles } from '@mui/styles';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { makeStyles } from '@mui/styles';
 import { useSelector } from 'react-redux';
 import DeviceList from './DeviceList';
 // import DeviceListTransport from './DeviceListTransport';
 import BottomMenu from '../common/components/BottomMenu';
-import usePersistedState from '../common/util/usePersistedState';
-import EventsDrawer from './EventsDrawer';
-import useFilter from './useFilter';
-import MainToolbar from './MainToolbar';
-import MainMap from './MainMap';
-import {
-  streetView,
-  generateRoute,
-} from '../common/util/mapPopup';
-import { map } from '../map/core/MapView';
-import './MainPage.css';
 import Counter from '../common/components/Counter';
+import {
+  generateRoute,
+  streetView,
+} from '../common/util/mapPopup';
+import usePersistedState from '../common/util/usePersistedState';
+import { map } from '../map/core/MapView';
+import EventsDrawer from './EventsDrawer';
+import MainMap from './MainMap';
+import './MainPage.css';
+import MainToolbar from './MainToolbar';
+import useFilter from './useFilter';
 // import ConnectionStatus from '../common/components/ConnectionStatus';
 import DebtModal from '../common/components/DebtModal';
-import PositionDrawer from './PositionInfoDrawer';
 import { useAdministrator } from '../common/util/permissions';
+import PushNotificationsManager from '../common/util/push';
+import { toast } from '../common/util/toasts';
 import { LayersManager } from '../common/util/utils';
 import Banner from './components/Banner';
-import { toast } from '../common/util/toasts';
+import SurveysDialog from './components/SurverysDialog';
 import LinksModal from './LinksModal';
 import MainMapButtons from './MainMapButtons';
-import PushNotificationsManager from '../common/util/push';
-import SurveysDialog from './components/SurverysDialog';
+import PositionDrawer from './PositionInfoDrawer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -185,8 +186,14 @@ const MainPage = () => {
     window.localStorage.setItem('showMapPopup', true);
     window.groupsNames = groups;
     window.layerManager = LayersManager.getInstance(20);
-    const pushManager = new PushNotificationsManager();
-    window.pushManager = pushManager;
+
+    try {
+      const pushManager = new PushNotificationsManager();
+      window.pushManager = pushManager;
+    } catch (error) {
+      console.error(error);
+    }
+
     const checkScriptLoaded = () => {
       if (typeof InternalTools !== 'undefined') {
         if (!window.internalTools) {

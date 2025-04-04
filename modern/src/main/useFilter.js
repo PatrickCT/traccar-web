@@ -1,6 +1,6 @@
+import moment from 'moment';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import moment from 'moment';
 
 export default (keyword, filter, filterSort, filterMap, positions, setFilteredDevices, setFilteredPositions) => {
   const groups = useSelector((state) => state.groups.items);
@@ -8,13 +8,20 @@ export default (keyword, filter, filterSort, filterMap, positions, setFilteredDe
 
   useEffect(() => {
     const deviceGroups = (device) => {
-      const groupIds = [];
+      const groupIds = new Set(); // Use Set to track visited groupIds
       let { groupId } = device;
+
       while (groupId) {
-        groupIds.push(groupId);
+        if (groupIds.has(groupId)) {
+          // console.error('Cycle detected in groupId references:', groupId);
+          break; // Prevent infinite loop
+        }
+
+        groupIds.add(groupId);
         groupId = groups[groupId]?.groupId || 0;
       }
-      return groupIds;
+
+      return [...groupIds]; // Convert Set back to an array
     };
 
     const filtered = Object.values(devices)

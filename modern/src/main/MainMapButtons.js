@@ -1,12 +1,13 @@
 import React, { memo } from 'react';
-import MapPopup from '../map/showpopup/MapPopup';
-import MapShare from '../map/share/MapShare';
 import MapCoverage from '../map/coverage/MapCoverage';
 import MapPromotions from '../map/promotions/MapPromotions';
+import MapShare from '../map/share/MapShare';
+import MapPopup from '../map/showpopup/MapPopup';
 // import MapHorizontalButton from '../map/Buttons/MapHorizontalButton';
-import { modals } from './LinksModal';
 import { useAdministrator } from '../common/util/permissions';
 import { showCoberturaMap } from '../common/util/utils';
+import MapHelp from '../map/help/MapHelp';
+import { modals } from './LinksModal';
 
 export const buttons = {};
 
@@ -22,6 +23,7 @@ const MainMapButtons = () => {
         <MapCoverage onClick={() => showCoberturaMap()} />
       )}
       <MapPromotions />
+      <MapHelp />
       {/* {!readonly && (
         <MapHorizontalButton title="Reportes anteriores al 29 de septiembre" enabled onClick={(() => window.open('http://rastreo.gpstracker.mx:8089', '_blank').focus())} />
       )} */}

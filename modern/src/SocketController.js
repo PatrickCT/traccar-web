@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-underscore-dangle */
+/* eslint-disable no-console */
 import { Snackbar } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -57,98 +58,102 @@ const SocketController = () => {
   };
 
   const connectSocket = () => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const socket = new WebSocket(`${protocol}//${window.location.host}/api/socket`);
-    socketRef.current = socket;
-    window.traccarSocket = socket;
+    try {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const socket = new WebSocket(`${protocol}//${window.location.host}/api/socket`);
+      socketRef.current = socket;
+      window.traccarSocket = socket;
 
-    const callCounters = {
-      updateDevices: 0,
-      updatePositions: 0,
-      addEvents: 0,
-    };
+      const callCounters = {
+        updateDevices: 0,
+        updatePositions: 0,
+        addEvents: 0,
+      };
 
-    const trackDispatch = (actionType) => {
-      callCounters[actionType]++;
-    };
+      const trackDispatch = (actionType) => {
+        callCounters[actionType]++;
+      };
 
-    setInterval(() => {
-      // console.log('Dispatch Call Counts per second:', callCounters);
-      // Reset the counters
-      callCounters.updateDevices = 0;
-      callCounters.updatePositions = 0;
-      callCounters.addEvents = 0;
-    }, 1000);
+      setInterval(() => {
+        // console.log('Dispatch Call Counts per second:', callCounters);
+        // Reset the counters
+        callCounters.updateDevices = 0;
+        callCounters.updatePositions = 0;
+        callCounters.addEvents = 0;
+      }, 1000);
 
-    const positionQueue = [];
+      const positionQueue = [];
 
-    // Add data to the queue
-    const queuePositions = (positions) => {
-      positionQueue.push(...positions);
-    };
+      // Add data to the queue
+      const queuePositions = (positions) => {
+        positionQueue.push(...positions);
+      };
 
-    // Process the queue every second
-    setInterval(() => {
-      if (positionQueue.length > 0) {
-        trackDispatch('updatePositions');
-        dispatch(sessionActions.updatePositions(positionQueue));
-        // Clear the queue
-        positionQueue.length = 0;
-      }
-    }, 1000);
-
-    socket.onopen = () => {
-      dispatch(sessionActions.updateSocket(true));
-    };
-
-    socket.onclose = async (event) => {
-      dispatch(sessionActions.updateSocket(false));
-      if (event.code !== logoutCode) {
-        try {
-          const devicesResponse = await fetch('/api/devices');
-          if (devicesResponse.ok) {
-            dispatch(devicesActions.update(await devicesResponse.json()));
-          }
-          const positionsResponse = await fetch('/api/positions');
-          if (positionsResponse.ok) {
-            dispatch(sessionActions.updatePositions(await positionsResponse.json()));
-          }
-          if (devicesResponse.status === 401 || positionsResponse.status === 401) {
-            navigate('/login');
-          }
-        } catch (error) {
-          // ignore errors
+      // Process the queue every second
+      setInterval(() => {
+        if (positionQueue.length > 0) {
+          trackDispatch('updatePositions');
+          dispatch(sessionActions.updatePositions(positionQueue));
+          // Clear the queue
+          positionQueue.length = 0;
         }
-        setTimeout(() => connectSocket(), 60000);
-      }
-    };
+      }, 1000);
 
-    socket.onmessage = (event) => {
-      if (document.hidden) return;
-      const data = JSON.parse(event.data);
+      socket.onopen = () => {
+        dispatch(sessionActions.updateSocket(true));
+      };
 
-      if (data.devices) {
-        trackDispatch('updateDevices');
-        dispatch(devicesActions.update(data.devices));
-      }
-      if (data.positions) {
-        queuePositions(data.positions);
-        // if (!document.hidden) {
-        //   // dispatch(sessionActions.updatePositions(data.positions));
-        //   queuePositions(data.positions);
-        // }
-      }
-      if (data.events) {
-        if (!features.disableEvents) {
-          trackDispatch('addEvents');
-          dispatch(eventsActions.add(data.events));
+      socket.onclose = async (event) => {
+        dispatch(sessionActions.updateSocket(false));
+        if (event.code !== logoutCode) {
+          try {
+            const devicesResponse = await fetch('/api/devices');
+            if (devicesResponse.ok) {
+              dispatch(devicesActions.update(await devicesResponse.json()));
+            }
+            const positionsResponse = await fetch('/api/positions');
+            if (positionsResponse.ok) {
+              dispatch(sessionActions.updatePositions(await positionsResponse.json()));
+            }
+            if (devicesResponse.status === 401 || positionsResponse.status === 401) {
+              navigate('/login');
+            }
+          } catch (error) {
+            // ignore errors
+          }
+          setTimeout(() => connectSocket(), 60000);
         }
-        setEvents(data.events);
-      }
-      if (data.custom) {
-        (allowedFunctions[JSON.parse(data.custom).command] ?? (() => { }))();
-      }
-    };
+      };
+
+      socket.onmessage = (event) => {
+        if (document.hidden) return;
+        const data = JSON.parse(event.data);
+
+        if (data.devices) {
+          trackDispatch('updateDevices');
+          dispatch(devicesActions.update(data.devices));
+        }
+        if (data.positions) {
+          queuePositions(data.positions);
+          // if (!document.hidden) {
+          //   // dispatch(sessionActions.updatePositions(data.positions));
+          //   queuePositions(data.positions);
+          // }
+        }
+        if (data.events) {
+          if (!features.disableEvents) {
+            trackDispatch('addEvents');
+            dispatch(eventsActions.add(data.events));
+          }
+          setEvents(data.events);
+        }
+        if (data.custom) {
+          (allowedFunctions[JSON.parse(data.custom).command] ?? (() => { }))();
+        }
+      };
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffectAsync(async () => {
