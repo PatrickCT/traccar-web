@@ -1,30 +1,36 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
 import { Popup } from 'maplibre-gl';
-import {
-  formatDistance, formatHours, formatVolume, formatTime,
-} from '../common/util/formatter';
-import ReportFilter from './components/ReportFilter';
-import { useAttributePreference, usePreference } from '../common/util/preferences';
+import Notiflix from 'notiflix';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import AddressValue from '../common/components/AddressValue';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
-import ReportsMenu from './components/ReportsMenu';
-import ColumnSelect from './components/ColumnSelect';
+import TableShimmer from '../common/components/TableShimmer';
+import {
+  formatDistance, formatHours,
+  formatTime,
+  formatVolume,
+} from '../common/util/formatter';
+import { createPopUpSimple } from '../common/util/mapPopup';
+import { useAttributePreference, usePreference } from '../common/util/preferences';
 import usePersistedState from '../common/util/usePersistedState';
-import { useCatch } from '../reactHelper';
-import useReportStyles from './common/useReportStyles';
-import MapPositions from '../map/MapPositionsOriginal';
+import '../main/MainPage.css';
+import { geometryToArea } from '../map/core/mapUtil';
 import MapView, { map } from '../map/core/MapView';
 import MapCamera from '../map/MapCamera';
-import AddressValue from '../common/components/AddressValue';
-import TableShimmer from '../common/components/TableShimmer';
 import MapGeofence from '../map/MapGeofence';
+import MapPositions from '../map/MapPositionsOriginal';
+import { useCatch } from '../reactHelper';
 import scheduleReport from './common/scheduleReport';
-import { createPopUpSimple } from '../common/util/mapPopup';
-import '../main/MainPage.css';
+import useReportStyles from './common/useReportStyles';
+import ColumnSelect from './components/ColumnSelect';
+import GeofenceCreator from './components/GeofenceCreator';
+import ReportFilter from './components/ReportFilter';
+import ReportsMenu from './components/ReportsMenu';
 
 const columnsArray = [
   ['startTime', 'reportStartTime'],
@@ -41,6 +47,7 @@ const StopReportPage = () => {
   const navigate = useNavigate();
   const classes = useReportStyles();
   const t = useTranslation();
+  const geofenceRef = useRef();
 
   const distanceUnit = useAttributePreference('distanceUnit');
   const volumeUnit = useAttributePreference('volumeUnit');
@@ -51,6 +58,11 @@ const StopReportPage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const geofences = useSelector((state) => state.geofences.items);
+
+  const handleTriggerGeofence = () => {
+    geofenceRef.current.config(true);
+  };
 
   const handleSubmit = useCatch(async ({ deviceId, from, to, type }) => {
     const query = new URLSearchParams({ deviceId, from, to });
@@ -115,10 +127,19 @@ const StopReportPage = () => {
     new Popup()
       .setMaxWidth('400px')
       .setOffset(30)
-      .setHTML(createPopUpSimple(position))
+      .setHTML(createPopUpSimple(position, ['streetView', 'geofence']))
       .setLngLat([position.longitude, position.latitude])
       .addTo(map);
   };
+
+  useEffect(() => {
+    window.createGeofence = handleTriggerGeofence;
+
+    return () => {
+      window.createGeofence = undefined;
+      delete window.createGeofence;
+    };
+  });
 
   return (
     <PageLayout menu={<ReportsMenu />} breadcrumbs={['reportTitle', 'reportStops']}>
@@ -146,6 +167,34 @@ const StopReportPage = () => {
               <ColumnSelect columns={columns} setColumns={setColumns} columnsArray={columnsArray} />
             </ReportFilter>
           </div>
+          <GeofenceCreator
+            ref={geofenceRef}
+            position={selectedItem}
+            existingGeofences={Object.values(geofences)}
+            radius={15}
+            onCreate={async (geojson) => {
+              // call your endpoint here
+              const newItem = { name: '', area: geometryToArea(geojson?.geometry) };
+              const response = await fetch('/api/geofences', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newItem),
+              });
+
+              if (response.ok) {
+                const item = await response.json();
+                await fetch('/api/permissions', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ deviceId: selectedItem.deviceId, geofenceId: item.id }),
+                });
+                navigate(`/settings/geofence/${item.id}`);
+              } else {
+                throw Error(await response.text());
+              }
+              Notiflix.Loading.remove();
+            }}
+          />
           <Table>
             <TableHead>
               <TableRow>

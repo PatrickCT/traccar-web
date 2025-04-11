@@ -1,14 +1,12 @@
 /* eslint-disable no-unused-vars */
 import {
-  Box,
   Button,
-  LinearProgress,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import React, { useEffect, useState } from 'react';
 import { useEffectAsync } from '../../reactHelper';
-import { useTranslation } from './LocalizationProvider';
 import { confirmDialog } from '../util/utils';
+import { useTranslation } from './LocalizationProvider';
 
 const LinkField = ({
   label,
@@ -23,7 +21,6 @@ const LinkField = ({
   const [active, setActive] = useState(false);
   const [items, setItems] = useState([]);
   const [linked, setLinked] = useState([]);
-  const [bulk, setBulk] = useState([]);
 
   const t = useTranslation();
 

@@ -613,6 +613,7 @@
     "exits": " Exits ",
     "changeExitTime": "Change exit time",
     "geofence": "Geofence",
+    "fastGeofence": "Fast geofence",
     "arrive": "Arrive",
     "success": "Success",
     "timeChangeSuccess": "Exit time success changed",

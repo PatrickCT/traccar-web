@@ -3,31 +3,31 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-floating-decimal */
 
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import * as turf from '@turf/turf';
+import { Marker, Popup } from 'maplibre-gl';
 import React, {
   memo, useCallback, useEffect, useState,
 } from 'react';
-import * as turf from '@turf/turf';
-import { Marker, Popup } from 'maplibre-gl';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
+import { createPopUp } from '../common/util/mapPopup';
+import useFeatures from '../common/util/useFeatures';
 import MapView, { map } from '../map/core/MapView';
-import MapSelectedDevice from '../map/main/MapSelectedDevice';
+import MapGeocoder from '../map/geocoder/MapGeocoder';
 import MapAccuracy from '../map/main/MapAccuracy';
-import MapGeofence from '../map/MapGeofence';
-import MapCurrentLocation from '../map/MapCurrentLocation';
-import PoiMap from '../map/main/PoiMap';
-import MapPadding from '../map/MapPadding';
-import { devicesActions } from '../store';
 import MapDefaultCamera from '../map/main/MapDefaultCamera';
 import MapLiveRoutes from '../map/main/MapLiveRoutes';
+import MapSelectedDevice from '../map/main/MapSelectedDevice';
+import PoiMap from '../map/main/PoiMap';
+import MapCurrentLocation from '../map/MapCurrentLocation';
+import MapGeofence from '../map/MapGeofence';
+import MapPadding from '../map/MapPadding';
 import MapPositions from '../map/MapPositions';
-import MapOverlay from '../map/overlay/MapOverlay';
-import MapGeocoder from '../map/geocoder/MapGeocoder';
 import MapScale from '../map/MapScale';
 import MapNotification from '../map/notification/MapNotification';
-import useFeatures from '../common/util/useFeatures';
-import { createPopUp } from '../common/util/mapPopup';
+import MapOverlay from '../map/overlay/MapOverlay';
+import { devicesActions } from '../store';
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -69,6 +69,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
 
     window.sleep = sleep;
     window.createPopUp = createPopUp;
+
     window.rtmPopUp = (position) => {
       if (position === undefined || position === null || window.position === null || window.localStorage.getItem('showMapPopup') === 'false') {
         return;

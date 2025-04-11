@@ -1,7 +1,7 @@
-import React from 'react';
 import {
   FormControl, InputLabel, MenuItem, Select,
 } from '@mui/material';
+import React from 'react';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import useReportStyles from '../common/useReportStyles';
 

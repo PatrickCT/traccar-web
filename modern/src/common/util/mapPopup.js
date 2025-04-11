@@ -1,14 +1,17 @@
 /* eslint-disable no-empty */
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-arrow-callback */
+/* eslint-disable import/no-extraneous-dependencies */
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 import { toast } from './toasts';
 import {
-  hasPassedTime,
-  isMobile,
-  valueParser,
-  isAdmin,
   createBaseURL,
   dateDifference,
+  hasPassedTime,
+  isAdmin,
+  isMobile,
+  valueParser,
 } from './utils';
 
 window.extraDiv = 'none';
@@ -96,14 +99,14 @@ window.confirmDialog = (type) => {
         await window.makeRequest('./api/commands/send', 'POST', {
           type: 'engineStop',
           attributes: {},
-          deviceId: window.position.deviceId,
+          deviceId: window.position?.deviceId || window.device?.id,
         });
         toast.toast('Comando enviado', { style: { main: { ...(isMobile() ? { bottom: '5vh' } : {}) } } });
       } else if (type === 2) {
         await window.makeRequest('./api/commands/send', 'POST', {
           id: 0,
           attributes: {},
-          deviceId: window.position.deviceId,
+          deviceId: window.position?.deviceId || window.device?.id,
           type: 'engineResume',
           textChannel: false,
           description: null,
@@ -162,6 +165,75 @@ export const streetView = (position = null) => {
   }
 };
 
+export const initiDriversTooltip = async () => {
+  // List of drivers
+  const drivers = (window.device?.id || window.position?.deviceId) ? await (await fetch(`${createBaseURL()}/api/drivers?deviceId=${window.device?.id || window.position?.deviceId}`)).json() : [];
+
+  // Create HTML for all driver cards
+  const profileCardsHTML = `
+      <style>
+      /* Style for the profile card */
+      .profile-card {
+        font-family: Arial, sans-serif;
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        width: 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .profile-card h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .profile-card p {
+        font-size: 14px;
+        color: #555;
+        margin: 5px 0;
+      }
+
+      .profile-card .label {
+        font-weight: bold;
+      }
+
+      /* Tooltip arrow styles */
+      .tippy-box {
+        border-radius: 8px;
+      }
+    </style>
+    <div style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
+        ${drivers.map((driver) => `
+          <div class="profile-card">
+            <h3>${driver.name}</h3>
+            <p><span class="label">Dirección:</span><span class="value">${driver.uniqueId}</span></p>
+            <p><span class="label">Telefono:</span><span class="value">${driver.phone}</span></p>
+            <p><span class="label">Licencia:</span><span class="value">${driver.license}</span></p>
+            <p><span class="label">Edad:</span><span class="value">${driver.age}</span></p>
+          </div>
+        `).join('')}
+    </div>
+    `;
+
+  // Initialize Tippy on the single button
+  if (drivers.length > 0) {
+    tippy('#driversTooltipButton', {
+      content: profileCardsHTML,
+      allowHTML: true,
+      theme: 'light',
+      maxWidth: '320px',
+      arrow: true,
+      interactive: true,
+      animation: 'fade',
+      placement: 'auto',
+    });
+  }
+};
+
 const popupHeaderButtons = (position) => {
   let html = '';
   html += "<div align='center' style='text-align: center;' >";
@@ -171,6 +243,8 @@ const popupHeaderButtons = (position) => {
   html += `<a style="margin: auto 2px" onclick="(function(){navigate('/settings/device/${position.deviceId}');}());"><img src="${createBaseURL()}${'/images/botones-popup/edit.svg'}" width="14" height="14" /></a>`;
 
   html += `<a style="margin: auto 2px" onclick="(function(){navigate('/settings/accumulators/${position.deviceId}');}());"><img src="${createBaseURL()}${'/images/botones-popup/accumulator.svg'}" width="14" height="14" /></a>`;
+
+  html += `<a style="margin: auto 2px" id="driversTooltipButton"><img src="${createBaseURL()}${'/images/botones-popup/driver.svg'}" width="14" height="14" /></a>`;
 
   if (isAdmin()) {
     html += `<a style="margin: auto 2px" onclick="(function(){navigate('/settings/device/${position.deviceId}/command');}());"><img src="${createBaseURL()}${'/images/botones-popup/command.svg'}" width="14" height="14" /></a>`;
@@ -203,6 +277,10 @@ const popupFooterButtons = (include = ['engineLock', 'engineResume', 'streetView
   }
   if (include.includes('replay')) {
     html += `<a style="margin: auto 2px" onclick="(function(){navigate('/replay');}());"><img src="${createBaseURL()}${'/images/botones-popup/replay.svg'}" width="35" height="35" /></a>`;
+  }
+
+  if (include.includes('geofence')) {
+    html += `<a style="margin: auto 2px" onclick="(function(){window.createGeofence()}());"><img src="${createBaseURL()}${'/images/botones-popup/geofence.svg'}" width="35" height="35" /></a>`;
   }
 
   html += '</div>';
@@ -293,6 +371,7 @@ const createPopUpFooterButtons = (include) => popupFooterButtons(include);
 
 const createPopUpContent = (position, showHeaderButtons = true, showFooterButtons = true, includeFooterButtons = []) => {
   try {
+    initiDriversTooltip();
     const user = window.getUser();
     // sections
     let html = '';
@@ -371,7 +450,7 @@ export const createPopUpReportRoute = (position) => {
   return html;
 };
 
-export const createPopUpSimple = (position) => {
+export const createPopUpSimple = (position, buttons = ['streetView']) => {
   window.replayPosition = position;
   let html = '<div>';
   window.sv = (pos) => window.streetView(pos);
@@ -383,6 +462,6 @@ export const createPopUpSimple = (position) => {
   html += '<br />';
   html = html.replace(/<br\s*\/?>\s*(?:<br\s*\/?>\s*)+/g, '<br />');
   html += '<br>';
-  html += createPopUpFooterButtons(['streetView']);
+  html += createPopUpFooterButtons(buttons);
   return html;
 };

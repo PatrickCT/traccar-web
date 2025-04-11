@@ -1,16 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
 
+import moment from 'moment';
+import 'moment-timezone';
 import {
   React, memo, useEffect, useState,
 } from 'react';
 import { useSelector } from 'react-redux';
-import moment from 'moment';
-import 'moment-timezone';
 import DropdownComponents from '../../common/components/DropdownComponent';
-import { useEffectAsync } from '../../reactHelper';
-import '../../common/tickets.css';
 import { useTranslation } from '../../common/components/LocalizationProvider';
+import '../../common/tickets.css';
 import TimeUpdateBtn from './TimeUpdateBtn';
 
 const isEqual = require('react-fast-compare');
