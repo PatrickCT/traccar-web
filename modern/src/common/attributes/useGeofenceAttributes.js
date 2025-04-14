@@ -23,4 +23,8 @@ export default (t) => useMemo(() => ({
     name: t('attributeColorChangeFlag'),
     type: 'color',
   },
+  allowedTime: {
+    name: t('attributeAllowedTime'),
+    type: 'number',
+  },
 }), [t]);

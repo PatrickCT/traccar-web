@@ -167,6 +167,7 @@
     "attributeNotificationTokens": "Notification Tokens",
     "attributePopupInfo": "Información popup",
     "attributeFuelEfficiency": "Rendimiento de combustible (km/l)",
+    "attributeAllowedTime": "Tiempo permitido (min)",
     "errorTitle": "Error",
     "errorGeneral": "Parámetros no válidos o fuera de los límites",
     "errorConnection": "Error en la conexión",
@@ -640,5 +641,7 @@
     "sharedClose": "Cerrar",
     "sharedNext": "Siguiente",
     "sharedShare": "Compartir",
-    "sharedAll": "Todo"
+    "sharedAll": "Todo",
+    "sharedRestricted": "Restringida",
+    "sharedAllowed": "Permitida"
 }
