@@ -165,6 +165,7 @@
     "attributeNotificationTokens": "Notification Tokens",
     "attributePopupInfo": "Popup Info",
     "attributeFuelEfficiency": "Fuel efficiency",
+    "attributeAllowedTime": "Allowed time (min)",
     "errorTitle": "Error",
     "errorGeneral": "Invalid parameters or constraints violation",
     "errorConnection": "Connection error",
@@ -637,5 +638,7 @@
     "sharedClose": "Close",
     "sharedNext": "Next",
     "sharedShare": "Share",
-    "sharedAll": "All"
+    "sharedAll": "All",
+    "sharedRestricted": "Restricted",
+    "sharedAllowed": "Allowed"
 }

@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
-  Accordion, AccordionSummary, AccordionDetails, Typography, TextField,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Checkbox,
+  FormControlLabel,
+  TextField,
+  Typography,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import EditItemView from './components/EditItemView';
-import EditAttributesAccordion from './components/EditAttributesAccordion';
-import { useTranslation } from '../common/components/LocalizationProvider';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import useGeofenceAttributes from '../common/attributes/useGeofenceAttributes';
-import SettingsMenu from './components/SettingsMenu';
+import { useTranslation } from '../common/components/LocalizationProvider';
 import SelectField from '../common/components/SelectField';
 import { geofencesActions } from '../store';
+import EditAttributesAccordion from './components/EditAttributesAccordion';
+import EditItemView from './components/EditItemView';
+import SettingsMenu from './components/SettingsMenu';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -81,6 +87,16 @@ const GeofencePage = () => {
                 endpoint="/api/calendars"
                 label={t('sharedCalendar')}
               />
+              <FormControlLabel
+                control={<Checkbox checked={item.restricted} onChange={(event) => setItem({ ...item, restricted: event.target.checked })} />}
+                label={t('sharedRestricted')}
+              />
+              {item.restricted && (
+                <FormControlLabel
+                  control={<Checkbox checked={item.allowed} onChange={(event) => setItem({ ...item, allowed: event.target.checked })} />}
+                  label={t('sharedAllowed')}
+                />
+              )}
             </AccordionDetails>
           </Accordion>
           <EditAttributesAccordion
