@@ -5,6 +5,10 @@ export default (t) => useMemo(() => ({
     name: t('attributeTelegramChatId'),
     type: 'string',
   },
+  viewPositionTechnicalInformation: {
+    name: t('attributeShowTechnicalPositionInfo'),
+    type: 'boolean',
+  },
   pushoverUserKey: {
     name: t('attributePushoverUserKey'),
     type: 'string',

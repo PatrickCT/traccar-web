@@ -208,7 +208,7 @@ const EditAttributesAccordion = ({ attribute, attributes, setAttributes, definit
               </Grid>
             );
           }
-          if (key === 'colorChange') {
+          if (key === 'colorChange' || key === 'color') {
             return (
               <Grid container direction="row" justifyContent="space-between" key={key}>
                 <FormControlLabel
