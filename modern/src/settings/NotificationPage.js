@@ -38,7 +38,6 @@ const NotificationPage = () => {
     key: unprefixString('alarm', it),
     name: t(it),
   }));
-
   const testNotificators = useCatch(async () => {
     await Promise.all(item.notificators.split(/[, ]+/).map(async (notificator) => {
       const response = await fetch(`/api/notifications/test/${notificator}`, {
@@ -124,7 +123,7 @@ const NotificationPage = () => {
                       checked={item.always}
                       onChange={(event) => setItem({ ...item, always: event.target.checked })}
                     />
-                    )}
+                  )}
                   label={t('notificationAlways')}
                 />
               </FormGroup>

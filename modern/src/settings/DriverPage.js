@@ -5,6 +5,7 @@ import {
   AccordionSummary,
   Typography,
 } from '@mui/material';
+import moment from 'moment';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
 import React, { useState } from 'react';
@@ -14,6 +15,7 @@ import { useTranslation } from '../common/components/LocalizationProvider';
 import EditAttributesAccordion from './components/EditAttributesAccordion';
 import EditItemView from './components/EditItemView';
 import SettingsMenu from './components/SettingsMenu';
+import { formatDate } from '../common/util/utils';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -81,6 +83,13 @@ const DriverPage = () => {
                 value={item.license || ''}
                 onChange={(event) => setItem({ ...item, license: event.target.value })}
                 label={t('license')}
+              />
+              <TextField
+                label={t('license_expiration')}
+                type="date"
+                value={moment((item?.licenseExpiration || ''), 'YYYY-MM-DD').locale('es').format(moment.HTML5_FMT.DATE)}
+                onChange={(event) => setItem({ ...item, licenseExpiration: formatDate(new Date(event.target.value), 'yyyy-MM-dd') })}
+                fullWidth
               />
               <TextField
                 value={item.age || ''}
