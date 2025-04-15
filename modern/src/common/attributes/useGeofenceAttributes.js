@@ -27,4 +27,8 @@ export default (t) => useMemo(() => ({
     name: t('attributeAllowedTime'),
     type: 'number',
   },
+  prohibitedGeofence: {
+    name: t('attributeShutdownGeofence'),
+    type: 'boolean',
+  },
 }), [t]);

@@ -166,6 +166,7 @@
     "attributePopupInfo": "Popup Info",
     "attributeFuelEfficiency": "Fuel efficiency",
     "attributeAllowedTime": "Allowed time (min)",
+    "attributeShutdownGeofence": "Shutdown geofence",
     "errorTitle": "Error",
     "errorGeneral": "Invalid parameters or constraints violation",
     "errorConnection": "Connection error",
