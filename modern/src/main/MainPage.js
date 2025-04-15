@@ -240,7 +240,6 @@ const MainPage = () => {
       Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item.remove());
     }
   }, [selectedDeviceId]);
-
   return (
     <div className={classes.root}>
       {user && user.attributes.hasOwnProperty('FPS') && user.attributes.FPS && (
@@ -302,7 +301,7 @@ const MainPage = () => {
           <DebtModal />
         )
       }
-      {selectedPosition && admin && (
+      {selectedPosition && (admin || (user.attributes.hasOwnProperty('viewPositionTechnicalInformation') && user.attributes.viewPositionTechnicalInformation === true)) && (
         <PositionDrawer onClose={() => setInfoDrawer(false)} open={infoDrawer} />
       )}
       <Banner

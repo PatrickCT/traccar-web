@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 export default (t) => useMemo(() => ({
   color: {
     name: t('attributeColor'),
-    type: 'string',
+    type: 'color',
   },
   speedLimit: {
     name: t('attributeSpeedLimit'),
