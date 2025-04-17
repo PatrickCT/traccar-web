@@ -46,7 +46,7 @@ const GeofenceCreator = forwardRef(({ position, existingGeofences, onCreate }, r
 
     const fixCoordinateOrder = (polygon) => {
       const fixed = turf.clone(polygon);
-      fixed.geometry.coordinates = fixed.geometry.coordinates.map((ring) => ring.map(([x, y]) => [y, x]));
+      fixed.geometry.coordinates = fixed.geometry.coordinates.filter((ring) => Array.isArray(ring[0])).map((ring) => ring.map(([x, y]) => [y, x]));
       return fixed;
     };
 
