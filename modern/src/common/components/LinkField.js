@@ -2,6 +2,7 @@
 import {
   Button,
 } from '@mui/material';
+import Notiflix from 'notiflix';
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useEffect, useState } from 'react';
 import { useEffectAsync } from '../../reactHelper';
@@ -57,8 +58,6 @@ const LinkField = ({
 
   const onChange = async (value) => {
     setActive(false);
-    // setItems((old) => old.map((item) => (item.id !== value.id ? item : { ...value, checked: !value.checked })));
-
     if (value.checked) {
       setLinked((old) => old.filter((i) => i !== value.id));
       await fetch('/api/permissions', {
@@ -67,6 +66,10 @@ const LinkField = ({
         body: JSON.stringify(createBody(keyGetter(value))),
       });
     } else {
+      if (endpointAll.includes('drivers') && linked.length >= 1) {
+        Notiflix.Notify.failure('Error: ya hay un conductor vinculado.');
+        return;
+      }
       setLinked((old) => [...old, value.id]);
       await fetch('/api/permissions', {
         method: 'POST',
