@@ -67,7 +67,7 @@ const ScheduleConnectionsPage = lazy(() => import('./settings/ScheduleConnection
 const DeviceConnectionGroupPage = lazy(() => import('./settings/DeviceConnectionGroupPage'));
 const TicketReportPage = lazy(() => import('./reports/TicketReportPage'));
 const HelpPage = lazy(() => import('./other/HelpPage'));
-const ExitsPage = lazy(() => import('./settings/ExitsPage'));
+const ExitsPage = lazy(() => import('./other/ExitsPage'));
 const VueltaReportPage = lazy(() => import('./reports/VueltaReportPage'));
 const HojaSalidaReportPage = lazy(() => import('./reports/HojaSalidas'));
 const ExcusesPage = lazy(() => import('./settings/ExcusesPage'));
@@ -132,6 +132,7 @@ const Navigation = () => {
         <Route path="replay" element={<Suspense fallback={<Loading type="08" />}><ReplayPage /></Suspense>} />
         <Route path="geofences" element={<Suspense fallback={<Loading type="08" />}><GeofencesPage /></Suspense>} />
         <Route path="help" element={<Suspense fallback={<Loading type="08" />}><HelpPage /></Suspense>} />
+        <Route path="exits" element={<Suspense fallback={<Loading type="08" />}><ExitsPage /></Suspense>} />
 
         <Route path="settings">
           <Route path="accumulators/:deviceId" element={<Suspense fallback={<Loading type="08" />}><AccumulatorsPage /></Suspense>} />
@@ -182,7 +183,6 @@ const Navigation = () => {
           <Route path="hours" element={<Suspense fallback={<Loading type="08" />}><HoursPage /></Suspense>} />
           <Route path="hour" element={<Suspense fallback={<Loading type="08" />}><HourPage /></Suspense>} />
           <Route path="hour/:horas" element={<Suspense fallback={<Loading type="08" />}><HourPage /></Suspense>} />
-          <Route path="exits" element={<Suspense fallback={<Loading type="08" />}><ExitsPage /></Suspense>} />
           <Route path="excuses" element={<Suspense fallback={<Loading type="08" />}><ExcusesPage /></Suspense>} />
           <Route path="excuse/:id" element={<Suspense fallback={<Loading type="08" />}><ExcusePage /></Suspense>} />
           <Route path="excuse" element={<Suspense fallback={<Loading type="08" />}><ExcusePage /></Suspense>} />

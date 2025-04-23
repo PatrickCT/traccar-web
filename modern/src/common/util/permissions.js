@@ -33,3 +33,22 @@ export const useRestriction = (key) => useSelector((state) => {
 });
 
 export const useUser = () => useSelector((state) => state.session.user);
+
+export const useCommonUser = () => useSelector((state) => {
+  // const transporte = (state.session.user.attributes.hasOwnProperty('Transporte') && state.session.user.attributes.Transporte);
+  const checador = (state.session.user.attributes.hasOwnProperty('Checador') && state.session.user.attributes.Checador);
+
+  return !checador;
+});
+
+export const useTransporte = () => useSelector((state) => {
+  const transporte = (state.session.user.attributes.hasOwnProperty('Transporte') && state.session.user.attributes.Transporte);
+
+  return transporte;
+});
+
+export const useChecador = () => useSelector((state) => {
+  const checador = (state.session.user?.attributes?.hasOwnProperty('Checador') && state.session.user?.attributes?.Checador);
+
+  return checador;
+});

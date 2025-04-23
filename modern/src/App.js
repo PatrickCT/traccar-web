@@ -1,16 +1,17 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { LinearProgress, useMediaQuery } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import theme from './common/theme';
-import BottomMenu from './common/components/BottomMenu';
-import SocketController from './SocketController';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Outlet, useNavigate } from 'react-router-dom';
 import CachingController from './CachingController';
-import { useEffectAsync } from './reactHelper';
-import { sessionActions } from './store';
+import BottomMenu from './common/components/BottomMenu';
 import ConnectionStatus from './common/components/ConnectionStatus';
+import theme from './common/theme';
+import { useChecador } from './common/util/permissions';
+import { useEffectAsync } from './reactHelper';
+import SocketController from './SocketController';
+import { sessionActions } from './store';
 
 const useStyles = makeStyles(() => ({
   page: {
@@ -26,6 +27,7 @@ const App = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const checador = useChecador();
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -45,6 +47,11 @@ const App = () => {
         navigate('/login');
       }
     }
+
+    if (checador) {
+      navigate('/exits');
+    }
+
     return null;
   }, [initialized]);
 

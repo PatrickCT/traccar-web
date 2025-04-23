@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
-import moment from 'moment';
-import { useSelector } from 'react-redux';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
-  AccordionSummary,
   AccordionDetails,
-  Typography,
-  FormControlLabel,
+  AccordionSummary,
   Checkbox,
+  FormControlLabel,
   TextField,
+  Typography,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import moment from 'moment';
+import React, { useState } from 'react';
 import { DropzoneArea } from 'react-mui-dropzone';
-import EditItemView from './components/EditItemView';
-import EditAttributesAccordion from './components/EditAttributesAccordion';
+import { useSelector } from 'react-redux';
+import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
+import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
+import { useTranslation } from '../common/components/LocalizationProvider';
 import SelectField from '../common/components/SelectField';
 import deviceCategories from '../common/util/deviceCategories';
-import { useTranslation } from '../common/components/LocalizationProvider';
-import useDeviceAttributes from '../common/attributes/useDeviceAttributes';
 import { useAdministrator } from '../common/util/permissions';
-import SettingsMenu from './components/SettingsMenu';
-import useCommonDeviceAttributes from '../common/attributes/useCommonDeviceAttributes';
-import { useCatch } from '../reactHelper';
 import { generateArray } from '../common/util/utils';
+import { useCatch } from '../reactHelper';
+import EditAttributesAccordion from './components/EditAttributesAccordion';
+import EditItemView from './components/EditItemView';
+import SettingsMenu from './components/SettingsMenu';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -244,7 +244,7 @@ const DevicePage = () => {
           )}
           {!user.deviceReadonly && (
             <EditAttributesAccordion
-              attributes={{ speedLimit: null, rendimiento: null, ...(admin ? (item.attributes) : { ...(item.attributes.speedLimit ? { speedLimit: item.attributes.speedLimit } : {}), ...(item.attributes.rendimiento ? { rendimiento: item.attributes.rendimiento } : {}) }) }}
+              attributes={{ speedLimit: null, rendimiento: null, ...(admin ? (item.attributes) : { ...(item.attributes?.speedLimit ? { speedLimit: item.attributes.speedLimit } : {}), ...(item.attributes?.rendimiento ? { rendimiento: item.attributes.rendimiento } : {}) }) }}
               setAttributes={(attributes) => setItem({ ...item, attributes })}
               definitions={{ ...commonDeviceAttributes, ...deviceAttributes }}
               canAdd={admin}

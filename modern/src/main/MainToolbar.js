@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Info } from '@mui/icons-material';
+import { Info, ScheduleOutlined } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import MapIcon from '@mui/icons-material/Map';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -7,9 +7,7 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import {
   Badge,
   Button,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormGroup,
   IconButton,
   InputAdornment,
@@ -28,7 +26,7 @@ import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useDeviceReadonly } from '../common/util/permissions';
+import { useAdministrator, useDeviceReadonly, useTransporte } from '../common/util/permissions';
 import SearchSelect from '../reports/components/SearchableSelect';
 import DeviceRow from './DeviceRow';
 import PulsingIconButton from './components/PulsingIconButton';
@@ -78,6 +76,8 @@ const MainToolbar = ({
   const [devicesAnchorEl, setDevicesAnchorEl] = useState(null);
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const admin = useAdministrator();
+  const transporte = useTransporte();
 
   const deviceStatusCount = (status) => Object.values(devices).filter((d) => d.status === status).length;
 
@@ -196,11 +196,20 @@ const MainToolbar = ({
           </FormGroup>
         </div>
       </Popover>
-      {((user.deviceLimit > 0 && filteredDevices.length < user.deviceLimit) || user.deviceLimit === -1) &&
+      {((user.deviceLimit > 0 && filteredDevices.length < user.deviceLimit) || user.deviceLimit === -1) && admin &&
         (
           <IconButton edge="end" onClick={() => navigate('/settings/device')} disabled={deviceReadonly}>
             <Tooltip open={!deviceReadonly && Object.keys(devices).length === 0} title={t('deviceRegisterFirst')} arrow>
               <AddIcon style={{ color: 'white' }} />
+            </Tooltip>
+          </IconButton>
+        )}
+
+      {transporte &&
+        (
+          <IconButton edge="end" onClick={() => navigate('/exits')} disabled={deviceReadonly}>
+            <Tooltip arrow>
+              <ScheduleOutlined style={{ color: 'white' }} />
             </Tooltip>
           </IconButton>
         )}

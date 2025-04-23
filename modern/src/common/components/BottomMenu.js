@@ -15,7 +15,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import { sessionActions } from '../../store';
-import { useRestriction } from '../util/permissions';
+import { useChecador, useRestriction } from '../util/permissions';
 import { forgetMe } from '../util/utils';
 import { useTranslation } from './LocalizationProvider';
 import { nativePostMessage } from './NativeInterface';
@@ -30,6 +30,7 @@ const BottomMenu = () => {
   const disableReports = useRestriction('disableReports');
   const user = useSelector((state) => state.session.user);
   const socket = useSelector((state) => state.session.socket);
+  const checador = useChecador();
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -114,30 +115,45 @@ const BottomMenu = () => {
 
   return (
     <Paper square elevation={3} id="bottomMenu">
-      <BottomNavigation value={currentSelection()} onChange={handleSelection} showLabels>
-        <BottomNavigationAction
-          label={t('mapTitle')}
-          icon={(
-            <Badge color="error" variant="dot" overlap="circular" invisible={socket !== false}>
-              <MapIcon style={{ color: 'white' }} />
-            </Badge>
+      {checador && (
+        <BottomNavigation value={currentSelection()} onChange={handleSelection} showLabels>
+          {readonly ? (
+            <BottomNavigationAction label={t('loginLogout')} icon={<ExitToAppIcon style={{ color: 'white' }} />} value="logout" />
+          ) : (
+            <BottomNavigationAction label={t('settingsUser')} icon={<PersonIcon style={{ color: 'white' }} />} value="account" />
           )}
-          value="map"
-        />
-        {!disableReports && (
-          <BottomNavigationAction id="btn-reports" label={t('reportTitle')} icon={<DescriptionIcon style={{ color: 'white' }} />} value="reports" />
-        )}
-        <BottomNavigationAction label={t('settingsTitle')} icon={<SettingsIcon style={{ color: 'white' }} />} value="settings" />
-        {readonly ? (
-          <BottomNavigationAction label={t('loginLogout')} icon={<ExitToAppIcon style={{ color: 'white' }} />} value="logout" />
-        ) : (
-          <BottomNavigationAction label={t('settingsUser')} icon={<PersonIcon style={{ color: 'white' }} />} value="account" />
-        )}
-      </BottomNavigation>
+        </BottomNavigation>
+      )}
+
+      {!checador && (
+        <BottomNavigation value={currentSelection()} onChange={handleSelection} showLabels>
+          <BottomNavigationAction
+            label={t('mapTitle')}
+            icon={(
+              <Badge color="error" variant="dot" overlap="circular" invisible={socket !== false}>
+                <MapIcon style={{ color: 'white' }} />
+              </Badge>
+            )}
+            value="map"
+          />
+          {!disableReports && (
+            <BottomNavigationAction id="btn-reports" label={t('reportTitle')} icon={<DescriptionIcon style={{ color: 'white' }} />} value="reports" />
+          )}
+          <BottomNavigationAction label={t('settingsTitle')} icon={<SettingsIcon style={{ color: 'white' }} />} value="settings" />
+          {readonly ? (
+            <BottomNavigationAction label={t('loginLogout')} icon={<ExitToAppIcon style={{ color: 'white' }} />} value="logout" />
+          ) : (
+            <BottomNavigationAction label={t('settingsUser')} icon={<PersonIcon style={{ color: 'white' }} />} value="account" />
+          )}
+        </BottomNavigation>
+      )}
+
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-        <MenuItem onClick={handleAccount}>
-          <Typography color="textPrimary">{t('settingsUser')}</Typography>
-        </MenuItem>
+        {!checador && (
+          <MenuItem onClick={handleAccount}>
+            <Typography color="textPrimary">{t('settingsUser')}</Typography>
+          </MenuItem>
+        )}
         <MenuItem onClick={handleLogout}>
           <Typography color="error">{t('loginLogout')}</Typography>
         </MenuItem>

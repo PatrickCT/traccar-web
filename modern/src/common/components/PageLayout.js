@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Breadcrumbs,
@@ -11,8 +12,7 @@ import {
   useTheme,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import MenuIcon from '@mui/icons-material/Menu';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from './LocalizationProvider';
 
@@ -65,7 +65,7 @@ export const PageTitle = ({ breadcrumbs }) => {
   );
 };
 
-const PageLayout = ({ menu, breadcrumbs, children }) => {
+const PageLayout = ({ menu, breadcrumbs, children, allowBack = true }) => {
   const classes = useStyles();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -84,9 +84,11 @@ const PageLayout = ({ menu, breadcrumbs, children }) => {
           classes={{ paper: classes.desktopDrawer }}
         >
           <Toolbar>
-            <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => navigate('/')}>
-              <ArrowBackIcon style={{ color: 'white' }} />
-            </IconButton>
+            {allowBack && (
+              <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={() => navigate('/')}>
+                <ArrowBackIcon style={{ color: 'white' }} />
+              </IconButton>
+            )}
             <PageTitle breadcrumbs={breadcrumbs} />
           </Toolbar>
           <Divider />
