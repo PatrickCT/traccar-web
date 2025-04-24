@@ -1,9 +1,12 @@
+/* eslint-disable no-unused-vars */
+
 import {
   Button, Container, Snackbar, TextField,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import moment from 'moment';
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
 import SelectField from '../common/components/SelectField';
@@ -50,6 +53,8 @@ const ExitsPage = () => {
   const [device, setDevice] = useState();
   const [hour, setHour] = useState(new Date());
   const [notifications, setNotifications] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [showMenu, setShowMenu] = useState(searchParams.get('showMenu') || true);
   const checador = useChecador();
   const classes = useStyles();
 
@@ -69,7 +74,7 @@ const ExitsPage = () => {
 
   const validate = () => schedule && device && hour;
   return (
-    <PageLayout menu={<ExitsMenu />} breadcrumbs={['sharedExits']} allowBack={!checador}>
+    <PageLayout menu={(showMenu === true) ? <ExitsMenu /> : null} breadcrumbs={['sharedExits']} allowBack={!checador}>
       <Container maxWidth="xl" className={classes.container}>
         <h1>Salidas</h1>
         <SelectField

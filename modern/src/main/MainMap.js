@@ -27,7 +27,7 @@ import MapPositions from '../map/MapPositions';
 import MapScale from '../map/MapScale';
 import MapNotification from '../map/notification/MapNotification';
 import MapOverlay from '../map/overlay/MapOverlay';
-import { devicesActions } from '../store';
+import { devicesActions, errorsActions } from '../store';
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -62,6 +62,9 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
     window.map = map;
     window.Marker = Marker;
     window.markers = [];
+    window.fakeError = (err) => {
+      dispatch(errorsActions.push(err));
+    };
 
     if (window.players === undefined || window.players === null) {
       window.players = {};
@@ -92,6 +95,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
 
     return () => {
       window.players = null;
+      delete window.fakeError;
     };
   }, []);
 

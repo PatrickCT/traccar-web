@@ -1,41 +1,48 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import TextField from '@mui/material/TextField';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
+import AddIcon from '@mui/icons-material/Add';
+import CancelIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import EditIcon from '@mui/icons-material/Edit';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SaveIcon from '@mui/icons-material/Save';
 import {
-  Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, FormLabel, MenuItem, InputLabel, Select, Snackbar,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  FormControl, FormLabel,
+  InputLabel,
+  MenuItem,
+  Select, Snackbar,
+  Typography,
 } from '@mui/material';
-import moment from 'moment';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
+import TextField from '@mui/material/TextField';
+import makeStyles from '@mui/styles/makeStyles';
 import {
-  GridRowModes,
   DataGrid,
-  GridToolbarContainer,
   GridActionsCellItem,
   GridRowEditStopReasons,
+  GridRowModes,
+  GridToolbarContainer,
 } from '@mui/x-data-grid';
-import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import makeStyles from '@mui/styles/makeStyles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import EditItemView from './components/EditItemView';
+import dayjs from 'dayjs';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import SettingsMenu from './components/SettingsMenu';
 import { useCatch } from '../reactHelper';
-import { groupsActions } from '../store';
 import SearchSelect from '../reports/components/SearchableSelect';
+import { groupsActions } from '../store';
+import EditItemView from './components/EditItemView';
+import SettingsMenu from './components/SettingsMenu';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -689,6 +696,11 @@ const SchedulePage = () => {
                   </FormControl>
                 )
               }
+
+              <FormControlLabel
+                control={<Checkbox checked={item.forceCreateOnEnter} onChange={(event) => setItem({ ...item, forceCreateOnEnter: event.target.checked })} />}
+                label="Forzar generar salida al entrar"
+              />
             </AccordionDetails>
           </Accordion>
           {

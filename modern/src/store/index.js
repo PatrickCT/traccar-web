@@ -1,15 +1,16 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
-import { errorsReducer as errors } from './errors';
-import { sessionReducer as session } from './session';
+import { calendarsReducer as calendars } from './calendars';
 import { devicesReducer as devices } from './devices';
+import { driversReducer as drivers } from './drivers';
+import { errorsReducer as errors } from './errors';
 import { eventsReducer as events } from './events';
 import { geofencesReducer as geofences } from './geofences';
 import { groupsReducer as groups } from './groups';
-import { driversReducer as drivers } from './drivers';
 import { maintenancesReducer as maintenances } from './maintenances';
-import { calendarsReducer as calendars } from './calendars';
+import { modalsReducer as modals } from './modals';
 import { reportsReducer as reports } from './reports';
+import { sessionReducer as session } from './session';
 import { subroutesReducer as subroutes } from './subroutes';
 import throttleMiddleware from './throttleMiddleware';
 
@@ -25,18 +26,20 @@ const reducer = combineReducers({
   calendars,
   reports,
   subroutes,
+  modals,
 });
 
-export { errorsActions } from './errors';
-export { sessionActions } from './session';
+export { calendarsActions } from './calendars';
 export { devicesActions } from './devices';
+export { driversActions } from './drivers';
+export { errorsActions } from './errors';
 export { eventsActions } from './events';
 export { geofencesActions } from './geofences';
 export { groupsActions } from './groups';
-export { driversActions } from './drivers';
 export { maintenancesActions } from './maintenances';
-export { calendarsActions } from './calendars';
+export { modalsActions } from './modals';
 export { reportsActions } from './reports';
+export { sessionActions } from './session';
 export { subroutesActions } from './subroutes';
 
 export default configureStore({

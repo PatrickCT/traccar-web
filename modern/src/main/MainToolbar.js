@@ -23,11 +23,12 @@ import {
 } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import React, { useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useAdministrator, useDeviceReadonly, useTransporte } from '../common/util/permissions';
 import SearchSelect from '../reports/components/SearchableSelect';
+import { modalsActions } from '../store/modals';
 import DeviceRow from './DeviceRow';
 import PulsingIconButton from './components/PulsingIconButton';
 
@@ -62,6 +63,7 @@ const MainToolbar = ({
   const classes = useStyles();
   const theme = useTheme();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const t = useTranslation();
   const user = useSelector((state) => state.session.user);
 
@@ -207,7 +209,7 @@ const MainToolbar = ({
 
       {transporte &&
         (
-          <IconButton edge="end" onClick={() => navigate('/exits')} disabled={deviceReadonly}>
+          <IconButton edge="end" onClick={() => dispatch(modalsActions.update({ showModalManualExits: true }))} disabled={deviceReadonly}>
             <Tooltip arrow>
               <ScheduleOutlined style={{ color: 'white' }} />
             </Tooltip>

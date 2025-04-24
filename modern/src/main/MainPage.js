@@ -39,6 +39,7 @@ import Banner from './components/Banner';
 import SurveysDialog from './components/SurverysDialog';
 import LinksModal from './LinksModal';
 import MainMapButtons from './MainMapButtons';
+import ManualExitsModal from './ManualExitsModal';
 import PositionDrawer from './PositionInfoDrawer';
 
 const useStyles = makeStyles((theme) => ({
@@ -308,6 +309,7 @@ const MainPage = () => {
         children={bannerText}
       />
       <LinksModal />
+      <ManualExitsModal />
       <MainMapButtons />
       {!user.administrator && (user.main || (user.principal && user.principal > 0)) && (
         <SurveysDialog />
