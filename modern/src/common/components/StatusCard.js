@@ -1,37 +1,37 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import Draggable from 'react-draggable';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import PendingIcon from '@mui/icons-material/Pending';
+import PublishIcon from '@mui/icons-material/Publish';
+import ReplayIcon from '@mui/icons-material/Replay';
 import {
   Card,
-  CardContent,
-  Typography,
   CardActions,
+  CardContent,
+  CardMedia,
   IconButton,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
   Menu,
   MenuItem,
-  CardMedia,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import CloseIcon from '@mui/icons-material/Close';
-import ReplayIcon from '@mui/icons-material/Replay';
-import PublishIcon from '@mui/icons-material/Publish';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PendingIcon from '@mui/icons-material/Pending';
+import React, { useState } from 'react';
+import Draggable from 'react-draggable';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-import { useTranslation } from './LocalizationProvider';
-import RemoveDialog from './RemoveDialog';
-import PositionValue from './PositionValue';
-import { useDeviceReadonly } from '../util/permissions';
-import usePositionAttributes from '../attributes/usePositionAttributes';
-import { devicesActions } from '../../store';
 import { useCatch, useCatchCallback } from '../../reactHelper';
+import { devicesActions } from '../../store';
+import usePositionAttributes from '../attributes/usePositionAttributes';
+import { useDeviceReadonly } from '../util/permissions';
 import { useAttributePreference } from '../util/preferences';
+import { useTranslation } from './LocalizationProvider';
+import PositionValue from './PositionValue';
+import RemoveDialog from './RemoveDialog';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -83,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
     position: 'fixed',
     zIndex: 5,
     left: '50%',
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('sm')]: {
       left: `calc(50% + ${desktopPadding} / 2)`,
       bottom: theme.spacing(3),
     },

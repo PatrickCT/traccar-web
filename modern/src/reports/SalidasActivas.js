@@ -1,16 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { ArrowBack } from '@mui/icons-material';
 import {
   Box, Grid, IconButton, MenuItem, Pagination, Select, Toolbar,
 } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import PageLayout, { PageTitle } from '../common/components/PageLayout';
-import useReportStyles from './common/useReportStyles';
 import TableExist from '../main/components/TableExits';
 import LoadingComponent from '../settings/components/LoadingComponent';
+import useReportStyles from './common/useReportStyles';
 
 const SalidasActivas = () => {
   const devices = useSelector((state) => state.devices.items);
@@ -121,19 +121,15 @@ const SalidasActivas = () => {
               <Grid key="devices-grid" container spacing={{ xs: 1, md: 0.5 }} columns={{ xs: 1, sm: 6, md: 12 }}>
                 {visibles.map((device) => (
                   <Grid key={`grid-device-${device.id}`} item xs={2} sm={2} md={2} lg={2}>
-                    <>
-                      <Toolbar>
-                        <PageTitle key={`toolb-${device.id}`} breadcrumbs={[`${device.name}`]} />
-                      </Toolbar>
-                      <TableExist
-                        key={device.id}
-                        deviceId={device.id}
-                        handleLoadInfo={() => { }}
-                        topDirectory="../"
-                        btnChangeTime={false}
-                        dropDrivers={false}
-                      />
-                    </>
+                    <TableExist
+                      key={device.id}
+                      deviceId={device.id}
+                      deviceName={device.name}
+                      handleLoadInfo={() => { }}
+                      topDirectory="../"
+                      btnChangeTime={false}
+                      dropDrivers={false}
+                    />
                   </Grid>
                 ))}
               </Grid>

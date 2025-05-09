@@ -26,7 +26,9 @@ import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useAdministrator, useDeviceReadonly, useTransporte } from '../common/util/permissions';
+import {
+  useAdministrator, useDeviceReadonly, useSalidasManuales, useTransporte,
+} from '../common/util/permissions';
 import SearchSelect from '../reports/components/SearchableSelect';
 import { modalsActions } from '../store/modals';
 import DeviceRow from './DeviceRow';
@@ -77,9 +79,10 @@ const MainToolbar = ({
   const [filterAnchorEl, setFilterAnchorEl] = useState(null);
   const [devicesAnchorEl, setDevicesAnchorEl] = useState(null);
 
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const admin = useAdministrator();
   const transporte = useTransporte();
+  const salidas = useSalidasManuales();
 
   const deviceStatusCount = (status) => Object.values(devices).filter((d) => d.status === status).length;
 
@@ -207,7 +210,7 @@ const MainToolbar = ({
           </IconButton>
         )}
 
-      {transporte &&
+      {transporte && salidas &&
         (
           <IconButton edge="end" onClick={() => dispatch(modalsActions.update({ showModalManualExits: true }))} disabled={deviceReadonly}>
             <Tooltip arrow>

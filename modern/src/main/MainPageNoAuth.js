@@ -6,18 +6,18 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import { Marker } from 'maplibre-gl';
-import { makeStyles } from '@mui/styles';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { makeStyles } from '@mui/styles';
 import { useSelector } from 'react-redux';
-import MainMap from './MainMapNoAuth';
 import {
-  streetView,
   generateRoute,
+  streetView,
 } from '../common/util/mapPopup';
 import { map } from '../map/core/MapView';
-import './MainPage.css';
 import './BannerNoAuth.css';
+import MainMap from './MainMapNoAuth';
+import './MainPage.css';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     pointerEvents: 'none',
     display: 'flex',
     flexDirection: 'column',
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('sm')]: {
       position: 'fixed',
       left: 0,
       top: 0,
@@ -74,7 +74,7 @@ const MainPageNoAuth = () => {
   const classes = useStyles();
   const theme = useTheme();
 
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
   const positions = useSelector((state) => state.session.positions);

@@ -1,17 +1,20 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unused-vars */
-import {
-  useId, useCallback, useEffect, memo, useState,
-} from 'react';
-import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/styles';
-import { map } from './core/MapView';
+import {
+  memo,
+  useCallback, useEffect,
+  useId,
+  useState,
+} from 'react';
+import { useSelector } from 'react-redux';
 import { formatTime, getStatusColor } from '../common/util/formatter';
-import { mapIconKey } from './core/preloadImages';
-import { findFonts } from './core/mapUtil';
-import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { checkClusters } from '../common/util/geospatial';
+import { useAttributePreference, usePreference } from '../common/util/preferences';
+import { findFonts } from './core/mapUtil';
+import { map } from './core/MapView';
+import { mapIconKey } from './core/preloadImages';
 
 const isEqual = require('react-fast-compare');
 
@@ -36,7 +39,7 @@ const MapPositions = ({
   const directions = `directions-${id}`;
 
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
 
   const devices = useSelector((state) => state.devices.items);

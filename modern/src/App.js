@@ -29,7 +29,7 @@ const App = () => {
   const navigate = useNavigate();
   const checador = useChecador();
 
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   const newServer = useSelector((state) => state.session.server.newServer);
   const initialized = useSelector((state) => !!state.session.user);

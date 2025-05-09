@@ -2,9 +2,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-string-refs */
-import React, { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import {
   FormControl,
   InputLabel,
@@ -13,22 +10,26 @@ import {
   Table, TableBody, TableCell, TableHead, TableRow,
 } from '@mui/material';
 import moment from 'moment';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import ClimbingBoxLoader from 'react-spinners/ClimbingBoxLoader';
-import ReportFilter from './components/ReportFilter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
-import ReportsMenu from './components/ReportsMenu';
-import { useCatch } from '../reactHelper';
-import { map } from '../map/core/MapView';
-import useReportStyles from './common/useReportStyles';
 import TableShimmer from '../common/components/TableShimmer';
-import scheduleReport from './common/scheduleReport';
+import '../common/tickets.css';
 import {
   generateRoute, streetView,
 } from '../common/util/mapPopup';
 import { formatDate, isMobile } from '../common/util/utils';
-import TimeUpdateBtn from '../main/components/TimeUpdateBtn';
 import TableExitsReport from '../main/components/TableExitsReport';
+import TimeUpdateBtn from '../main/components/TimeUpdateBtn';
+import { map } from '../map/core/MapView';
+import { useCatch } from '../reactHelper';
+import scheduleReport from './common/scheduleReport';
+import useReportStyles from './common/useReportStyles';
+import ReportFilter from './components/ReportFilter';
+import ReportsMenu from './components/ReportsMenu';
 
 const TicketReportPage = () => {
   const navigate = useNavigate();
@@ -295,9 +296,14 @@ const TicketReportPage = () => {
                   <React.Fragment key={salida}>
                     <TableRow>
                       <TableCell colSpan={2}>{`Salida: ${salida}`}</TableCell>
-                      {(groups[salida]?.s?.modifiedBy !== 0 || groups[salida]?.s?.modifiedBy !== null) && (
-                        <TableCell colSpan={5}>{`La hora fue modificada por el sub-usuario: ${groups[salida].s.modifiedBy} - ${subusers.find((su) => su.id === groups[salida].s.modifiedBy)?.name} el dia: ${new Date(groups[salida].s.modifiedWhen).toLocaleString()}`}</TableCell>
-                      )}
+                      <TableCell colSpan={2}>
+                        {`Salida generada el ${moment(groups[salida].s.date).locale('es').format('dddd D [de] MMMM [de] YYYY [a las] HH:mm:ss')}`}
+                      </TableCell>
+                      {(groups[salida].s?.modifiedBy > 0) ? (
+                        <TableCell colSpan={3}>
+                          {`La hora fue modificada por el sub-usuario: ${groups[salida].s.modifiedBy} - ${subusers.find((su) => su.id === groups[salida].s.modifiedBy)?.name} el dia: ${new Date(groups[salida].s.modifiedWhen).toLocaleString()}`}
+                        </TableCell>
+                      ) : <TableCell colSpan={3} />}
                       <TableCell colSpan={3}>
                         {(groups[salida]?.s?.modifiedBy === 0 || groups[salida]?.s?.modifiedBy === null) && (
                           <TimeUpdateBtn

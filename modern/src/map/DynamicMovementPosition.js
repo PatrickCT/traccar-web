@@ -1,18 +1,21 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
-import React, {
-  useState, useCallback, useRef, useEffect, useMemo,
-} from 'react';
-import { LngLat, Popup } from 'mapbox-gl';
 import makeStyles from '@mui/styles/makeStyles';
+import { LngLat, Popup } from 'mapbox-gl';
+import React, {
+  useCallback,
+  useEffect, useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useSelector } from 'react-redux';
-import MapView, { map } from './core/MapView';
-import MapPositions from './MapPositions';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import {
   createPopUpReportRoute, createPopUpSimple,
 } from '../common/util/mapPopup';
 import { attsGetter } from '../common/util/utils';
+import MapView, { map } from './core/MapView';
+import MapPositions from './MapPositions';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -66,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
       width: '90%',
       bottom: '8%',
     },
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('sm')]: {
       // marginTop: theme.spacing(1),
     },
     lineHeight: '1px',

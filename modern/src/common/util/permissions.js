@@ -47,6 +47,12 @@ export const useTransporte = () => useSelector((state) => {
   return transporte;
 });
 
+export const useSalidasManuales = () => useSelector((state) => {
+  const salidas = (state.session.user.attributes.hasOwnProperty('Transporte') && state.session.user.attributes.Transporte && state.session.user.attributes.hasOwnProperty('Salidas') && state.session.user.attributes.Salidas);
+
+  return salidas;
+});
+
 export const useChecador = () => useSelector((state) => {
   const checador = (state.session.user?.attributes?.hasOwnProperty('Checador') && state.session.user?.attributes?.Checador);
 

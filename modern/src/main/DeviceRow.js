@@ -1,26 +1,30 @@
-import React from 'react';
 import { useTheme } from '@emotion/react';
-import { useDispatch, useSelector } from 'react-redux';
-import makeStyles from '@mui/styles/makeStyles';
-import {
-  ListItemText, ListItemButton, useMediaQuery, Tooltip, IconButton,
-} from '@mui/material';
-import CrisisAlertIcon from '@mui/icons-material/CrisisAlert';
-import BatteryFullIcon from '@mui/icons-material/BatteryFull';
-import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
-import Battery60Icon from '@mui/icons-material/Battery60';
-import BatteryCharging60Icon from '@mui/icons-material/BatteryCharging60';
 import Battery20Icon from '@mui/icons-material/Battery20';
+import Battery60Icon from '@mui/icons-material/Battery60';
 import BatteryCharging20Icon from '@mui/icons-material/BatteryCharging20';
+import BatteryCharging60Icon from '@mui/icons-material/BatteryCharging60';
+import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
+import BatteryFullIcon from '@mui/icons-material/BatteryFull';
+import CrisisAlertIcon from '@mui/icons-material/CrisisAlert';
 import ErrorIcon from '@mui/icons-material/Error';
-import { ReactComponent as EngineIcon } from '../resources/images/data/engine.svg';
-import { devicesActions } from '../store';
+import {
+  IconButton,
+  ListItemButton,
+  ListItemText,
+  Tooltip,
+  useMediaQuery,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from '../common/components/LocalizationProvider';
+import { formatAlarm, formatBoolean, formatPercentage } from '../common/util/formatter';
 import { useAdministrator } from '../common/util/permissions';
 import { useAttributePreference } from '../common/util/preferences';
-import { formatAlarm, formatBoolean, formatPercentage } from '../common/util/formatter';
 import { dateDifference, hasPassedTime } from '../common/util/utils';
 import { map } from '../map/core/MapView';
+import { ReactComponent as EngineIcon } from '../resources/images/data/engine.svg';
+import { devicesActions } from '../store';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -57,7 +61,7 @@ const DeviceRow = ({ data, index, style }) => {
   const dispatch = useDispatch();
   const t = useTranslation();
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const admin = useAdministrator();
   // const user = useSelector((state) => state.session.user);
   const item = data[index];

@@ -8,7 +8,7 @@ import {
   Paper,
 } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 // import { Marker } from 'maplibre-gl';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
     pointerEvents: 'none',
     display: 'flex',
     flexDirection: 'column',
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('sm')]: {
       position: 'fixed',
       left: 0,
       top: 0,
@@ -98,7 +98,7 @@ const MainPage = () => {
   const classes = useStyles();
   const theme = useTheme();
 
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   // const mapOnSelect = useAttributePreference('mapOnSelect', true);
 
@@ -125,6 +125,10 @@ const MainPage = () => {
   const groups = useSelector((state) => state.groups.items);
 
   const [infoDrawer, setInfoDrawer] = useState(true);
+
+  /* eslint-disable no-unused-vars */
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [showBottomMenu, setShowBottomMenu] = useState(searchParams.get('showBottomMenu') || true);
   const admin = useAdministrator();
 
   // banner
@@ -241,6 +245,7 @@ const MainPage = () => {
       Array.from(document.getElementsByClassName('maplibregl-popup')).map((item) => item.remove());
     }
   }, [selectedDeviceId]);
+
   return (
     <div className={classes.root}>
       {user && user.attributes.hasOwnProperty('FPS') && user.attributes.FPS && (
@@ -290,7 +295,7 @@ const MainPage = () => {
             <DeviceList devices={filteredDevices} />
           </Paper>
         </div>
-        {desktop && (
+        {desktop && showBottomMenu && (
           <div className={classes.footer}>
             <BottomMenu />
           </div>

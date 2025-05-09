@@ -1,25 +1,29 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
-import React, {
-  useState, useCallback, useRef, useEffect, useMemo, memo,
-} from 'react';
-import { LngLat, Popup } from 'maplibre-gl';
-import * as turf from '@turf/turf';
 import makeStyles from '@mui/styles/makeStyles';
+import * as turf from '@turf/turf';
+import { LngLat, Popup } from 'maplibre-gl';
+import React, {
+  memo,
+  useCallback,
+  useEffect, useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useSelector } from 'react-redux';
-import MapView, { map } from '../map/core/MapView';
-import MapRoutePath from '../map/MapRoutePathReplay';
-import MapRoutePoints from '../map/MapRoutePoints';
-import MapPositions from '../map/MapPositionsReplay';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import { useCatch } from '../reactHelper';
+import { createPopUpReportRoute } from '../common/util/mapPopup';
+import { toast } from '../common/util/toasts';
+import { attConverter } from '../common/util/utils';
+import MapView, { map } from '../map/core/MapView';
 import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
-import ReplaySideBar from './ReplaySideBar';
-import { attConverter } from '../common/util/utils';
-import { toast } from '../common/util/toasts';
+import MapPositions from '../map/MapPositionsReplay';
+import MapRoutePath from '../map/MapRoutePathReplay';
+import MapRoutePoints from '../map/MapRoutePoints';
+import { useCatch } from '../reactHelper';
 import './ReplayPage.css';
-import { createPopUpReportRoute } from '../common/util/mapPopup';
+import ReplaySideBar from './ReplaySideBar';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -73,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
       width: '90%',
       bottom: '8%',
     },
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('sm')]: {
       // marginTop: theme.spacing(1),
     },
     lineHeight: '1px',

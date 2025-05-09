@@ -25,5 +25,4 @@ const { reducer, actions } = createSlice({
   },
 });
 
-export { actions as reportsActions };
-export { reducer as reportsReducer };
+export { actions as reportsActions, reducer as reportsReducer };

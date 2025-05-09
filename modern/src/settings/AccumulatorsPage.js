@@ -12,7 +12,7 @@ import {
 import makeStyles from '@mui/styles/makeStyles';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
 import { distanceFromMeters, distanceToMeters, distanceUnitString } from '../common/util/converter';
@@ -41,21 +41,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AccumulatorsPage = () => {
+const AccumulatorsPage = ({ device = null, showMenu = true, showNavigation = true }) => {
   const navigate = useNavigate();
   const classes = useStyles();
   const t = useTranslation();
 
   const distanceUnit = useAttributePreference('distanceUnit');
   const { deviceId } = useParams();
-  const position = useSelector((state) => state.session.positions[deviceId]);
+
+  const position = useSelector((state) => state.session.positions[deviceId || device]);
   const [item, setItem] = useState();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [hideMenu, setHideMenu] = useState(searchParams.get('hideMenu') || false);
-  const [hideNavigation, setHideNavigation] = useState(searchParams.get('hideNavigation') || false);
 
   useEffect(() => {
-    if (hideNavigation) {
+    if (!showNavigation) {
       document.getElementById('bottomMenu').style.display = 'none';
     }
   }, []);
@@ -63,15 +61,15 @@ const AccumulatorsPage = () => {
   useEffect(() => {
     if (position) {
       setItem({
-        deviceId: parseInt(deviceId, 10),
+        deviceId: parseInt(deviceId || device, 10),
         hours: position.attributes.hours || 0,
         totalDistance: position.attributes.totalDistance || 0,
       });
     }
-  }, [deviceId, position]);
+  }, [deviceId, device, position]);
 
   const handleSave = useCatch(async () => {
-    const response = await fetch(`/api/devices/${deviceId}/accumulators`, {
+    const response = await fetch(`/api/devices/${deviceId || device}/accumulators`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item),
@@ -85,7 +83,7 @@ const AccumulatorsPage = () => {
   });
 
   return (
-    <PageLayout menu={!hideMenu ? <SettingsMenu /> : null} breadcrumbs={['sharedDeviceAccumulators']}>
+    <PageLayout menu={showMenu ? <SettingsMenu /> : null} breadcrumbs={['sharedDeviceAccumulators']}>
       {item && (
         <Container maxWidth="xs" className={classes.container}>
           <Accordion defaultExpanded>

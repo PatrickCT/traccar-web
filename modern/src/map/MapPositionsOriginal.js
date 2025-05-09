@@ -1,13 +1,13 @@
-import { useId, useCallback, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/styles';
-import { map } from './core/MapView';
+import { useCallback, useEffect, useId } from 'react';
+import { useSelector } from 'react-redux';
 import { formatTime, getStatusColor } from '../common/util/formatter';
-import { mapIconKey } from './core/preloadImages';
 import { useAttributePreference } from '../common/util/preferences';
 import { useCatchCallback } from '../reactHelper';
 import { findFonts } from './core/mapUtil';
+import { map } from './core/MapView';
+import { mapIconKey } from './core/preloadImages';
 
 const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleField }) => {
   const id = useId();
@@ -15,7 +15,7 @@ const MapPositions = ({ positions, onClick, showStatus, selectedPosition, titleF
   const selected = `${id}-selected`;
 
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
 
   const devices = useSelector((state) => state.devices.items);

@@ -71,7 +71,7 @@ const SearchSelect = ({
   return (
     <FormControl fullWidth={fullWidth}>
       <InputLabel>{label}</InputLabel>
-      <Select label={label} value={value || null} onChange={onChange} multiple={multiple}>
+      <Select label={label} value={value ?? ''} onChange={onChange} multiple={multiple}>
         <ListSubheader>
           <TextField
             size="small"

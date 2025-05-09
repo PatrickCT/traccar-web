@@ -2,28 +2,31 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-rest-params */
 /* eslint-disable react/no-this-in-sfc */
-import { Popup } from 'maplibre-gl';
-import { useNavigate } from 'react-router-dom';
+import { KeyboardArrowDownOutlined } from '@mui/icons-material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DownloadIcon from '@mui/icons-material/Download';
+import FastForwardIcon from '@mui/icons-material/FastForward';
+import FastRewindIcon from '@mui/icons-material/FastRewind';
+import MenuIcon from '@mui/icons-material/Menu';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import TuneIcon from '@mui/icons-material/Tune';
 import {
-  Box, Button, IconButton, ListItemText, MenuItem, Paper, Select, Slider, Toolbar, Typography, useMediaQuery, useTheme, ListItemButton, ListItemIcon,
+  Box, Button, IconButton,
+  ListItemButton, ListItemIcon,
+  ListItemText,
   Menu,
+  MenuItem, Paper, Select, Slider, Toolbar, Typography, useMediaQuery, useTheme,
 } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { Popup } from 'maplibre-gl';
 import React, {
   memo, useEffect, useState,
 } from 'react';
-import makeStyles from '@mui/styles/makeStyles';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import MenuIcon from '@mui/icons-material/Menu';
-import TuneIcon from '@mui/icons-material/Tune';
-import DownloadIcon from '@mui/icons-material/Download';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
-import FastForwardIcon from '@mui/icons-material/FastForward';
-import FastRewindIcon from '@mui/icons-material/FastRewind';
-import { KeyboardArrowDownOutlined } from '@mui/icons-material';
-import ReportFilter from '../reports/components/ReportFilter';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import Modal from '../main/components/BasicModal';
+import ReportFilter from '../reports/components/ReportFilter';
 
 import { createPopUpSimple, streetView } from '../common/util/mapPopup';
 import { dateDifference } from '../common/util/utils';
@@ -84,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
       width: '90%',
       bottom: '8%',
     },
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('sm')]: {
       // marginTop: theme.spacing(1),
     },
     lineHeight: '1px',
@@ -248,7 +251,7 @@ const ReplaySideBar = ({
   const navigate = useNavigate();
   const t = useTranslation();
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   useEffect(() => {
     window.streetView = streetView;

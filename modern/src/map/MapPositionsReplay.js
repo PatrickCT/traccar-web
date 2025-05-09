@@ -1,19 +1,22 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-unused-vars */
 import {
-  useId, useCallback, useEffect, memo, useState,
+  memo,
+  useCallback, useEffect,
+  useId,
+  useState,
 } from 'react';
 // import { Popup } from 'mapbox-gl';
-import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/styles';
-import { map } from './core/MapView';
+import { useDispatch, useSelector } from 'react-redux';
 import { formatTime, getStatusColor } from '../common/util/formatter';
-import { mapIconKey } from './core/preloadImages';
-import { findFonts } from './core/mapUtil';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
 import { hasPassedTime } from '../common/util/utils';
 import { devicesActions } from '../store';
+import { findFonts } from './core/mapUtil';
+import { map } from './core/MapView';
+import { mapIconKey } from './core/preloadImages';
 
 const isEqual = require('react-fast-compare');
 
@@ -36,7 +39,7 @@ const MapPositions = ({
   const direction = `${id}-direction`;
 
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
 
   const devices = useSelector((state) => state.devices.items);

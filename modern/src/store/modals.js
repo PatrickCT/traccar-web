@@ -10,8 +10,6 @@ const { reducer, actions } = createSlice({
   reducers: {
     update(state, action) {
       Object.keys(action.payload).forEach((k) => {
-        console.log(state.items[k]);
-        console.log(action.payload[k]);
         state.items[k] = action.payload[k];
       });
     },

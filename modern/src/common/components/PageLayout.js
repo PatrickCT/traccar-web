@@ -48,7 +48,7 @@ export const PageTitle = ({ breadcrumbs }) => {
   const theme = useTheme();
   const t = useTranslation();
 
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   if (desktop) {
     return (
@@ -70,7 +70,7 @@ const PageLayout = ({ menu, breadcrumbs, children, allowBack = true }) => {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   const [openDrawer, setOpenDrawer] = useState(false);
   window.openDrawer = setOpenDrawer;

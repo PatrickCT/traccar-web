@@ -2,35 +2,46 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/no-this-in-sfc */
 
-import React, { useEffect, useState } from 'react';
-import moment from 'moment';
-import {
-  useMediaQuery, InputLabel, Select, MenuItem, FormControl, Button, TextField, Link, Snackbar, IconButton, Tooltip, LinearProgress,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-} from '@mui/material';
 import { InfoOutlined } from '@mui/icons-material';
-import makeStyles from '@mui/styles/makeStyles';
 import CloseIcon from '@mui/icons-material/Close';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  InputLabel,
+  LinearProgress,
+  Link,
+  MenuItem,
+  Select,
+  Snackbar,
+  TextField,
+  Tooltip,
+  useMediaQuery,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { encode } from 'base-64';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { encode } from 'base-64';
-import { sessionActions } from '../store';
 import { useLocalization, useTranslation } from '../common/components/LocalizationProvider';
-import LoginLayout from './LoginLayout';
-import usePersistedState from '../common/util/usePersistedState';
 import { handleLoginTokenListeners, nativeEnvironment, nativePostMessage } from '../common/components/NativeInterface';
-import LogoImage from './LogoImage';
-import { useCatch } from '../reactHelper';
-import { loginTour } from './login_tour';
 import VideoPlayer from '../common/components/VideoPlayer';
 import ctheme from '../common/theme';
+import usePersistedState from '../common/util/usePersistedState';
 import {
   forgetMe, haveSavedSession, openModalPromociones, rememberMe,
 } from '../common/util/utils';
+import { useCatch } from '../reactHelper';
+import { sessionActions } from '../store';
+import { loginTour } from './login_tour';
+import LoginLayout from './LoginLayout';
+import LogoImage from './LogoImage';
 
 const useStyles = makeStyles((theme) => ({
   options: {
@@ -96,7 +107,7 @@ const LoginPage = () => {
 
   const [announcementShown, setAnnouncementShown] = useState(false);
   const announcement = useSelector((state) => state.session.server.announcement);
-  const desktop = useMediaQuery(ctheme.breakpoints.up('md'));
+  const desktop = useMediaQuery(ctheme.breakpoints.up('sm'));
 
   const generateLoginToken = async () => {
     if (nativeEnvironment) {

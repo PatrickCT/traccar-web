@@ -1,15 +1,15 @@
+import { Link } from '@mui/material';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import {
   formatAlarm, formatAltitude, formatBoolean, formatCoordinate, formatCourse, formatDistance, formatNumber, formatNumericHours, formatPercentage, formatSpeed, formatTime,
 } from '../util/formatter';
-import { useAttributePreference, usePreference } from '../util/preferences';
-import { useTranslation } from './LocalizationProvider';
 import { useAdministrator } from '../util/permissions';
-import AddressValue from './AddressValue';
+import { useAttributePreference, usePreference } from '../util/preferences';
 import { TreeWalker } from '../util/utils';
+import AddressValue from './AddressValue';
+import { useTranslation } from './LocalizationProvider';
 
 const PositionValue = ({ position, property, attribute }) => {
   const t = useTranslation();
@@ -19,7 +19,7 @@ const PositionValue = ({ position, property, attribute }) => {
   const device = useSelector((state) => state.devices.items[position.deviceId]);
 
   const key = property || attribute;
-  const value = property ? walker.getValue(key) : walker.getValue(`attributes.${key}`, { temp: ['temp', 'temperature', 'bleTemp', 'bleTemp2'] }); // position[property] : position.attributes[attribute];
+  const value = property ? walker.getValue(key) : walker.getValue(`attributes.${key}`, { temp: ['temp', 'temperature', 'bleTemp', 'bleTemp2'], odometer: ['odomater', 'totalDistance'] }); // position[property] : position.attributes[attribute];
 
   const distanceUnit = useAttributePreference('distanceUnit');
   const altitudeUnit = useAttributePreference('altitudeUnit');
@@ -27,7 +27,7 @@ const PositionValue = ({ position, property, attribute }) => {
   const coordinateFormat = usePreference('coordinateFormat');
   const hours12 = usePreference('twelveHourFormat');
 
-  const formatValue = () => {
+  const formatValue = (value) => {
     switch (key) {
       case 'fixTime':
       case 'deviceTime':

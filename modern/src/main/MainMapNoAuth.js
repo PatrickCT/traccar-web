@@ -3,22 +3,22 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-floating-decimal */
 
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import * as turf from '@turf/turf';
+import { Marker, Popup } from 'maplibre-gl';
 import React, {
   useCallback, useEffect,
 } from 'react';
-import * as turf from '@turf/turf';
-import { Marker, Popup } from 'maplibre-gl';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch } from 'react-redux';
+import { createPopUp } from '../common/util/mapPopup';
 import MapView, { map } from '../map/core/MapView';
+import MapDefaultCamera from '../map/main/MapDefaultCamera';
 import PoiMap from '../map/main/PoiMap';
 import MapPadding from '../map/MapPadding';
-import { devicesActions } from '../store';
-import MapDefaultCamera from '../map/main/MapDefaultCamera';
 import MapPositions from '../map/MapPositions';
 import MapOverlay from '../map/overlay/MapOverlay';
-import { createPopUp } from '../common/util/mapPopup';
+import { devicesActions } from '../store';
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -32,7 +32,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   // replay replica
   const onMarkerClick = useCallback((_, deviceId) => {

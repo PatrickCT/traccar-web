@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const { reducer, actions } = createSlice({
-  name: 'subroutes',
+  name: 'schedules',
   initialState: {
     items: {},
   },
@@ -12,4 +12,4 @@ const { reducer, actions } = createSlice({
   },
 });
 
-export { actions as subroutesActions, reducer as subroutesReducer };
+export { actions as schedulesActions, reducer as schedulesReducer };

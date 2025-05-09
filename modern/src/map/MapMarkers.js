@@ -1,15 +1,15 @@
-import { useId, useEffect } from 'react';
-import { useTheme } from '@mui/styles';
 import { useMediaQuery } from '@mui/material';
-import { map } from './core/MapView';
+import { useTheme } from '@mui/styles';
+import { useEffect, useId } from 'react';
 import { useAttributePreference } from '../common/util/preferences';
 import { findFonts } from './core/mapUtil';
+import { map } from './core/MapView';
 
 const MapMarkers = ({ markers, showTitles }) => {
   const id = useId();
 
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const iconScale = useAttributePreference('iconScale', desktop ? 0.75 : 1);
 
   useEffect(() => {

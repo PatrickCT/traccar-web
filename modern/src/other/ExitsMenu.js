@@ -52,7 +52,7 @@ const ExitsMenu = () => {
   const commonUser = useCommonUser();
   const checador = useChecador();
 
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   const handleLogout = async () => {
     forgetMe();

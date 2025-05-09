@@ -1,18 +1,17 @@
+/* eslint-disable no-unused-vars */
+import {
+  Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField,
+} from '@mui/material';
+import dayjs from 'dayjs';
+import moment from 'moment';
+import 'moment-timezone';
+// import { Dialog } from 'primereact/dialog';
+import { CancelOutlined, CheckOutlined } from '@mui/icons-material';
 import {
   React, memo, useState,
 } from 'react';
-import 'moment-timezone';
-import moment from 'moment';
-import dayjs from 'dayjs';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { TextField } from '@mui/material';
-import '../../common/tickets.css';
 import { useTranslation } from '../../common/components/LocalizationProvider';
+import TimePickerComponent from '../../common/components/TimePicker';
 import { createBaseURL } from '../../common/util/utils';
 
 const TimeUpdateBtn = ({
@@ -49,16 +48,18 @@ const TimeUpdateBtn = ({
   const footerContent = (
     <div>
       <Button
-        label={t('sharedNo')}
-        icon="pi pi-times"
+        startIcon={<CancelOutlined />}
         onClick={() => {
-
+          setVisible(false);
+          setPasswordUser('');
         }}
-        className="p-button-text"
-      />
+        variant="outlined"
+      >
+        {t('sharedNo')}
+      </Button>
       <Button
-        label={t('sharedYes')}
-        icon="pi pi-check"
+        autoFocus
+        startIcon={<CheckOutlined />}
         onClick={() => {
           if (passwordEquals()) {
             setVisible(false);
@@ -66,31 +67,31 @@ const TimeUpdateBtn = ({
             setPasswordUser('');
           }
         }}
-        autoFocus
-      />
+        variant="outlined"
+      >
+        {t('sharedYes')}
+      </Button>
     </div>
   );
 
   return (
     <>
       <div className="btn-change">
-        <Button label={t('changeExitTime')} icon="pi pi-external-link" onClick={() => setVisible(true)} />
+        <Button onClick={() => setVisible(true)} variant="outlined">
+          {t('changeExitTime')}
+        </Button>
       </div>
       <div className="card flex justify-content-center">
-        <Dialog header={t('changeExitTime')} visible={visible} style={{ width: '16.5vw' }} breakpoints={{ '960px': '75vw', '641px': '100vw', '1500px': '35vm', '1200px': '50vm' }} onHide={() => setVisible(false)} footer={(passwordEquals() && passwordUser !== '') ? footerContent : <div />}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer
-              components={[
-                'DesktopTimePicker',
-              ]}
-            >
-              <DemoItem label="">
-                <TimePicker value={hourSelected} onChange={handleChangeHour} ampm={false} className="picker" timeSteps={{ hours: 1, minutes: 1 }} />
-              </DemoItem>
-            </DemoContainer>
-          </LocalizationProvider>
-          <TextField type="password" className="passwordUser" style={{ height: '3rem', width: '100%' }} label="Contraseña" value={passwordUser} onChange={handleChangePassword} />
-          {(passwordUser !== '' && !passwordEquals()) && <span style={{ color: 'red' }}>{t('password_wrong')}</span>}
+        <Dialog open={visible} onClose={() => setVisible(false)}>
+          <DialogTitle>{t('changeExitTime')}</DialogTitle>
+          <DialogContent>
+            <TimePickerComponent hour={hourSelected} setHour={handleChangeHour} t={t} />
+            <TextField type="password" className="passwordUser" style={{ height: '3rem', width: '100%' }} label="Contraseña" value={passwordUser} onChange={handleChangePassword} />
+            {(passwordUser !== '' && !passwordEquals()) && <span style={{ color: 'red' }}>{t('password_wrong')}</span>}
+          </DialogContent>
+          <DialogActions>
+            {(passwordEquals() && passwordUser !== '') ? footerContent : <div />}
+          </DialogActions>
         </Dialog>
       </div>
     </>

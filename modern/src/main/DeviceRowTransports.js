@@ -1,24 +1,24 @@
+import { useTheme } from '@emotion/react';
+import {
+  ListItemButton,
+  ListItemText,
+  useMediaQuery,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import moment from 'moment';
 import {
   React, memo, useEffect, useState,
 } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import moment from 'moment';
-import makeStyles from '@mui/styles/makeStyles';
-import { useTheme } from '@emotion/react';
-import {
-  ListItemText,
-  ListItemButton,
-  useMediaQuery,
-} from '@mui/material';
 import Collapse from 'react-collapse';
-import { devicesActions } from '../store';
+import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from '../common/components/LocalizationProvider';
 import {
   getStatusColor,
 } from '../common/util/formatter';
-import { useTranslation } from '../common/components/LocalizationProvider';
 import { useAdministrator } from '../common/util/permissions';
 import { useAttributePreference } from '../common/util/preferences';
 import { map } from '../map/core/MapView';
+import { devicesActions } from '../store';
 import TableExist from './components/TableExits';
 
 const useStyles = makeStyles((theme) => ({
@@ -55,7 +55,7 @@ const DeviceRowTransporte = ({ data, index }) => {
   const t = useTranslation();
   const user = useSelector((state) => state.session.user);
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
 
   const admin = useAdministrator();
   const item = data[index];

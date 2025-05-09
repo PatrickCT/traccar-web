@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+/* eslint-disable no-unused-vars */
 import {
-  FormControl, InputLabel, Select, MenuItem, Button, TextField, Typography, FormGroup, FormControlLabel, Checkbox,
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField, Typography,
 } from '@mui/material';
+import React, { useState } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from '../../common/components/LocalizationProvider';
-import useReportStyles from '../common/useReportStyles';
-import { devicesActions, reportsActions } from '../../store';
-import SplitButton from '../../common/components/SplitButton';
 import SelectField from '../../common/components/SelectField';
+import SplitButton from '../../common/components/SplitButton';
 import { useRestriction } from '../../common/util/permissions';
+import { devicesActions, reportsActions } from '../../store';
+import useReportStyles from '../common/useReportStyles';
 import SearchSelect from './SearchableSelect';
 
 const ReportFilter = ({
@@ -118,6 +127,7 @@ const ReportFilter = ({
           </FormControl>
         </div>
       )}
+
       {includeGroups && (
         <div className={classes.filterItem}>
           <FormControl fullWidth>
@@ -128,8 +138,8 @@ const ReportFilter = ({
               onChange={(e) => dispatch(reportsActions.updateGroupIds(e.target.value))}
               multiple
             >
-              {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).filter((group) => group.groupId !== 0).map((group) => (
-                <MenuItem key={group.id} value={group.groupId}>{group.name}</MenuItem>
+              {Object.values(groups).sort((a, b) => a.name.localeCompare(b.name)).map((group) => (
+                <MenuItem key={group.id} value={group.id}>{group.name}</MenuItem>
               ))}
             </Select>
           </FormControl>

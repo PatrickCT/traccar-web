@@ -1,10 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import {
-  useId, useCallback, useEffect, memo,
-} from 'react';
-import { useTheme } from '@mui/styles';
 import { useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/styles';
 import { Expression } from 'mapbox-expression';
+import {
+  memo,
+  useCallback, useEffect,
+  useId,
+} from 'react';
 
 import { useAttributePreference } from '../common/util/preferences';
 import { map } from './core/MapView';
@@ -16,7 +18,7 @@ const MapRoutePoints = ({
   const clusters = `${id}-clusters`;
 
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const iconScale = useAttributePreference('iconScale', desktop ? 1 : 1);
 
   const onMouseEnter = () => map.getCanvas().style.cursor = 'pointer';

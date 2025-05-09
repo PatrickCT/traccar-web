@@ -3,14 +3,15 @@ import { Box } from '@mui/material';
 import React, { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createBaseURL } from '../common/util/utils';
+import ExitsPage from '../other/ExitsPage';
 import { modalsActions } from '../store/modals';
 import Modal from './components/BasicModal';
 
 const style = {
   position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  top: '5%',
+  left: '5%',
+  transform: 'translate(-5%, -5%)',
   width: '100%',
   height: '100%',
   bgcolor: 'background.paper',
@@ -30,18 +31,10 @@ const ManualExitsModal = memo(() => {
         dispatch(modalsActions.update({ showModalManualExits: false }));
       }} // Close modal when the overlay is clicked or Esc is pressed
       contentLabel="Salidas manuales"
+      style={{ height: '90%', width: '80%' }}
     >
       <Box sx={style}>
-        <iframe
-          src={`${createBaseURL()}/exits?showMenu=false`}
-          width="100%"
-          height="100%"
-          frameBorder="0"
-          style={{ border: 0 }}
-          allowFullScreen=""
-          aria-hidden="false"
-          title="SV"
-        />
+        <ExitsPage showMenu={false} />
       </Box>
     </Modal>
   );

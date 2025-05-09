@@ -1,19 +1,19 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
 import { LinearProgress, useMediaQuery } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import theme from './common/theme';
-import BottomMenu from './common/components/BottomMenu';
-import SocketController from './SocketControllerNoAuth';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Outlet, useNavigate } from 'react-router-dom';
 import CachingController from './CachingController';
-import { useEffectAsync } from './reactHelper';
+import BottomMenu from './common/components/BottomMenu';
 import ConnectionStatus from './common/components/ConnectionStatus';
-import { toast } from './common/util/toasts';
 import { useTranslation } from './common/components/LocalizationProvider';
+import theme from './common/theme';
+import { toast } from './common/util/toasts';
 import AdBanner from './main/components/BannerAds';
+import { useEffectAsync } from './reactHelper';
+import SocketController from './SocketControllerNoAuth';
 
 const useStyles = makeStyles(() => ({
   page: {
@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
 
 const ShareNoAuth = () => {
   const classes = useStyles();
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
   const t = useTranslation();

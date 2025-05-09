@@ -1,56 +1,50 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-unused-vars */
 
+import { CancelOutlined } from '@mui/icons-material';
+import { Button, Toolbar, Typography } from '@mui/material';
 import moment from 'moment';
 import 'moment-timezone';
 import {
   React, memo, useEffect, useState,
 } from 'react';
 import { useSelector } from 'react-redux';
-import DropdownComponents from '../../common/components/DropdownComponent';
+// import DropdownComponents from '../../common/components/DropdownComponent';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import '../../common/tickets.css';
-import TimeUpdateBtn from './TimeUpdateBtn';
+import { confirmDialog, createBaseURL } from '../../common/util/utils';
+// import TimeUpdateBtn from './TimeUpdateBtn';
 
 const isEqual = require('react-fast-compare');
 
 window.isEqual = isEqual;
 
-// const propPrint = (prop) => {
-//   switch (typeof prop) {
-//     case 'object': return JSON.stringify(prop);
-//     case 'undefined': return 'NULL';
-//     default: return prop;
-//   }
-// };
-
-const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDrivers = false }) => {
+const TableExist = ({ deviceId, deviceName = '' }) => {
   const t = useTranslation();
 
   const [info, setInfo] = useState({});
   const [toDay, setDate] = useState(null);
-  const [optionSelected, setOption] = useState(null);
-  const [conductores, setConductores] = useState([]);
+  // const [optionSelected, setOption] = useState(null);
+  // const [conductores, setConductores] = useState([]);
   const [tickets, setTickets] = useState([]);
   const [subroutes, setSubroutes] = useState([]);
   const [loading, setLoading] = useState(false);
   const geofences = useSelector((state) => state.geofences.items);
-  const subusers = useSelector((state) => state.session.subusers);
   // const user = useSelector((state) => state.session.user);
   const loadInfoTable = async () => {
     if (loading) return;
     setLoading(false);
-    const response = await fetch(`${topDirectory}api/devices/${deviceId}/ticket`);
+    const response = await fetch(`${createBaseURL()}/api/devices/${deviceId}/ticket`);
     if (response.ok) {
       const information = await response.json();
       setInfo(information);
-      setConductores((information.choferes ?? []).map((e) => {
-        setOption(e.id);
-        return ({
-          label: e.name,
-          value: e.id,
-        });
-      }));
+      // setConductores((information.choferes ?? []).map((e) => {
+      //   setOption(e.id);
+      //   return ({
+      //     label: e.name,
+      //     value: e.id,
+      //   });
+      // }));
       setTickets((information.ticket ?? []));
       setSubroutes((information.subroutes ?? []));
       // if (setHasSalida) {
@@ -88,9 +82,9 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
     setDate(moment().format('YYYY-MM-D'));
   }, [toDay]);
 
-  const handleSelectedOption = (value) => {
-    setOption(value);
-  };
+  // const handleSelectedOption = (value) => {
+  //   setOption(value);
+  // };
 
   useEffect(() => {
     async function load() {
@@ -108,7 +102,7 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
 
   const calcDiffColor = (ticket) => {
     let border = '#163b61';
-    let backgroundColor = '#9dc5ff  ';
+    let backgroundColor = '#9dc5ff';
 
     if (ticket.enterTime === undefined || ticket.enterTime === null) {
       border = '#163b61';
@@ -130,9 +124,27 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
     return { backgroundColor, border, borderStyle: 'solid', borderWidth: '3px', marginBottom: '3px', borderRadius: '8px' };
   };
 
+  const cancelarSalida = (id) => {
+    fetch(`${createBaseURL()}/api/salidas/cancel/${id}`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } }).then((_) => loadInfoTable());
+  };
+
   return (
     <div>
-      {btnChangeTime && (info?.salida?.modifiedBy === 0 || info?.salida?.modifiedBy === null) && (
+      <Toolbar>
+        <Typography key={`toolb-${deviceId}`} variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          {deviceName}
+        </Typography>
+        <Button
+          sx={{ backgroundColor: 'white' }}
+          variant="outlined"
+          startIcon={<CancelOutlined />}
+          onClick={(evt) => confirmDialog(() => cancelarSalida(info?.salida?.id))}
+        >
+          Cancelar salida
+        </Button>
+      </Toolbar>
+
+      {/* {btnChangeTime && (info?.salida?.modifiedBy === 0 || info?.salida?.modifiedBy === null) && (
         <TimeUpdateBtn
           id={info.salida.id}
           subusers={subusers}
@@ -146,7 +158,8 @@ const TableExist = ({ deviceId, topDirectory = '', btnChangeTime = true, dropDri
           label=""
           options={conductores}
         />
-      )}
+      )} */}
+
       <div>
         <div className="nameChecker">
           Ruta:&nbsp;

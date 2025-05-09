@@ -30,6 +30,7 @@ import { useAttributePreference } from '../common/util/preferences';
 import { prefixString } from '../common/util/stringUtils';
 import { createBaseURL, formatDate } from '../common/util/utils';
 import SearchSelect from '../reports/components/SearchableSelect';
+import AccumulatorsPage from './AccumulatorsPage';
 import EditAttributesAccordion from './components/EditAttributesAccordion';
 import EditItemView from './components/EditItemView';
 import SettingsMenu from './components/SettingsMenu';
@@ -322,16 +323,7 @@ const MaintenancePage = () => {
                 aria-describedby="modal-modal-description"
               >
                 <Box sx={style}>
-                  <iframe
-                    src={`${createBaseURL()}/settings/accumulators/${(device?.id || deviceId)}?hideMenu=true&hideNavigation=true`}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    style={{ border: 0 }}
-                    allowFullScreen=""
-                    aria-hidden="false"
-                    title="SV"
-                  />
+                  <AccumulatorsPage device={(device?.id || deviceId)} showMenu={false} showNavigation={false} />
                 </Box>
               </Modal>
             </AccordionDetails>

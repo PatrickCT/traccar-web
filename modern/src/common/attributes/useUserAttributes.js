@@ -61,4 +61,8 @@ export default (t) => useMemo(() => ({
     name: t('attributeMailSmtpPassword'),
     type: 'string',
   },
+  Salidas: {
+    name: t('settingsExits'),
+    type: 'boolean',
+  },
 }), [t]);

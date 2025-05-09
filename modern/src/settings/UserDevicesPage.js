@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import { LinkOffOutlined } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
-import { useEffectAsync } from '../reactHelper';
+import React, { useState } from 'react';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
-import CollectionActions from './components/CollectionActions';
-import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 import { useAdministrator, useDeviceReadonly } from '../common/util/permissions';
+import { confirmDialog } from '../common/util/utils';
+import { useEffectAsync } from '../reactHelper';
+import CollectionActions from './components/CollectionActions';
 import LoadingComponent from './components/LoadingComponent';
+import SearchHeader, { filterByKeyword } from './components/SearchHeader';
 
 const UserDevicesPage = ({ id }) => {
   const t = useTranslation();
@@ -19,6 +21,23 @@ const UserDevicesPage = ({ id }) => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(false);
   const [groups, setGroups] = useState([]);
+  const [deviceId, setDeviceId] = useState(null);
+
+  const actionUnlink = {
+    key: 'unlinkDevice',
+    title: t('deviceTitle'),
+    icon: <LinkOffOutlined fontSize="small" />,
+    handler: (deviceId) => confirmDialog(() => setDeviceId(deviceId)),
+  };
+
+  useEffectAsync(async () => {
+    if (deviceId) {
+      setLoading(true);
+      await fetch('/api/permissions', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: id, deviceId }) });
+      setDeviceId(null);
+      setTimestamp(new Date());
+    }
+  }, [deviceId]);
 
   useEffectAsync(async () => {
     setLoading(true);
@@ -71,7 +90,7 @@ const UserDevicesPage = ({ id }) => {
           editPath="/settings/device"
           endpoint="devices"
           setTimestamp={setTimestamp}
-          customActions={[]}
+          customActions={[...(admin ? [actionUnlink] : [])]}
           readonly={deviceReadonly}
         />,
       ],

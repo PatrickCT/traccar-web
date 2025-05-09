@@ -1,29 +1,38 @@
-import React, { Fragment, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  FormControl, InputLabel, Select, MenuItem, Table, TableHead, TableRow, TableCell, TableBody, Link, IconButton,
-} from '@mui/material';
 import GpsFixedIcon from '@mui/icons-material/GpsFixed';
 import LocationSearchingIcon from '@mui/icons-material/LocationSearching';
+import {
+  FormControl,
+  IconButton,
+  InputLabel,
+  Link,
+  MenuItem,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead, TableRow,
+} from '@mui/material';
+import React, { Fragment, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { formatSpeed, formatTime } from '../common/util/formatter';
-import ReportFilter from './components/ReportFilter';
-import { prefixString } from '../common/util/stringUtils';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import PageLayout from '../common/components/PageLayout';
-import ReportsMenu from './components/ReportsMenu';
-import usePersistedState from '../common/util/usePersistedState';
-import ColumnSelect from './components/ColumnSelect';
-import { useCatch, useEffectAsync } from '../reactHelper';
-import useReportStyles from './common/useReportStyles';
 import TableShimmer from '../common/components/TableShimmer';
+import { formatSpeed, formatTime } from '../common/util/formatter';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
+import { prefixString } from '../common/util/stringUtils';
+import usePersistedState from '../common/util/usePersistedState';
 import MapView from '../map/core/MapView';
+import MapCamera from '../map/MapCamera';
 import MapGeofence from '../map/MapGeofence';
 import MapPositions from '../map/MapPositions';
-import MapCamera from '../map/MapCamera';
-import scheduleReport from './common/scheduleReport';
 import MapRoutePoints from '../map/MapRoutePoints';
+import { useCatch, useEffectAsync } from '../reactHelper';
+import scheduleReport from './common/scheduleReport';
+import useReportStyles from './common/useReportStyles';
+import ColumnSelect from './components/ColumnSelect';
+import ReportFilter from './components/ReportFilter';
+import ReportsMenu from './components/ReportsMenu';
 
 const filters = ['Unknown', 'Offline', 'Online'];
 const columnsArray = [
@@ -82,8 +91,9 @@ const EventReportPage = () => {
     }
   }, []);
 
-  const handleSubmit = useCatch(async ({ deviceId, groupIds, from, to, type }) => {
-    const query = new URLSearchParams(deviceId !== null ? { deviceId, from, to } : { from, to });
+  const handleSubmit = useCatch(async ({ deviceIds, groupIds, from, to, type }) => {
+    const query = new URLSearchParams({ from, to });
+    deviceIds.forEach((deviceId) => query.append('deviceId', deviceId));
 
     eventTypes.forEach((it) => query.append('type', it));
     groupIds.forEach((groupId) => query.append('groupId', groupId));
@@ -103,7 +113,7 @@ const EventReportPage = () => {
         if (response.ok) {
           const i = await response.json();
           setItems(i);
-          setSelectedItem(i.filter((it) => !filters.some((term) => it.type.includes(term)))[0]);
+          // setSelectedItem(i.filter((it) => !filters.some((term) => it.type.includes(term)))[0]);
         } else {
           throw Error(await response.text());
         }
@@ -179,7 +189,7 @@ const EventReportPage = () => {
         )}
         <div className={classes.containerMain}>
           <div className={classes.header}>
-            <ReportFilter handleSubmit={handleSubmit} handleSchedule={handleSchedule} includeGroups>
+            <ReportFilter handleSubmit={handleSubmit} handleSchedule={handleSchedule} includeGroups multiDevice>
               <div className={classes.filterItem}>
                 <FormControl fullWidth>
                   <InputLabel>{t('reportEventTypes')}</InputLabel>

@@ -41,7 +41,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
-  const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const eventsAvailable = useSelector((state) => !!state.events.items.length);
   const features = useFeatures();
 
