@@ -21,6 +21,7 @@ import '../common/tickets.css';
 import {
   generateRoute, streetView,
 } from '../common/util/mapPopup';
+import { useAheadTimeThreshold } from '../common/util/permissions';
 import { formatDate, isMobile } from '../common/util/utils';
 import TableExitsReport from '../main/components/TableExitsReport';
 import TimeUpdateBtn from '../main/components/TimeUpdateBtn';
@@ -39,6 +40,7 @@ const TicketReportPage = () => {
 
   const devices = useSelector((state) => state.devices.items);
   const subusers = useSelector((state) => state.session.subusers);
+  const aheadTime = useAheadTimeThreshold();
 
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -190,10 +192,10 @@ const TicketReportPage = () => {
     if (ticket.enterTime === undefined || ticket.enterTime === null) {
       border = '#163b61';
       backgroundColor = '#9dc5ff';
-    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= -3) {
+    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= -aheadTime) {
       border = '#cc9c00';
       backgroundColor = '#ffe798';
-    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= 0 && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > -3) {
+    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= 0 && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > -aheadTime) {
       border = '#065f46';
       backgroundColor = '#d1fae5';
     } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > 0) {

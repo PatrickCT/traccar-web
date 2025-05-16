@@ -9,9 +9,11 @@ import BottomMenu from './common/components/BottomMenu';
 import ConnectionStatus from './common/components/ConnectionStatus';
 import theme from './common/theme';
 import { useChecador } from './common/util/permissions';
+import { infoDialog } from './common/util/utils';
 import { useEffectAsync } from './reactHelper';
 import SocketController from './SocketController';
 import { sessionActions } from './store';
+import APP_VERSION from './Version';
 
 const useStyles = makeStyles(() => ({
   page: {
@@ -54,6 +56,14 @@ const App = () => {
 
     return null;
   }, [initialized]);
+
+  useEffectAsync(async () => {
+    const version = await (await fetch('/version.json')).json();
+
+    if ((version?.version || -1) !== APP_VERSION) {
+      infoDialog('Se encontro una actualización, para evitar errores asegurese de limpiar la cache de su navegador presionando las teclas control + F5');
+    }
+  }, []);
 
   return !initialized ? (<LinearProgress />) : (
     <>

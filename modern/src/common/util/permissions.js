@@ -58,3 +58,10 @@ export const useChecador = () => useSelector((state) => {
 
   return checador;
 });
+
+export const useAheadTimeThreshold = () => {
+  const user = useUser();
+  const aheadTime = user.attributes?.aheadTime ?? 3;
+
+  return aheadTime;
+};

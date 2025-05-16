@@ -65,4 +65,8 @@ export default (t) => useMemo(() => ({
     name: t('settingsExits'),
     type: 'boolean',
   },
+  aheadTime: {
+    name: t('aheadTimeThreshold'),
+    type: 'number',
+  },
 }), [t]);

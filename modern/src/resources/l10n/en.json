@@ -645,5 +645,7 @@
     "sharedShare": "Share",
     "sharedAll": "All",
     "sharedRestricted": "Restricted",
-    "sharedAllowed": "Allowed"
+    "sharedAllowed": "Allowed",
+    "aheadTimeThreshold": "Ahead arrival time threshold (min)",
+    "behindTimeThreshold": "Behind arrival time threshold (min)"
 }

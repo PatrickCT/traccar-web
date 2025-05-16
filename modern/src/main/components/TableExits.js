@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 // import DropdownComponents from '../../common/components/DropdownComponent';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import '../../common/tickets.css';
+import { useAheadTimeThreshold } from '../../common/util/permissions';
 import { confirmDialog, createBaseURL } from '../../common/util/utils';
 // import TimeUpdateBtn from './TimeUpdateBtn';
 
@@ -30,7 +31,8 @@ const TableExist = ({ deviceId, deviceName = '' }) => {
   const [subroutes, setSubroutes] = useState([]);
   const [loading, setLoading] = useState(false);
   const geofences = useSelector((state) => state.geofences.items);
-  // const user = useSelector((state) => state.session.user);
+  const aheadTimeThreshold = useAheadTimeThreshold();
+
   const loadInfoTable = async () => {
     if (loading) return;
     setLoading(false);
@@ -107,10 +109,10 @@ const TableExist = ({ deviceId, deviceName = '' }) => {
     if (ticket.enterTime === undefined || ticket.enterTime === null) {
       border = '#163b61';
       backgroundColor = '#9dc5ff';
-    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= -3) {
+    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= -aheadTimeThreshold) {
       border = '#cc9c00';
       backgroundColor = '#ffe798';
-    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= 0 && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > -3) {
+    } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) <= 0 && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > -aheadTimeThreshold) {
       border = '#065f46';
       backgroundColor = '#d1fae5';
     } else if (parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10) > 0) {
@@ -188,7 +190,7 @@ const TableExist = ({ deviceId, deviceName = '' }) => {
           <div className="columns bodyCol2">
             {('expectedTime' in ticket) ? `${t('expectedTime')}: ${moment(ticket.expectedTime).tz('America/Mexico_City').format('HH:mm:ss')}` : `${t('no-data')}`}
             <br />
-            {('enterTime' in ticket) ? `${t('arrive')}: ${moment(ticket.enterTime).tz('America/Mexico_City').format('HH:mm:ss')}` : `${t('no-data')}`}
+            {('enterTime' in ticket && ticket.enterTime) ? `${t('arrive')}: ${moment(ticket.enterTime).tz('America/Mexico_City').format('HH:mm:ss')}` : `${t('no-data')}`}
           </div>
           <div className="columns bodyCol3 strike " style={ticket.excuse != null ? { color: 'black', textDecoration: 'line-through' } : { color: 'black' }}>
             {('enterTime' in ticket) && parseInt((moment.duration(moment(ticket.enterTime).tz('America/Mexico_City').diff(moment(ticket.expectedTime).tz('America/Mexico_City')))).asMinutes(), 10)}

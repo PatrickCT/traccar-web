@@ -648,5 +648,7 @@
     "sharedShare": "Compartir",
     "sharedAll": "Todo",
     "sharedRestricted": "Restringida",
-    "sharedAllowed": "Permitida"
+    "sharedAllowed": "Permitida",
+    "aheadTimeThreshold": "Margen de tiempo adelantado (min)",
+    "behindTimeThreshold": "Margen de tiempo atrasado (min)"
 }

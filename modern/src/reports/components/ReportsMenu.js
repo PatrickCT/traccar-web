@@ -1,20 +1,20 @@
-import React from 'react';
 import {
   Divider, List, ListItemButton, ListItemIcon, ListItemText,
 } from '@mui/material';
+import React from 'react';
 import { useSelector } from 'react-redux';
 // import StarIcon from '@mui/icons-material/Star';
-import TimelineIcon from '@mui/icons-material/Timeline';
-import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
-import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import {
   AirplaneTicketOutlined, ScreenLockLandscapeOutlined, TimeToLeaveOutlined, TripOriginOutlined,
 } from '@mui/icons-material';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
+import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import RouteIcon from '@mui/icons-material/Route';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 // import EventRepeatIcon from '@mui/icons-material/EventRepeat';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from '../../common/components/LocalizationProvider';

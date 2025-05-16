@@ -151,6 +151,7 @@ const ExitsPage = ({ showMenu = true }) => {
           onChange={(event) => setDevice(event.target.value)}
           label="Unidad"
           endpoint="/api/devices"
+          dataGetter={(data) => data.sort((a, b) => ((a.name.toUpperCase() < b.name.toUpperCase()) ? -1 : (a.name.toUpperCase() > b.name.toUpperCase()) ? 1 : 0))}
         />
         <br />
         <br />

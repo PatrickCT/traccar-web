@@ -94,9 +94,10 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "npm run set-version && craco build",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix --ext .js ."
+    "lint:fix": "eslint --fix --ext .js .",
+    "set-version": "node set-version.js"
   },
   "browserslist": {
     "production": [

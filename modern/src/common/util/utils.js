@@ -797,6 +797,10 @@ export const confirmDialog = (callBackYes, callBackNo = (() => { })) => {
   }).show();
 };
 
+export const infoDialog = (message, callbackYes = (() => { })) => {
+  window.alertify.alert('Alerta', message, callbackYes);
+};
+
 export const isAdmin = () => ((window.getUser())?.administrator || false);
 export const createBaseURL = () => `${window.location.protocol}//${window.location.hostname}${window.location.port !== '' ? `:${window.location.port}` : ''}`;
 
