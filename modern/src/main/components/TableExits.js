@@ -133,7 +133,7 @@ const TableExist = ({ deviceId, deviceName = '' }) => {
   return (
     <div>
       <Toolbar>
-        <Typography key={`toolb-${deviceId}`} variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Typography key={`toolb-${deviceId}`} variant="h6" component="div" sx={{ flexGrow: 1 }} color="white">
           {deviceName}
         </Typography>
         <Button
