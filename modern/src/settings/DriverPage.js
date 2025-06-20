@@ -5,17 +5,17 @@ import {
   AccordionSummary,
   Typography,
 } from '@mui/material';
-import moment from 'moment';
 import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
+import moment from 'moment';
 import React, { useState } from 'react';
 // import { PhoneInput } from 'react-international-phone';
 // import 'react-international-phone/style.css';
 import { useTranslation } from '../common/components/LocalizationProvider';
+import { formatDate } from '../common/util/utils';
 import EditAttributesAccordion from './components/EditAttributesAccordion';
 import EditItemView from './components/EditItemView';
 import SettingsMenu from './components/SettingsMenu';
-import { formatDate } from '../common/util/utils';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -68,8 +68,8 @@ const DriverPage = () => {
                 label={t('sharedName')}
               />
               <TextField
-                value={item.uniqueId || ''}
-                onChange={(event) => setItem({ ...item, uniqueId: event.target.value })}
+                value={item.address || ''}
+                onChange={(event) => setItem({ ...item, address: event.target.value })}
                 label={t('deviceAddress')}
               />
               <TextField

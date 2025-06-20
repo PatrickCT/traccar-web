@@ -138,6 +138,7 @@ const ReplayPage = () => {
   const [expanded, setExpanded] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(500);
+  const [showInfo, setShowInfo] = useState(true);
 
   const [value, setValue] = React.useState([50, 100]);
   // const [marker, setMarker] = useState(null);
@@ -197,6 +198,7 @@ const ReplayPage = () => {
   }, [index, positions]);
 
   useEffect(() => {
+    if (!showInfo) return;
     if (positions && positions.length > 0 && index < positions.length) {
       Array.from(document.getElementsByClassName('maplibregl-popup')).filter((popup) => popup.id !== '').map((item) => item.remove());
       const speed = parseFloat((attConverter(positions[index], 'speed') ?? (attConverter(positions[(index - 1) > 0 ? index - 1 : 0], 'speed') ?? '0 -')).split(' ')[0]) || 0;
@@ -337,6 +339,8 @@ const ReplayPage = () => {
         expanded={expanded}
         value={value}
         stops={stops}
+        showInfo={showInfo}
+        setShowInfo={setShowInfo}
       />
       {/* {showCard && index < positions.length && (
         <StatusCard

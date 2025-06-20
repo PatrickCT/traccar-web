@@ -12,11 +12,11 @@ import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import TuneIcon from '@mui/icons-material/Tune';
 import {
-  Box, Button, IconButton,
+  Box, Button, FormControlLabel, IconButton,
   ListItemButton, ListItemIcon,
   ListItemText,
   Menu,
-  MenuItem, Paper, Select, Slider, Toolbar, Typography, useMediaQuery, useTheme,
+  MenuItem, Paper, Select, Slider, Switch, Toolbar, Typography, useMediaQuery, useTheme,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { Popup } from 'maplibre-gl';
@@ -230,7 +230,7 @@ const DiscreteSlider = (props) => {
 };
 
 const ReplaySideBar = ({
-  setExpanded, setIndex, setPlaying, handleDownload, handleChange, handleSubmit, changeSpeed, index, max, playing, expanded, stops,
+  setExpanded, setIndex, setPlaying, handleDownload, handleChange, handleSubmit, changeSpeed, index, max, playing, expanded, stops, showInfo, setShowInfo,
 }) => {
   const [speed, setSpeed] = useState(500);
   const [value, setValue] = React.useState([50, 100]);
@@ -408,7 +408,8 @@ const ReplaySideBar = ({
               {`${value[1]} - 200 Km/h`}
             </div>
             <div style={{ marginTop: '20px' }} className={classes.row}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: 'transparent', marginRight: '80%' }} />
+              <FormControlLabel control={<Switch checked={showInfo} onChange={(evt) => setShowInfo(evt.target.checked)} />} label="Mostrar popup" />
+              <div style={{ width: '20px', height: '20px', backgroundColor: 'transparent', marginRight: '40%' }} />
               <Button onClick={() => setShowModalSpeed(true)}>Cambiar</Button>
             </div>
           </Box>
