@@ -8,6 +8,7 @@ import {
   useId,
   useState,
 } from 'react';
+import isEqual from 'react-fast-compare';
 import { useSelector } from 'react-redux';
 import { formatTime, getStatusColor } from '../common/util/formatter';
 import { checkClusters } from '../common/util/geospatial';
@@ -16,7 +17,6 @@ import { findFonts } from './core/mapUtil';
 import { map } from './core/MapView';
 import { mapIconKey } from './core/preloadImages';
 
-const isEqual = require('react-fast-compare');
 
 const propPrint = (prop) => {
   switch (typeof prop) {

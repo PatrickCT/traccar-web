@@ -1,17 +1,17 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-underscore-dangle */
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector, connect } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { Snackbar } from '@mui/material';
-import { devicesActions, sessionActions } from './store';
+import React, { useEffect, useRef, useState } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from './common/components/LocalizationProvider';
 import { snackBarDurationLongMs } from './common/util/duration';
-import alarm from './resources/alarm.mp3';
-import { eventsActions } from './store/events';
-import useFeatures from './common/util/useFeatures';
 import { useAttributePreference } from './common/util/preferences';
+import useFeatures from './common/util/useFeatures';
+import alarm from './resources/alarm.mp3';
+import { devicesActions, sessionActions } from './store';
+import { eventsActions } from './store/events';
 
 const logoutCode = 4000;
 
@@ -19,8 +19,8 @@ function importAll(r) {
   return r.keys().map(r);
 }
 
-const sosFiles = importAll(require.context('./resources/alarms/sos', false, /\.(mp3|wav)$/));
-const powerCutFiles = importAll(require.context('./resources/alarms/powerCut', false, /\.(mp3|wav)$/));
+const sosFiles = import.meta.glob('./resources/alarms/sos/*.{mp3,wav}', { eager: true });
+const powerCutFiles = import.meta.glob('./resources/alarms/powerCut/*.{mp3,wav}', { eager: true });
 
 const SocketController = () => {
   const dispatch = useDispatch();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@mui/styles';
-import { ReactComponent as Logo } from '../resources/images/logo.svg';
-
+// import { ReactComponent as Logo } from '../resources/images/logo.svg';
+import Logo from '../resources/images/logo.svg?react';
 const useStyles = makeStyles(() => ({
   image: {
     alignSelf: 'center',

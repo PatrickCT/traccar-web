@@ -373,4 +373,29 @@ export default (t) => useMemo(() => ({
     name: t('date'),
     type: 'string',
   },
+  bleTemp1: {
+    name: `${t('positionTemp')} 1 (BL)`,
+    type: 'number',
+    dataType: 'bleTemp'
+  },
+  bleTemp2: {
+    name: `${t('positionTemp')} 2 (BL)`,
+    type: 'number',
+    dataType: 'bleTemp'
+  },
+  bleTemp3: {
+    name: `${t('positionTemp')} 3 (BL)`,
+    type: 'number',
+    dataType: 'bleTemp'
+  },
+  bleTemp4: {
+    name: `${t('positionTemp')} 4 (BL)`,
+    type: 'number',
+    dataType: 'bleTemp'
+  },
+  bleTemp5: {
+    name: `${t('positionTemp')} 5 (BL)`,
+    type: 'number',
+    dataType: 'bleTemp'
+  }
 }), [t]);

@@ -15,6 +15,7 @@ import {
 } from '../common/util/converter';
 import { formatTime } from '../common/util/formatter';
 import { useAttributePreference, usePreference } from '../common/util/preferences';
+import { attConverter, attVariantsEvaluator } from '../common/util/utils';
 import { useCatch } from '../reactHelper';
 import useReportStyles from './common/useReportStyles';
 import ReportFilter from './components/ReportFilter';
@@ -71,6 +72,19 @@ const ChartReportPage = () => {
               case 'hours':
                 formatted[key] = (value / 1000).toFixed(2);
                 break;
+              case 'bleTemp':
+                function normalizeTemp(rawTemp) {
+                  if (rawTemp === 327.67 || rawTemp === 655.35) {
+                    return null; // Invalid or no data
+                  }
+                  if (rawTemp > 100) {
+                    return rawTemp; // Already in °C
+                  } else {
+                    return rawTemp * 10; // Likely decicelsius
+                  }
+                }
+                formatted[key] = normalizeTemp(Number(value));
+                break;
               default:
                 formatted[key] = value;
                 break;
@@ -79,6 +93,8 @@ const ChartReportPage = () => {
         });
         return formatted;
       });
+      console.log(formattedPositions);
+
       setItems(formattedPositions);
     } else {
       throw Error(await response.text());
@@ -92,7 +108,7 @@ const ChartReportPage = () => {
           <FormControl fullWidth>
             <InputLabel>{t('reportChartType')}</InputLabel>
             <Select label={t('reportChartType')} value={type} onChange={(e) => setType(e.target.value)}>
-              {Object.keys(positionAttributes).filter((key) => ['speed', 'rpm', 'fuel', 'temp', 'temp1', 'temp2', 'temp3', 'temp4'].some((f) => key.includes(f))).filter((key) => positionAttributes[key].type === 'number' && key !== 'odometer').map((key) => (
+              {Object.keys(positionAttributes).filter((key) => ['speed', 'rpm', 'fuel', 'temp', 'temp1', 'temp2', 'temp3', 'temp4', 'deviceTemp', 'temp1', 'bleeTemperature', 'temp2', 'bleTemp1', 'bleTemp2', 'bleTemp3', 'bleTemp4'].some((f) => key.includes(f))).filter((key) => positionAttributes[key].type === 'number' && key !== 'odometer').map((key) => (
                 <MenuItem key={key} value={key}>{positionAttributes[key].name}</MenuItem>
               ))}
             </Select>

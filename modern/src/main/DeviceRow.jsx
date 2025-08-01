@@ -23,7 +23,8 @@ import { useAdministrator } from '../common/util/permissions';
 import { useAttributePreference } from '../common/util/preferences';
 import { dateDifference, hasPassedTime } from '../common/util/utils';
 import { map } from '../map/core/MapView';
-import { ReactComponent as EngineIcon } from '../resources/images/data/engine.svg';
+// import { ReactComponent as EngineIcon } from '../resources/images/data/engine.svg';
+import EngineIcon from '../resources/images/data/engine.svg?react';
 import { devicesActions } from '../store';
 
 const useStyles = makeStyles((theme) => ({

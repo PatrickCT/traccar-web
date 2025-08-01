@@ -1,18 +1,29 @@
 /* eslint-disable no-await-in-loop */
-import React, { useEffect, useState } from 'react';
-import TextField from '@mui/material/TextField';
-import { useNavigate, useParams } from 'react-router-dom';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
-  Accordion, AccordionSummary, AccordionDetails, Typography, FormControl, Table, TableHead, TableRow, TableCell, TableBody, Button, Box, LinearProgress,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
   CircularProgress,
   circularProgressClasses,
+  FormControl,
+  LinearProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead, TableRow,
+  Typography,
 } from '@mui/material';
+import TextField from '@mui/material/TextField';
 import makeStyles from '@mui/styles/makeStyles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import EditItemView from './components/EditItemView';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from '../common/components/LocalizationProvider';
-import SettingsMenu from './components/SettingsMenu';
 import { useCatch } from '../reactHelper';
+import EditItemView from './components/EditItemView';
+import SettingsMenu from './components/SettingsMenu';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -118,6 +129,21 @@ const HourPage = () => {
     }
   };
 
+  const removeItems = async () => {
+    setSaving(true);
+    setProgress(0);
+    const step = ((1 * 100) / items.length);
+    await Promise.all(items.map(async item => {
+      await Promise.all([removeItem(item)]);
+      setProgress((prev) => prev + step);
+    }));
+    setProgress(0);
+    setSaving(false);
+    setTimeout(() => {
+      location.reload()
+    }, 10 * 1000);
+  }
+
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
@@ -197,27 +223,32 @@ const HourPage = () => {
               <Box sx={{ width: '100%' }} />
             ) :
               (
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('sharedName')}</TableCell>
-                      <TableCell>{t('sharedHour')}</TableCell>
-                      <TableCell className={classes.columnAction} />
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {items.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{name}</TableCell>
-                        <TableCell>{new Date(item.hour).toLocaleString()}</TableCell>
-                        <TableCell className={classes.columnAction} padding="none">
-                          {/* <Button onClick={(() => updateItem(item))}>Editar</Button> */}
-                          <Button onClick={(() => removeItem(item))}>Eliminar</Button>
-                        </TableCell>
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+                    <Button onClick={removeItems}>Eliminar todo</Button>
+                  </div>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>{t('sharedName')}</TableCell>
+                        <TableCell>{t('sharedHour')}</TableCell>
+                        <TableCell className={classes.columnAction} />
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHead>
+                    <TableBody>
+                      {items.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>{name}</TableCell>
+                          <TableCell>{new Date(item.hour).toLocaleString()}</TableCell>
+                          <TableCell className={classes.columnAction} padding="none">
+                            {/* <Button onClick={(() => updateItem(item))}>Editar</Button> */}
+                            <Button onClick={(() => removeItem(item))}>Eliminar</Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </>
               )}
 
           </AccordionDetails>

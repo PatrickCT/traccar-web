@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1a237e" />
+    <meta name="description" content="Plataforma GPS Tracker MX" />
+    <meta name="google" content="notranslate">
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="/styles.css" id="main-style" disabled>
+    <link rel="stylesheet" href="/marquee.css">
+    <link rel="stylesheet" href="./src/resources/libs/alertify/css/alertify.min.css">
+    <link rel="stylesheet" href="./src/resources/libs/jsPanel/jspanel.css">
+    <link rel="stylesheet" href="./src/resources/libs/jsPanel/extensions/dialog/jspanel.dialog.css">
+    <title>GpsTracker</title>
+
+</head>
+
+<body>
+    <div id="root" class="root"></div>
+    <script>
+        const stylize = () => {
+            let styleInterval = setInterval(() => {
+                console.log('styling');
+                const mainStyle = document.getElementById('main-style');
+                // const jspanelStyle = document.getElementById('jspanel-style');
+                // const jsmodalStyle = document.getElementById('jsmodal-style');
+
+                if (mainStyle.getAttribute('disabled') === 'disabled' || mainStyle.getAttribute('disabled') === '') {
+                    if (mainStyle) mainStyle.removeAttribute('disabled');
+                    // if (jspanelStyle) jspanelStyle.removeAttribute('disabled');
+                    // if (jsmodalStyle) jsmodalStyle.removeAttribute('disabled');
+                } else {
+                    clearInterval(styleInterval);
+                }
+            }, 500);
+        };
+        stylize();
+    </script>
+    <script>
+        // Function to check if the user is accessing from a mobile device
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Function to add meta tag for viewport if the user is on a mobile device
+        function addViewportMetaTag() {
+            if (isMobileDevice()) {
+                var metaTag = document.createElement('meta');
+                metaTag.setAttribute('name', 'viewport');
+                metaTag.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                document.head.appendChild(metaTag);
+            }
+        }
+
+        // Call the function to add the meta tag
+        addViewportMetaTag();
+
+        window.onload = () => {
+            if (!window.OffscreenCanvas) {
+                window.OffscreenCanvas = class OffscreenCanvas {
+                    constructor(width, height) {
+                        this.canvas = document.createElement('canvas');
+                        this.canvas.width = width;
+                        this.canvas.height = height;
+
+                        this.canvas.convertToBlob = () => {
+                            return new Promise(resolve => {
+                                this.canvas.toBlob(resolve);
+                            });
+                        };
+
+                        return this.canvas;
+                    }
+                };
+            }
+
+            document.addEventListener('visibilitychange', (event) => {
+                if (document.visibilityState == 'visible') {
+                    console.log('tab is active');
+                    // notifyMe('El movimiento de los marcadores se restablecera');
+                    Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(false));
+
+                } else {
+                    console.log('tab is inactive');
+                    if (window.players) {
+                        Object.keys(window.players ?? {}).forEach((id) => window.players[id].pause(true));
+                    }
+                    // notifyMe('El movimiento de los marcadores se pausara');
+                }
+            });
+
+            hideMarquee = () => {
+                setTimeout(() => {
+                    document.getElementById('info-banner').style.display = 'none';
+                    console.log('hidden at ', new Date());
+                    showMarquee();
+                }, 2 * 60 * 1000);
+            };
+
+            showMarquee = () => {
+                setTimeout(() => {
+                    document.getElementById('info-banner').style.display = 'block';
+                    console.log('restored at ', new Date());
+                    hideMarquee();
+                }, 10 * 60 * 1000);
+            };
+        }
+
+        const notifyMe = (message, icon, image) => {
+            if (!('Notification' in window)) return;
+            if (!Notification.permission === 'granted') {
+                Notification.requestPermission().then((permission) => {
+                    if (permission === 'granted') {
+                        browserNotification(message, icon, image);
+                        return;
+                    }
+                });
+            }
+            browserNotification(message, icon, image);
+            return;
+        }
+
+        const browserNotification = (message, icon, image) => {
+            const options = {
+                timestamp: new Date()
+            };
+            if (icon) {
+                options.icon = icon;
+            }
+            if (image) {
+                options.image = image;
+            }
+            const notification = new Notification(message, options);
+            notification.onclick = () => notification.close();
+            setTimeout(() => {
+                notification.close()
+            }, 3000);
+        }
+
+        const clearAllIntervals = () => {
+            var highestTimeoutId = setTimeout(';');
+            for (var i = 0; i < highestTimeoutId; i++) {
+                clearTimeout(i);
+            }
+        }
+    </script>
+    <script type="module" src="/src/index.jsx"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js"
+        integrity="sha512-dUlSLLkxslGILhPdCkALwk4szPhp3xmZIKFtlUD+O9Lslq41Aksmdt5OGqpomDoT4FsCUH70jQU8ezZHI3v1RQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+        integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+        crossorigin="anonymous"></script>
+    <script type="module" src="./src/resources/libs/alertify/alertify.min.js"></script>
+    <script type="module" src="./src/resources/libs/screenlog/screenlog.js"></script>
+
+</body>
+
+</html>

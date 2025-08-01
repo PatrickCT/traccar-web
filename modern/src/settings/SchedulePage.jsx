@@ -235,6 +235,39 @@ const SchedulePage = () => {
       },
     },
     {
+      field: 'forceBacktrackSearch', // or any field name you want
+      headerName: 'Forzar busqueda hacia atras',
+      width: 120,
+      editable: true,
+      type: 'boolean',
+      renderCell: (params) => (params.value ? 'Sí' : 'No'),
+      renderEditCell: (params) => (
+        <Checkbox
+          checked={!!params.value}
+          onChange={(event) => {
+            params.api.setEditCellValue({ id: params.id, field: params.field, value: event.target.checked });
+          }}
+        />
+      ),
+    },
+    ,
+    {
+      field: 'forceUseExitTime', // or any field name you want
+      headerName: 'Forzar usar hora de salida',
+      width: 120,
+      editable: true,
+      type: 'boolean',
+      renderCell: (params) => (params.value ? 'Sí' : 'No'),
+      renderEditCell: (params) => (
+        <Checkbox
+          checked={!!params.value}
+          onChange={(event) => {
+            params.api.setEditCellValue({ id: params.id, field: params.field, value: event.target.checked });
+          }}
+        />
+      ),
+    },
+    {
       field: 'actions',
       type: 'actions',
       headerName: 'Opciones',
@@ -399,6 +432,7 @@ const SchedulePage = () => {
       onItemSaved={onItemSaved}
       menu={<SettingsMenu />}
       breadcrumbs={['settingsTitle', 'scheduleDialog']}
+      defaultItem={{ forceCreateOnEnter: false }}
     >
       {item && (
         <>
@@ -697,10 +731,19 @@ const SchedulePage = () => {
                 )
               }
 
-              <FormControlLabel
-                control={<Checkbox checked={item.forceCreateOnEnter} onChange={(event) => setItem({ ...item, forceCreateOnEnter: event.target.checked })} />}
-                label="Forzar generar salida al entrar"
-              />
+              {item?.forceCreateOnEnter !== undefined && (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={item.forceCreateOnEnter}
+                      onChange={(event) =>
+                        setItem({ ...item, forceCreateOnEnter: event.target.checked })
+                      }
+                    />
+                  }
+                  label={`Forzar generar salida al entrar`}
+                />
+              )}
             </AccordionDetails>
           </Accordion>
           {

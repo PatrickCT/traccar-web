@@ -13,13 +13,15 @@
   margin-top: 50px;
   max-height: calc(90vh - 50px);
 }
+
 .jsPanel-dialog .jsPanel-content {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* Add some padding to the dialog content */ 
+  /* Add some padding to the dialog content */
   padding: 1rem;
 }
+
 .jsPanel-dialog .buttonbar {
   margin-top: 10px;
   padding-top: 10px;
@@ -28,6 +30,7 @@
   display: flex;
   justify-content: right;
 }
+
 .jsPanel-dialog .buttonbar button {
   margin-left: 0.5rem;
 }
@@ -38,7 +41,10 @@
 }
 
 /* Dialog sizes */
-.dialog-sm, .dialog-md, .dialog-lg, .dialog-xl {
+.dialog-sm,
+.dialog-md,
+.dialog-lg,
+.dialog-xl {
   max-height: calc(90vh - 50px);
   overflow: hidden auto;
   margin: 0 auto;
@@ -61,28 +67,39 @@
 }
 
 @media (max-width: 767px) {
-  .dialog-md, .dialog-lg, .dialog-xl {
+
+  .dialog-md,
+  .dialog-lg,
+  .dialog-xl {
     width: 90vw !important;
   }
 }
+
 @media (max-width: 991px) {
-  .dialog-lg, .dialog-xl {
+
+  .dialog-lg,
+  .dialog-xl {
     width: 90vw !important;
   }
 }
+
 @media (max-width: 1199px) {
   .dialog-xl {
     width: 90vw !important;
   }
 }
+
 /* A few button colors */
-button.blue, button.info {
+button.blue,
+button.info {
   color: #fff !important;
   background-color: #039be5 !important;
   border-color: #039be5 !important;
 }
 
-button.gray, button.default, button.secondary {
+button.gray,
+button.default,
+button.secondary {
   color: #fff;
   background-color: #b0bec5 !important;
   border-color: #b0bec5 !important;
@@ -99,31 +116,36 @@ button.primary {
   border-color: #01579b !important;
 }
 
-button.yellow, button.warning {
+button.yellow,
+button.warning {
   color: #000 !important;
   background-color: #f57f17 !important;
   border-color: #f57f17 !important;
 }
 
-button.red, button.danger {
+button.red,
+button.danger {
   color: #fff !important;
   background-color: #dd2c00 !important;
   border-color: #dd2c00 !important;
 }
 
-button.green, button.success {
+button.green,
+button.success {
   color: #fff !important;
   background-color: #2e7d32 !important;
   border-color: #2e7d32 !important;
 }
 
-input:disabled, input[readonly] {
+input:disabled,
+input[readonly] {
   cursor: not-allowed !important;
   background-color: #eee !important;
 }
 
 /* Radio buttons and checkboxes, followed by a span */
-input[type=checkbox], input[type=radio] {
+input[type=checkbox],
+input[type=radio] {
   vertical-align: middle;
   margin: 0 0.5rem 0 0;
 }
@@ -132,9 +154,7 @@ input[type=radio] {
   margin-bottom: 2px;
 }
 
-input:disabled + span {
+input:disabled+span {
   opacity: 0.4;
   cursor: not-allowed;
 }
-
-/*# sourceMappingURL=jspanel.dialog.css.map */

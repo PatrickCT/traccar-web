@@ -1,45 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
-  AccordionSummary,
   AccordionDetails,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  FormGroup,
-  TextField,
+  AccordionSummary,
   Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
 } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
-import EditItemView from './components/EditItemView';
-import EditAttributesAccordion from './components/EditAttributesAccordion';
-import { useTranslation } from '../common/components/LocalizationProvider';
-import useUserAttributes from '../common/attributes/useUserAttributes';
-import { sessionActions } from '../store';
-import SelectField from '../common/components/SelectField';
-import SettingsMenu from './components/SettingsMenu';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import useCommonUserAttributes from '../common/attributes/useCommonUserAttributes';
-import {
-  useAdministrator, useRestriction, useManager, useUser,
-} from '../common/util/permissions';
-import useQuery from '../common/util/useQuery';
-import { useCatch } from '../reactHelper';
-import useMapStyles from '../map/core/useMapStyles';
-import { map } from '../map/core/MapView';
+import useUserAttributes from '../common/attributes/useUserAttributes';
 import ExtraEmailList from '../common/components/ExtraEmailList';
 import ExtraPhoneList from '../common/components/ExtraPhoneList';
+import { useTranslation } from '../common/components/LocalizationProvider';
+import SelectField from '../common/components/SelectField';
 import SubUserList from '../common/components/SubUserList';
+import {
+  useAdministrator,
+  useManager,
+  useRestriction,
+  useUser,
+} from '../common/util/permissions';
 import { toast } from '../common/util/toasts';
+import useQuery from '../common/util/useQuery';
+import { map } from '../map/core/MapView';
+import useMapStyles from '../map/core/useMapStyles';
+import { useCatch } from '../reactHelper';
 import SearchSelect from '../reports/components/SearchableSelect';
+import { sessionActions } from '../store';
+import EditAttributesAccordion from './components/EditAttributesAccordion';
+import EditItemView from './components/EditItemView';
+import SettingsMenu from './components/SettingsMenu';
 
 const useStyles = makeStyles((theme) => ({
   details: {
@@ -400,11 +403,6 @@ const UserPage = () => {
                       disabled={!manager}
                     />
                     <FormControlLabel
-                      control={<Checkbox checked={item.disableReports} onChange={(e) => setItem({ ...item, disableReports: e.target.checked })} />}
-                      label={t('userDisableReports')}
-                      disabled={!manager}
-                    />
-                    <FormControlLabel
                       control={<Checkbox checked={item.fixedEmail} onChange={(e) => setItem({ ...item, fixedEmail: e.target.checked })} />}
                       label={t('userFixedEmail')}
                       disabled={!manager}
@@ -412,11 +410,18 @@ const UserPage = () => {
                   </>
                 )}
                 {(item?.id !== user.id) && (
-                  <FormControlLabel
-                    control={<Checkbox checked={item.deviceReadonly} onChange={(e) => setItem({ ...item, deviceReadonly: e.target.checked })} />}
-                    label={t('userDeviceReadonly')}
-                    disabled={!manager}
-                  />
+                  <>
+                    <FormControlLabel
+                      control={<Checkbox checked={item.deviceReadonly} onChange={(e) => setItem({ ...item, deviceReadonly: e.target.checked })} />}
+                      label={t('userDeviceReadonly')}
+                      disabled={!manager}
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={item.disableReports} onChange={(e) => setItem({ ...item, disableReports: e.target.checked })} />}
+                      label={t('userDisableReports')}
+                      disabled={!manager}
+                    />
+                  </>
                 )}
               </FormGroup>
             </AccordionDetails>

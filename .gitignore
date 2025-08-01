@@ -13,3 +13,5 @@ node_modules
 .*.swp
 *~
 modern/.vscode/settings.json
+modern/build/*
+modern/_build/*

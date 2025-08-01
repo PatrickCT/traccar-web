@@ -1,2 +1,2 @@
-const APP_VERSION = '1750104760561';
+const APP_VERSION = '1752687191649';
 export default APP_VERSION;

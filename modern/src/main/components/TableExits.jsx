@@ -16,7 +16,7 @@ import { useAheadTimeThreshold } from '../../common/util/permissions';
 import { confirmDialog, createBaseURL } from '../../common/util/utils';
 // import TimeUpdateBtn from './TimeUpdateBtn';
 
-const isEqual = require('react-fast-compare');
+import isEqual from 'react-fast-compare';
 
 window.isEqual = isEqual;
 

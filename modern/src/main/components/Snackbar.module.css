@@ -1,0 +1,59 @@
+/* Snackbar.module.css */
+.snackbar {
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.snack {
+  background: black;
+  color: white;
+  opacity: 0;
+  padding: 24px;
+  pointer-events: initial;
+  position: relative;
+  transition: opacity 1s;
+}
+
+.active {
+  opacity: 1;
+}
+
+.snack span {
+  position: relative;
+  z-index: 1;
+}
+
+.dismissible {
+  padding-right: 54px;
+}
+
+.dismissible button {
+  background: tomato;
+  border: none;
+  border-radius: 100%;
+  color: black;
+  height: 24px;
+  line-height: 20px;
+  position: absolute;
+  right: 15px;
+  top: 21px;
+  text-align: center;
+  width: 24px;
+  z-index: 1;
+}
+
+.progress {
+  background: yellow;
+  height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transition: width 70ms linear;
+  width: 0;
+  z-index: 0;
+}

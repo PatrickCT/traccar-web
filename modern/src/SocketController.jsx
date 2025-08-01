@@ -2,7 +2,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
-import { Snackbar } from '@mui/material';
+import { Alert, Box, LinearProgress, Link, Snackbar } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { useTranslation } from './common/components/LocalizationProvider';
 import { snackBarDurationLongMs } from './common/util/duration';
 import { useAttributePreference } from './common/util/preferences';
 import useFeatures from './common/util/useFeatures';
+import { isMobile } from './common/util/utils';
 import { useEffectAsync } from './reactHelper';
 import alarm from './resources/alarm.mp3';
 import { devicesActions, sessionActions } from './store';
@@ -21,8 +22,8 @@ function importAll(r) {
   return r.keys().map(r);
 }
 
-const sosFiles = importAll(require.context('./resources/alarms/sos', false, /\.(mp3|wav)$/));
-const powerCutFiles = importAll(require.context('./resources/alarms/powerCut', false, /\.(mp3|wav)$/));
+const sosFiles = import.meta.glob('./resources/alarms/sos/*.{mp3,wav}', { eager: true });
+const powerCutFiles = import.meta.glob('./resources/alarms/powerCut/*.{mp3,wav}', { eager: true });
 
 const SocketController = () => {
   const dispatch = useDispatch();
@@ -184,11 +185,14 @@ const SocketController = () => {
   }, [authenticated]);
 
   useEffect(() => {
-    setNotifications(events.map((event) => ({
-      id: event.id,
-      message: event.attributes.message,
-      show: true,
-    })));
+    if (!isMobile()) {
+      setNotifications(events.map((event) => ({
+        id: event.id,
+        message: event.attributes.message,
+        show: true,
+        position: { vertical: 'bottom', horizontal: 'right' }
+      })));
+    }
   }, [events, devices, t]);
 
   useEffect(() => {
@@ -217,12 +221,62 @@ const SocketController = () => {
     <>
       {notifications.map((notification) => (
         <Snackbar
+          anchorOrigin={notification.position}
           key={notification.id}
           open={notification.show}
-          message={notification.message}
           autoHideDuration={snackBarDurationLongMs}
           onClose={() => setEvents(events.filter((e) => e.id !== notification.id))}
-        />
+        >
+          <Alert
+            severity="info"
+            onClose={() => setEvents(events.filter((e) => e.id !== notification.id))}
+            variant="filled"
+            sx={{
+              fontSize: '12px',
+              maxHeight: '20dvh',
+              maxWidth: '90dvw',
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              color: 'black',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+              transition: 'background-color 0.3s, opacity 0.3s',
+              '&:hover': {
+                backgroundColor: 'transparent',
+                opacity: 0.0,
+                backdropFilter: 'none',
+              },
+            }}
+          >
+            {notification.message.split('\\n').map((line, i) => (
+              <React.Fragment key={i}>
+                {line.includes('http') ? <Link href={line} target='_blank'>{line}</Link> : line}
+                <br />
+              </React.Fragment>
+            ))}
+            <LinearProgress
+              variant="determinate"
+              value={100}
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '100%',
+                height: '3px',
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                '& .MuiLinearProgress-bar': {
+                  backgroundColor: 'rgba(9, 12, 155, 0.9)',
+                  transformOrigin: 'left',
+                  animation: `shrink ${snackBarDurationLongMs}ms linear forwards`,
+                },
+                '@keyframes shrink': {
+                  from: { transform: 'scaleX(1)' },
+                  to: { transform: 'scaleX(0)' },
+                },
+              }}
+            />
+          </Alert>
+        </Snackbar>
       ))}
     </>
   );

@@ -43,6 +43,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
 
   const desktop = useMediaQuery(theme.breakpoints.up('sm'));
   const eventsAvailable = useSelector((state) => !!state.events.items.length);
+  const eventsCount = useSelector((state) => state.events.items.length);
   const features = useFeatures();
 
   // replay replica
@@ -121,7 +122,7 @@ const MainMap = ({ filteredPositions, selectedPosition, onEventsClick }) => {
       <MapCurrentLocation />
       <MapGeocoder />
       {!features.disableEvents && (
-        <MapNotification enabled={eventsAvailable} onClick={onEventsClick} />
+        <MapNotification enabled={eventsAvailable} onClick={onEventsClick} count={eventsCount} />
       )}
       {desktop && (
         <MapPadding left={parseInt(theme.dimensions.drawerWidthDesktop, 10)} />

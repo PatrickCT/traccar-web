@@ -37,7 +37,7 @@ const TimeUpdateBtn = ({
         'Content-Type': 'application/json;charset=utf-8',
       },
       body: JSON.stringify({
-        time: moment(hourSelected.$d).utc().format('HH:mm'),
+        time: moment(hourSelected._d).utc().format('HH:mm'),
         pass: passwordUser,
       }),
     });

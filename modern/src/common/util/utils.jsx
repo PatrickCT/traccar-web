@@ -319,7 +319,7 @@ export const attConverter = (obj, attribute) => {
     }
     case 'temperaturaC': {
       const value = attVariantsEvaluator(obj, 'temperature');
-      return value ? (obj.protocol === 'teltonika' ? (value * 10) : value).toFixed(1) : null;
+      return value ? value.toFixed(1) : null;
     }
     case 'temperaturaF': {
       const value = attVariantsEvaluator(obj, 'temperature');
@@ -446,11 +446,39 @@ export const attConverter = (obj, attribute) => {
   }
 };
 
-let attVariantsEvaluator = (obj, attribute) => attsGetter(obj, attVariants(attribute).find((key) => attsGetter(obj, key) != null)) ?? null;
+let attVariantsNormalizer = (obj, attribute) => {
+  const value = attsGetter(obj, attribute) ?? null
+  switch (attribute) {
+    case 'deviceTemp':
+    case 'temp1':
+    case 'bleeTemperature':
+    case 'temp2':
+    case 'bleTemp1':
+    case 'bleTemp2':
+    case 'bleTemp3':
+    case 'bleTemp4':
+      function normalizeTemp(rawTemp) {
+        if (rawTemp === 327.67 || rawTemp === 655.35) {
+          return null; // Invalid or no data
+        }
+        if (rawTemp > 100) {
+          return rawTemp; // Already in °C
+        } else {
+          return rawTemp * 10; // Likely decicelsius
+        }
+      }
 
-let attVariants = (att) => {
+      return normalizeTemp(Number(value));
+    default:
+      return value;
+  }
+}
+
+export const attVariantsEvaluator = (obj, attribute) => attVariantsNormalizer(obj, attVariants(attribute).find((key) => attsGetter(obj, key) != null));
+
+export const attVariants = (att) => {
   switch (att) {
-    case 'temperature': return ['deviceTemp', 'temp1', 'bleeTemperature', 'temp2', 'bleTemp2'];
+    case 'temperature': return ['deviceTemp', 'temp1', 'bleeTemperature', 'temp2', 'bleTemp1', 'bleTemp2', 'bleTemp3', 'bleTemp4'];
     case 'motion': return ['motion', 'io173'];
     case 'group': return ['group', 'groupName'];
     case 'imei': return ['uniqueId'];
